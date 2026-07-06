@@ -1,6 +1,10 @@
 # macOS
 .DS_Store
 
+# Node
+node_modules/
+dist/
+
 # Claude Code — personal/local config
 .claude/settings.local.json
 .claude/**/*.local.json

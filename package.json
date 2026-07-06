@@ -1,0 +1,21 @@
+{
+  "name": "ds-bench",
+  "version": "0.0.0",
+  "type": "module",
+  "files": [
+    "dist/src"
+  ],
+  "bin": {
+    "ds-bench": "./dist/src/cli.js"
+  },
+  "scripts": {
+    "test": "tsc && node --test dist/tests/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}
