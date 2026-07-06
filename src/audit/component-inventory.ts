@@ -1,3 +1,4 @@
+import { isExampleCarrier } from "./example-carriers.ts";
 import type { TextFile } from "./file-system.ts";
 
 const COMPONENT_NAME = /^[A-Z][A-Za-z0-9]*$/;
@@ -27,13 +28,4 @@ export function getExportedComponents(files: TextFile[]): ComponentInventory {
   return {
     components: Array.from(components).sort(),
   };
-}
-
-function isExampleCarrier(relativePath: string): boolean {
-  return (
-    /\.stories\.[jt]sx?$/.test(relativePath) ||
-    relativePath.endsWith(".stories.mdx") ||
-    relativePath.startsWith("examples/") ||
-    /canonical-examples/i.test(relativePath)
-  );
 }

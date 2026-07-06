@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, extname, join, relative } from "node:path";
+import { EXAMPLE_CARRIER_KINDS } from "./example-carriers.ts";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
@@ -44,16 +45,10 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
     carriers.add("TypeScript exports");
   }
 
-  if (files.some((file) => /\.stories\.[jt]sx?$/.test(file.relativePath) || file.relativePath.endsWith(".stories.mdx"))) {
-    carriers.add("Storybook stories/MDX");
-  }
-
-  if (files.some((file) => file.relativePath.startsWith("examples/"))) {
-    carriers.add("examples dir");
-  }
-
-  if (files.some((file) => /canonical-examples/i.test(file.relativePath))) {
-    carriers.add("canonical-examples files");
+  for (const kind of EXAMPLE_CARRIER_KINDS) {
+    if (files.some((file) => kind.matches(file.relativePath))) {
+      carriers.add(kind.label);
+    }
   }
 
   const packageJson = readJsonFile(join(targetPath, "package.json"));

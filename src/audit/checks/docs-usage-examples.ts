@@ -1,4 +1,5 @@
 import { getExportedComponents } from "../component-inventory.ts";
+import { EXAMPLE_CARRIER_LABELS, isExampleCarrier } from "../example-carriers.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 
@@ -7,7 +8,7 @@ export const docsUsageExamplesCheck: AuditCheck = {
   category: "docs",
   severity: "critical",
   signal: "usage examples",
-  carriers: ["Storybook stories/MDX", "examples dir", "canonical-examples files"],
+  carriers: EXAMPLE_CARRIER_LABELS,
   measure: "% exported components with >=1 importable usage example",
   fix: "Add one canonical story/example per component.",
   naBehavior: "Never N/A; usage examples are a universal design-system signal, so absence fails.",
@@ -15,7 +16,7 @@ export const docsUsageExamplesCheck: AuditCheck = {
   run(context: CheckContext): CheckResult {
     const files = listTextFiles(context.targetPath);
     const inventory = getExportedComponents(files);
-    const exampleFiles = files.filter(isExampleCarrier);
+    const exampleFiles = files.filter((file) => isExampleCarrier(file.relativePath));
     const covered = new Set<string>();
 
     for (const component of inventory.components) {
@@ -40,15 +41,6 @@ export const docsUsageExamplesCheck: AuditCheck = {
     };
   },
 };
-
-function isExampleCarrier(file: { relativePath: string }): boolean {
-  return (
-    /\.stories\.[jt]sx?$/.test(file.relativePath) ||
-    file.relativePath.endsWith(".stories.mdx") ||
-    file.relativePath.startsWith("examples/") ||
-    /canonical-examples/i.test(file.relativePath)
-  );
-}
 
 function hasImportableUsage(content: string, component: string): boolean {
   const importsComponent = new RegExp(`\\bimport\\s+(?:\\{[^}]*\\b${component}\\b[^}]*\\}|${component}\\b)`, "m").test(content);
