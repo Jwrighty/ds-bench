@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Claude Code — personal/local config
+.claude/settings.local.json
+.claude/**/*.local.json
+
+# Installed skills — restored from skills-lock.json
+.agents/skills/
+.claude/skills
+
+# Private planning — lives in external notes, never committed
+docs/BRIEF.md
