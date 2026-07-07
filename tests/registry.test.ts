@@ -17,6 +17,8 @@ describe("check registry", () => {
         "api.name-coherence",
         "api.barrel-completeness",
         "guidance.when-to-use",
+        "guidance.alternatives-resolve",
+        "guidance.confusable-pairs",
         "tokens.hardcoded-values",
         "tokens.machine-readable",
         "tokens.naming-consistency",

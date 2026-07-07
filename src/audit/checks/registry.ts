@@ -12,6 +12,8 @@ import { docsExampleImportsRealCheck } from "./docs-example-imports-real.ts";
 import { docsPropDescriptionsCheck } from "./docs-prop-descriptions.ts";
 import { docsUndocumentedExportsCheck } from "./docs-undocumented-exports.ts";
 import { docsUsageExamplesCheck } from "./docs-usage-examples.ts";
+import { guidanceAlternativesResolveCheck } from "./guidance-alternatives-resolve.ts";
+import { guidanceConfusablePairsCheck } from "./guidance-confusable-pairs.ts";
 import { guidanceWhenToUseCheck } from "./guidance-when-to-use.ts";
 import { tokensHardcodedValuesCheck } from "./tokens-hardcoded-values.ts";
 import { tokensMachineReadableCheck } from "./tokens-machine-readable.ts";
@@ -27,6 +29,8 @@ export const CHECK_REGISTRY: AuditCheck[] = [
   apiNameCoherenceCheck,
   apiBarrelCompletenessCheck,
   guidanceWhenToUseCheck,
+  guidanceAlternativesResolveCheck,
+  guidanceConfusablePairsCheck,
   tokensHardcodedValuesCheck,
   tokensMachineReadableCheck,
   tokensNamingConsistencyCheck,

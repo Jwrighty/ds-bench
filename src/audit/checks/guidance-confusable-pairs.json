@@ -1,0 +1,10 @@
+[
+  ["Button", "Link"],
+  ["Checkbox", "Switch"],
+  ["Combobox", "Select"],
+  ["Dialog", "Popover"],
+  ["DropdownMenu", "Menu"],
+  ["RadioGroup", "Select"],
+  ["SegmentedControl", "Tabs"],
+  ["Alert", "Toast"]
+]

@@ -1,0 +1,5 @@
+{
+  "name": "confusable-pairs-missing",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

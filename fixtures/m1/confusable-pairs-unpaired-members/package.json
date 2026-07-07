@@ -1,0 +1,5 @@
+{
+  "name": "confusable-pairs-unpaired-members",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

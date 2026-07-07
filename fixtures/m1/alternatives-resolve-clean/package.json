@@ -1,0 +1,5 @@
+{
+  "name": "alternatives-resolve-clean",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

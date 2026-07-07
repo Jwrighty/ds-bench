@@ -31,8 +31,8 @@ describe("audit seam", () => {
     assert.equal(report.composite, 38.2);
     assert.deepEqual(report.applicability, {
       applicable: 12,
-      total: 16,
-      confidence: "medium",
+      total: 18,
+      confidence: "low",
     });
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
@@ -57,7 +57,7 @@ describe("audit seam", () => {
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 17);
+    assert.equal(report.findings.length, 19);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -324,6 +324,94 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "guidance.when-to-use").evidence, ["Card"]);
     assert.equal(finding(clean, "guidance.when-to-use").outcome, "pass");
     assert.equal(finding(clean, "guidance.when-to-use").measure.value, 1);
+  });
+
+  it("checks guidance.alternatives-resolve against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("alternatives-do-not-resolve"));
+    const clean = await audit(m1FixturePath("alternatives-resolve-clean"));
+
+    assert.deepEqual(finding(failing, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 alternatives/instead component references resolve to exported components; unresolved: GhostButton",
+    });
+    assert.equal(finding(failing, "guidance.alternatives-resolve").outcome, "fail");
+    assert.deepEqual(finding(failing, "guidance.alternatives-resolve").evidence, ["GhostButton"]);
+    assert.equal(finding(clean, "guidance.alternatives-resolve").outcome, "pass");
+    assert.deepEqual(finding(clean, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "2/2 alternatives/instead component references resolve to exported components; unresolved: none",
+    });
+  });
+
+  it("reports guidance.alternatives-resolve as N/A when no alternatives content exists", async () => {
+    const report = await audit(m1FixturePath("usage-guidance-clean"));
+
+    assert.equal(finding(report, "guidance.alternatives-resolve").outcome, "na");
+    assert.deepEqual(finding(report, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No alternatives/instead guidance content found; alternatives resolution is not applicable.",
+    });
+  });
+
+  it("checks guidance.confusable-pairs against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("confusable-pairs-missing"));
+    const clean = await audit(m1FixturePath("confusable-pairs-clean"));
+
+    assert.deepEqual(finding(failing, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 detected confusable pairs reference each other; missing: Dialog/Popover",
+    });
+    assert.equal(finding(failing, "guidance.confusable-pairs").outcome, "fail");
+    assert.deepEqual(finding(failing, "guidance.confusable-pairs").evidence, ["Dialog/Popover"]);
+    assert.equal(finding(clean, "guidance.confusable-pairs").outcome, "pass");
+    assert.deepEqual(finding(clean, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 detected confusable pairs reference each other; missing: none",
+    });
+  });
+
+  it("reports guidance.confusable-pairs as N/A when fewer than two seed pair members are present", async () => {
+    const report = await audit(m1FixturePath("usage-guidance-clean"));
+
+    assert.equal(finding(report, "guidance.confusable-pairs").outcome, "na");
+    assert.deepEqual(finding(report, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "Fewer than 2 seed confusable-pair members are in inventory; disambiguation is not applicable.",
+    });
+  });
+
+  it("fails guidance.confusable-pairs when seed members exist without a complete configured pair", async () => {
+    const report = await audit(m1FixturePath("confusable-pairs-unpaired-members"));
+
+    assert.equal(finding(report, "guidance.confusable-pairs").outcome, "fail");
+    assert.deepEqual(finding(report, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/0 detected confusable pairs reference each other; missing: no complete seed pairs among Button, Dialog",
+    });
+    assert.deepEqual(finding(report, "guidance.confusable-pairs").evidence, ["no complete seed pairs among Button, Dialog"]);
+  });
+
+  it("aggregates all three Usage guidance checks into the guidance category score", async () => {
+    const report = await audit(m1FixturePath("guidance-category-aggregate"));
+    const guidanceCategory = report.categories.find((category) => category.id === "guidance");
+
+    assert.equal(finding(report, "guidance.when-to-use").measure.value, 0.5);
+    assert.equal(finding(report, "guidance.alternatives-resolve").measure.value, 1);
+    assert.equal(finding(report, "guidance.confusable-pairs").measure.value, 1);
+    assert.deepEqual(guidanceCategory, {
+      id: "guidance",
+      score: 83.3,
+      applicable: 3,
+      total: 3,
+      weightRedistributed: false,
+    });
   });
 
   it("checks docs.prop-descriptions against failure and clean fixtures", async () => {
@@ -604,8 +692,8 @@ describe("audit seam", () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
     assert.equal(report.applicability.applicable, 16);
-    assert.equal(report.applicability.total, 16);
-    assert.equal(report.applicability.confidence, "high");
+    assert.equal(report.applicability.total, 18);
+    assert.equal(report.applicability.confidence, "medium");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
     assert.equal(finding(report, "deprecation.marked").measure.detail, "1/1 known-deprecated exports carry @deprecated; missing: none");
@@ -622,6 +710,8 @@ describe("audit seam", () => {
         "critical",
         "critical",
         "critical",
+        "warning",
+        "warning",
         "warning",
         "warning",
         "warning",
