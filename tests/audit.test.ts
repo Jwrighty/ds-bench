@@ -9,6 +9,7 @@ import type { AuditFinding } from "../src/audit/types.ts";
 const repoRoot = process.cwd();
 const fixturePath = join(repoRoot, "fixtures/missing-usage-examples");
 const m1FixturePath = (name: string) => join(repoRoot, "fixtures/m1", name);
+const agentMetadataFixturePath = (name: string) => join(repoRoot, "fixtures/agent-metadata", name);
 
 describe("audit seam", () => {
   it("returns the ARS v0 report contract for a missing usage examples fixture", async () => {
@@ -30,8 +31,8 @@ describe("audit seam", () => {
     });
     assert.equal(report.composite, 38.2);
     assert.deepEqual(report.applicability, {
-      applicable: 12,
-      total: 18,
+      applicable: 15,
+      total: 22,
       confidence: "low",
     });
     assert.equal(report.categories.length, 6);
@@ -57,7 +58,7 @@ describe("audit seam", () => {
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 19);
+    assert.equal(report.findings.length, 23);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -688,11 +689,101 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "agent.manifest-coverage").measure.value, 1);
   });
 
+  it("checks agent.context-file-quality against doc-rot and clean fixtures", async () => {
+    const failing = await audit(agentMetadataFixturePath("doc-rot-agents-md"));
+    const clean = await audit(agentMetadataFixturePath("context-file-quality-clean"));
+
+    assert.deepEqual(finding(failing, "agent.context-file-quality").measure, {
+      kind: "ratio",
+      value: 0.5,
+      detail: "1/2 agent context component references resolve against exported components; dead references: GhostButton",
+    });
+    assert.equal(finding(failing, "agent.context-file-quality").outcome, "fail");
+    assert.deepEqual(finding(failing, "agent.context-file-quality").evidence, ["GhostButton"]);
+    assert.equal(finding(clean, "agent.context-file-quality").outcome, "pass");
+    assert.equal(finding(clean, "agent.context-file-quality").measure.value, 1);
+  });
+
+  it("checks agent.llms-txt locally while validating external URL syntax only", async () => {
+    const failing = await audit(agentMetadataFixturePath("llms-txt-broken"));
+    const clean = await audit(agentMetadataFixturePath("llms-txt-clean"));
+
+    assert.deepEqual(finding(failing, "agent.llms-txt").measure, {
+      kind: "ratio",
+      value: 0.25,
+      detail: "1/4 llms.txt references are valid; invalid references: ./docs/missing.md, ./docs/raw-missing.md, https://%zz",
+    });
+    assert.equal(finding(failing, "agent.llms-txt").outcome, "fail");
+    assert.deepEqual(finding(failing, "agent.llms-txt").evidence, ["./docs/missing.md", "./docs/raw-missing.md", "https://%zz"]);
+    assert.equal(finding(clean, "agent.llms-txt").outcome, "pass");
+    assert.equal(finding(clean, "agent.llms-txt").measure.value, 1);
+  });
+
+  it("distinguishes importing metadata examples from rebuild-style examples", async () => {
+    const failing = await audit(agentMetadataFixturePath("reimplementation-spec-design-md"));
+    const clean = await audit(agentMetadataFixturePath("instruction-manual-clean"));
+
+    assert.deepEqual(finding(failing, "agent.instruction-manual").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 metadata code examples import system components; rebuild examples: DESIGN.md#example-1",
+    });
+    assert.equal(finding(failing, "agent.instruction-manual").outcome, "fail");
+    assert.deepEqual(finding(failing, "agent.instruction-manual").evidence, ["DESIGN.md#example-1"]);
+    assert.equal(finding(clean, "agent.instruction-manual").outcome, "pass");
+    assert.equal(finding(clean, "agent.instruction-manual").measure.value, 1);
+  });
+
+  it("reports agent.instruction-manual as N/A when no agent metadata files exist", async () => {
+    const report = await audit(agentMetadataFixturePath("mcp-missing"));
+
+    assert.deepEqual(finding(report, "agent.instruction-manual").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0 agent metadata files found; instruction-manual orientation is not applicable.",
+    });
+    assert.equal(finding(report, "agent.instruction-manual").outcome, "na");
+  });
+
+  it("checks agent.mcp-present against missing and detected fixtures", async () => {
+    const failing = await audit(agentMetadataFixturePath("mcp-missing"));
+    const clean = await audit(agentMetadataFixturePath("mcp-present"));
+
+    assert.deepEqual(finding(failing, "agent.mcp-present").measure, {
+      kind: "count",
+      value: 0,
+      detail: "0 MCP package/config carriers detected: none",
+    });
+    assert.equal(finding(failing, "agent.mcp-present").outcome, "fail");
+    assert.deepEqual(finding(failing, "agent.mcp-present").evidence, []);
+    assert.equal(finding(clean, "agent.mcp-present").outcome, "pass");
+    assert.equal(finding(clean, "agent.mcp-present").measure.value, 1);
+  });
+
+  it("aggregates all five agent metadata checks", async () => {
+    const report = await audit(agentMetadataFixturePath("category-aggregate"));
+    const agentCategory = report.categories.find((category) => category.id === "agent");
+
+    assert.deepEqual(
+      ["agent.context-file-quality", "agent.manifest-coverage", "agent.llms-txt", "agent.instruction-manual", "agent.mcp-present"].map(
+        (checkId) => finding(report, checkId).outcome,
+      ),
+      ["pass", "pass", "pass", "pass", "pass"],
+    );
+    assert.deepEqual(agentCategory, {
+      id: "agent",
+      score: 100,
+      applicable: 5,
+      total: 5,
+      weightRedistributed: false,
+    });
+  });
+
   it("produces six real scored categories on the combined M1 fixture", async () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
-    assert.equal(report.applicability.applicable, 16);
-    assert.equal(report.applicability.total, 18);
+    assert.equal(report.applicability.applicable, 19);
+    assert.equal(report.applicability.total, 22);
     assert.equal(report.applicability.confidence, "medium");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
@@ -703,30 +794,31 @@ describe("audit seam", () => {
       assert.equal(category.applicable > 0, true, `${category.id} should have an applicable check`);
     }
 
-    assert.deepEqual(
-      report.findings.map((candidate) => candidate.severity),
-      [
-        "critical",
-        "critical",
-        "critical",
-        "critical",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "warning",
-        "info",
-        "info",
-        "info",
-      ],
-    );
+    assert.deepEqual(report.findings.map((candidate) => candidate.severity), [
+      "critical",
+      "critical",
+      "critical",
+      "critical",
+      "critical",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "warning",
+      "info",
+      "info",
+      "info",
+      "info",
+      "info",
+    ]);
     for (const candidate of report.findings) {
       assert.ok(candidate.fix.length > 0, `${candidate.checkId} should carry a fix`);
       assert.ok(candidate.receipt.length > 0, `${candidate.checkId} should carry a receipt`);

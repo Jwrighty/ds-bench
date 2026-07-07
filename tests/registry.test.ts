@@ -26,7 +26,11 @@ describe("check registry", () => {
         "deprecation.migration-notes",
         "deprecation.manifest-exclusion",
         "deprecation.zombie-exports",
+        "agent.context-file-quality",
         "agent.manifest-coverage",
+        "agent.llms-txt",
+        "agent.instruction-manual",
+        "agent.mcp-present",
       ]),
     );
   });

@@ -2,11 +2,14 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, extname, join, relative } from "node:path";
 import { EXAMPLE_CARRIER_KINDS } from "./example-carriers.ts";
 import { isManifestCarrier } from "./manifest-carriers.ts";
+import { isAgentMetadataFile, isLlmsTxtFile } from "./agent-metadata-paths.ts";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
 const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
 const DATA_EXTENSIONS = new Set([".json"]);
+const TEXT_EXTENSIONS = new Set([".txt"]);
+const SPECIAL_TEXT_FILES = new Set([".cursorrules"]);
 const IGNORED_DIRECTORIES = new Set([
   ".cache",
   ".claude",
@@ -50,7 +53,9 @@ export function listTextFiles(root: string, options: FileDiscoveryOptions = {}):
         SOURCE_EXTENSIONS.has(extname(path)) ||
         EXAMPLE_EXTENSIONS.has(extname(path)) ||
         STYLE_EXTENSIONS.has(extname(path)) ||
-        DATA_EXTENSIONS.has(extname(path)),
+        DATA_EXTENSIONS.has(extname(path)) ||
+        TEXT_EXTENSIONS.has(extname(path)) ||
+        SPECIAL_TEXT_FILES.has(basename(path)),
     )
     .map((path) => ({
       path,
@@ -88,6 +93,14 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
 
   if (files.some((file) => isManifestCarrier(file.relativePath))) {
     carriers.add("manifests");
+  }
+
+  if (files.some((file) => isAgentMetadataFile(file.relativePath))) {
+    carriers.add("agent metadata files");
+  }
+
+  if (files.some((file) => isLlmsTxtFile(file.relativePath))) {
+    carriers.add("llms.txt");
   }
 
   if (files.some((file) => STYLE_EXTENSIONS.has(extname(file.path)))) {

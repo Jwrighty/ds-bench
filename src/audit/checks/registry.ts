@@ -1,5 +1,9 @@
 import type { AuditCheck } from "../types.ts";
+import { agentContextFileQualityCheck } from "./agent-context-file-quality.ts";
+import { agentInstructionManualCheck } from "./agent-instruction-manual.ts";
+import { agentLlmsTxtCheck } from "./agent-llms-txt.ts";
 import { agentManifestCoverageCheck } from "./agent-manifest-coverage.ts";
+import { agentMcpPresentCheck } from "./agent-mcp-present.ts";
 import { apiBarrelCompletenessCheck } from "./api-barrel-completeness.ts";
 import { apiNameCoherenceCheck } from "./api-name-coherence.ts";
 import { apiPropTypeSoundnessCheck } from "./api-prop-type-soundness.ts";
@@ -38,5 +42,9 @@ export const CHECK_REGISTRY: AuditCheck[] = [
   deprecationMigrationNotesCheck,
   deprecationManifestExclusionCheck,
   deprecationZombieExportsCheck,
+  agentContextFileQualityCheck,
   agentManifestCoverageCheck,
+  agentLlmsTxtCheck,
+  agentInstructionManualCheck,
+  agentMcpPresentCheck,
 ];

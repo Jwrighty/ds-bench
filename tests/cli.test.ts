@@ -16,10 +16,10 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /composite score: 38\.2\/100/);
-    assert.match(result.stdout, /applicable checks: 12\/18 \(low confidence\)/);
+    assert.match(result.stdout, /applicable checks: 15\/22 \(low confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
-    assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(1\/1\)/);
+    assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(4\/5\)/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
   });
@@ -70,14 +70,14 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 79\.2\/100/);
-    assert.match(result.stdout, /applicable checks: 16\/18 \(medium confidence\)/);
+    assert.match(result.stdout, /composite score: 74\.2\/100/);
+    assert.match(result.stdout, /applicable checks: 19\/22 \(medium confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/3\)/);
     assert.match(result.stdout, /Token hygiene\s+\[########\.\.\]\s+77\.8 \(3\/3\)/);
     assert.match(result.stdout, /Deprecation signalling\s+\[#######\.\.\.\]\s+66\.7 \(3\/3\)/);
-    assert.match(result.stdout, /Agent metadata\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
+    assert.match(result.stdout, /Agent metadata\s+\[##\.\.\.\.\.\.\.\.]\s+16\.7 \(4\/5\)/);
     assert.match(result.stdout, /guidance\.alternatives-resolve - na/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
