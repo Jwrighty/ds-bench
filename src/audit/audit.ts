@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { CHECK_REGISTRY } from "./checks/registry.ts";
 import { detectCarriers, getPackageName, isRecord, listTextFiles } from "./file-system.ts";
-import { scoreFindings, type FindingScoreInput } from "./scoring.ts";
+import { scoreFindings, toReportFinding, type FindingScoreInput } from "./scoring.ts";
 import type { AuditConfig, AuditFinding, AuditReport } from "./types.ts";
 
 const RUBRIC_VERSION = "ARS v0";
@@ -28,9 +28,7 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
     });
   }
 
-  const findings = sortFindingsForReport(
-    findingsForScoring.map(({ score: _score, ...finding }) => finding),
-  );
+  const findings = sortFindingsForReport(findingsForScoring.map(toReportFinding));
 
   return {
     rubricVersion: RUBRIC_VERSION,
@@ -51,7 +49,7 @@ const SEVERITY_RANK: Record<AuditFinding["severity"], number> = {
   info: 2,
 };
 
-function sortFindingsForReport(findings: AuditFinding[]): AuditFinding[] {
+export function sortFindingsForReport(findings: AuditFinding[]): AuditFinding[] {
   return [...findings].sort((left, right) => SEVERITY_RANK[left.severity] - SEVERITY_RANK[right.severity]);
 }
 

@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { join } from "node:path";
-import { audit } from "../src/audit/audit.ts";
+import { audit, sortFindingsForReport } from "../src/audit/audit.ts";
+import type { AuditFinding } from "../src/audit/types.ts";
 
 const repoRoot = process.cwd();
 const fixturePath = join(repoRoot, "fixtures/missing-usage-examples");
@@ -136,6 +137,34 @@ describe("audit seam", () => {
     assert.equal(customReport.composite, 10);
   });
 });
+
+describe("sortFindingsForReport", () => {
+  it("orders findings critical, then warning, then info regardless of input order", () => {
+    const info = stubFinding("info-check", "info");
+    const warning = stubFinding("warning-check", "warning");
+    const critical = stubFinding("critical-check", "critical");
+
+    const sorted = sortFindingsForReport([info, warning, critical]);
+
+    assert.deepEqual(
+      sorted.map((finding) => finding.checkId),
+      ["critical-check", "warning-check", "info-check"],
+    );
+  });
+});
+
+function stubFinding(checkId: string, severity: AuditFinding["severity"]): AuditFinding {
+  return {
+    checkId,
+    category: "docs",
+    severity,
+    outcome: "pass",
+    measure: { kind: "ratio", value: 1, detail: "stub" },
+    evidence: [],
+    fix: "stub",
+    receipt: "stub",
+  };
+}
 
 type Report = Awaited<ReturnType<typeof audit>>;
 

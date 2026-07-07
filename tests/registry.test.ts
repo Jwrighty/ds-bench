@@ -3,9 +3,16 @@ import { describe, it } from "node:test";
 import { CHECK_REGISTRY } from "../src/audit/checks/registry.ts";
 
 describe("check registry", () => {
+  it("registers every known check", () => {
+    const ids = CHECK_REGISTRY.map((check) => check.id);
+    assert.deepEqual(
+      new Set(ids),
+      new Set(["docs.usage-examples", "docs.example-imports-real", "deprecation.migration-notes"]),
+    );
+  });
+
   it("contains fully metadata'd checks", () => {
     assert.ok(CHECK_REGISTRY.length >= 1);
-    assert.equal(CHECK_REGISTRY[0].id, "docs.usage-examples");
 
     for (const check of CHECK_REGISTRY) {
       for (const field of ["id", "category", "severity", "signal", "carriers", "measure", "fix", "naBehavior", "receipt"] as const) {

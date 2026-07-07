@@ -5,6 +5,11 @@ export type FindingScoreInput = AuditFinding & {
   score: number | null;
 };
 
+export function toReportFinding(finding: FindingScoreInput): AuditFinding {
+  const { score: _score, ...reportFinding } = finding;
+  return reportFinding;
+}
+
 export type ScoredReportParts = {
   weights: {
     source: "default" | "custom";

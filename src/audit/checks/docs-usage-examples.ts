@@ -1,7 +1,8 @@
-import { getExportedComponents } from "../component-inventory.ts";
+import { getExportedComponents, hasImportableUsage } from "../component-inventory.ts";
 import { EXAMPLE_CARRIER_LABELS, isExampleCarrier } from "../example-carriers.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { formatNames, roundRatio } from "./support.ts";
 
 export const docsUsageExamplesCheck: AuditCheck = {
   id: "docs.usage-examples",
@@ -35,24 +36,9 @@ export const docsUsageExamplesCheck: AuditCheck = {
       measure: {
         kind: "ratio",
         value: roundRatio(ratio),
-        detail: `${covered.size}/${total} exported components have importable usage examples; missing: ${formatMissing(missing)}`,
+        detail: `${covered.size}/${total} exported components have importable usage examples; missing: ${formatNames(missing)}`,
       },
       evidence: missing.slice(0, 20),
     };
   },
 };
-
-function hasImportableUsage(content: string, component: string): boolean {
-  const importsComponent = new RegExp(`\\bimport\\s+(?:\\{[^}]*\\b${component}\\b[^}]*\\}|${component}\\b)`, "m").test(content);
-  const rendersComponent = new RegExp(`<${component}(\\s|>|/)`, "m").test(content);
-
-  return importsComponent && rendersComponent;
-}
-
-function formatMissing(missing: string[]): string {
-  return missing.length === 0 ? "none" : missing.join(", ");
-}
-
-function roundRatio(value: number): number {
-  return Math.round(value * 1000) / 1000;
-}

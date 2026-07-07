@@ -1,6 +1,7 @@
 import { isExampleCarrier } from "../example-carriers.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { formatNames, roundRatio } from "./support.ts";
 
 type DeprecatedExport = {
   name: string;
@@ -44,7 +45,7 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
       measure: {
         kind: "ratio",
         value: roundRatio(ratio),
-        detail: `${migratedCount}/${deprecatedExports.length} deprecated exports include migration guidance; missing: ${formatMissing(withoutMigration)}`,
+        detail: `${migratedCount}/${deprecatedExports.length} deprecated exports include migration guidance; missing: ${formatNames(withoutMigration.map((deprecatedExport) => deprecatedExport.name))}`,
       },
       evidence: withoutMigration.map((deprecatedExport) => deprecatedExport.name).slice(0, 20),
     };
@@ -68,12 +69,4 @@ function getDeprecatedExports(content: string): DeprecatedExport[] {
 
 function hasMigrationNote(note: string): boolean {
   return /\b(use|instead|replace(?:d)? by|renamed to|migrate to)\b/i.test(note);
-}
-
-function formatMissing(withoutMigration: DeprecatedExport[]): string {
-  return withoutMigration.length === 0 ? "none" : withoutMigration.map((deprecatedExport) => deprecatedExport.name).join(", ");
-}
-
-function roundRatio(value: number): number {
-  return Math.round(value * 1000) / 1000;
 }
