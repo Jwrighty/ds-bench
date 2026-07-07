@@ -1,5 +1,11 @@
 import { CATEGORY_ORDER, DEFAULT_WEIGHTS } from "./categories.ts";
-import type { AuditCheck, AuditConfig, AuditFinding, CategoryId, Confidence } from "./types.ts";
+import type { AuditCheck, AuditConfig, AuditFinding, CategoryId, Confidence, Severity } from "./types.ts";
+
+const SEVERITY_WEIGHTS: Record<Severity, number> = {
+  critical: 4,
+  warning: 2,
+  info: 1,
+};
 
 export type FindingScoreInput = AuditFinding & {
   score: number | null;
@@ -32,7 +38,8 @@ export type ScoredReportParts = {
 
 export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[], config: AuditConfig = {}): ScoredReportParts {
   const scoredChecks = checks.filter((check) => check.scored !== false);
-  const scoredCheckIds = new Set(scoredChecks.map((check) => check.id));
+  const scoredChecksById = new Map(scoredChecks.map((check) => [check.id, check]));
+  const scoredCheckIds = new Set(scoredChecksById.keys());
   const weights = {
     source: config.weights ? ("custom" as const) : ("default" as const),
     values: { ...DEFAULT_WEIGHTS, ...config.weights },
@@ -43,8 +50,16 @@ export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[
     const categoryFindings = findings.filter(
       (finding) => scoredCheckIds.has(finding.checkId) && finding.category === id && finding.outcome !== "na",
     );
-    const scores = categoryFindings.map((finding) => finding.score ?? 0);
-    const score = scores.length === 0 ? null : roundScore(mean(scores) * 100);
+    const weightedScores = categoryFindings.map((finding) => {
+      const check = scoredChecksById.get(finding.checkId);
+      const weight = check ? SEVERITY_WEIGHTS[check.severity] : 0;
+
+      return {
+        score: finding.score ?? 0,
+        weight,
+      };
+    });
+    const score = weightedScores.length === 0 ? null : roundScore(weightedMean(weightedScores) * 100);
 
     return {
       id,
@@ -81,8 +96,13 @@ export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[
   };
 }
 
-function mean(values: number[]): number {
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+function weightedMean(values: Array<{ score: number; weight: number }>): number {
+  const weightTotal = values.reduce((sum, value) => sum + value.weight, 0);
+  if (weightTotal === 0) {
+    return 0;
+  }
+
+  return values.reduce((sum, value) => sum + value.score * value.weight, 0) / weightTotal;
 }
 
 function roundScore(value: number): number {

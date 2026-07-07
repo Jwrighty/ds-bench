@@ -30,7 +30,7 @@ describe("scoring machinery", () => {
     assert.equal(confidenceForApplicableCount(6), "low");
   });
 
-  it("uses default ARS v0 weights and marks custom weight overrides", () => {
+  it("uses default ARS v0.1 weights and marks custom weight overrides", () => {
     const checks = [check("docs.complete", "docs", "critical"), check("api.empty", "api", "warning")];
     const findings = [
       finding("docs.complete", "docs", "critical", "pass", 1),
@@ -56,25 +56,55 @@ describe("scoring machinery", () => {
     assert.equal(customScored.composite, 10);
   });
 
-  it("keeps severity out of scoring math", () => {
-    const critical = [
-      check("docs.complete", "docs", "critical"),
-      check("api.partial", "api", "warning"),
+  it("uses severity-weighted means within each category", () => {
+    const checks = [
+      check("docs.critical-gap", "docs", "critical"),
+      check("docs.warning-pass", "docs", "warning"),
+      check("docs.info-pass", "docs", "info"),
     ];
-    const swapped = [
-      check("docs.complete", "docs", "info"),
-      check("api.partial", "api", "critical"),
-    ];
-    const criticalFindings = [
-      finding("docs.complete", "docs", "critical", "pass", 1),
-      finding("api.partial", "api", "warning", "fail", 0.25),
-    ];
-    const swappedFindings = [
-      finding("docs.complete", "docs", "info", "pass", 1),
-      finding("api.partial", "api", "critical", "fail", 0.25),
+    const findings = [
+      finding("docs.critical-gap", "docs", "critical", "fail", 0),
+      finding("docs.warning-pass", "docs", "warning", "pass", 1),
+      finding("docs.info-pass", "docs", "info", "pass", 1),
     ];
 
-    assert.equal(scoreFindings(critical, criticalFindings).composite, scoreFindings(swapped, swappedFindings).composite);
+    const scored = scoreFindings(checks, findings);
+
+    assert.equal(category(scored, "docs").score, 42.9);
+    assert.equal(category(scored, "docs").applicable, 3);
+    assert.equal(category(scored, "docs").total, 3);
+    assert.equal(scored.composite, 42.9);
+  });
+
+  it("keeps all-info categories as a normal weighted mean", () => {
+    const checks = [check("agent.discovery", "agent", "info"), check("agent.mcp", "agent", "info")];
+    const findings = [
+      finding("agent.discovery", "agent", "info", "fail", 0.25),
+      finding("agent.mcp", "agent", "info", "pass", 1),
+    ];
+
+    const scored = scoreFindings(checks, findings);
+
+    assert.equal(category(scored, "agent").score, 62.5);
+    assert.equal(scored.composite, 62.5);
+  });
+
+  it("limits a single failing info check to its severity weight share", () => {
+    const checks = [
+      check("tokens.hardcoded-values", "tokens", "warning"),
+      check("tokens.machine-readable", "tokens", "warning"),
+      check("tokens.naming-consistency", "tokens", "info"),
+    ];
+    const findings = [
+      finding("tokens.hardcoded-values", "tokens", "warning", "pass", 1),
+      finding("tokens.machine-readable", "tokens", "warning", "pass", 1),
+      finding("tokens.naming-consistency", "tokens", "info", "fail", 0),
+    ];
+
+    const scored = scoreFindings(checks, findings);
+
+    assert.equal(category(scored, "tokens").score, 80);
+    assert.equal(scored.composite, 80);
   });
 
   it("reports unscored checks without moving category, composite, or applicability math", () => {
@@ -112,6 +142,12 @@ function confidenceForApplicableCount(applicable: number) {
   );
 
   return scoreFindings(checks, findings).applicability.confidence;
+}
+
+function category(scored: ReturnType<typeof scoreFindings>, id: CategoryId) {
+  const found = scored.categories.find((candidate) => candidate.id === id);
+  assert.ok(found);
+  return found;
 }
 
 function check(id: string, category: CategoryId, severity: Severity): AuditCheck {

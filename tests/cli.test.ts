@@ -15,9 +15,9 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 38\.2\/100/);
+    assert.match(result.stdout, /composite score: 40\.7\/100/);
     assert.match(result.stdout, /applicable checks: 14\/22 \(low confidence\)/);
-    assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
+    assert.match(result.stdout, /Docs & examples\s+\[######\.\.\.\.\]\s+58\.3 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(4\/5\)/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
@@ -31,7 +31,7 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     const report = JSON.parse(result.stdout) as { rubricVersion: string; findings: Array<{ checkId: string }> };
-    assert.equal(report.rubricVersion, "ARS v0");
+    assert.equal(report.rubricVersion, "ARS v0.1");
     assert.equal(report.findings[0].checkId, "docs.usage-examples");
   });
 
@@ -47,7 +47,7 @@ describe("CLI", () => {
     assert.equal(report.weights.source, "custom");
     assert.equal(report.weights.values.docs, 10);
     assert.equal(report.weights.values.deprecation, 90);
-    assert.equal(report.composite, 45.3);
+    assert.equal(report.composite, 55.2);
   });
 
   it("--exclude filters files through shared discovery", () => {
@@ -70,14 +70,14 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 74\.2\/100/);
+    assert.match(result.stdout, /composite score: 75\.3\/100/);
     assert.match(result.stdout, /applicable checks: 19\/22 \(medium confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/3\)/);
-    assert.match(result.stdout, /Token hygiene\s+\[########\.\.\]\s+77\.8 \(3\/3\)/);
-    assert.match(result.stdout, /Deprecation signalling\s+\[#######\.\.\.\]\s+66\.7 \(3\/3\)/);
-    assert.match(result.stdout, /Agent metadata\s+\[##\.\.\.\.\.\.\.\.]\s+16\.7 \(4\/5\)/);
+    assert.match(result.stdout, /Token hygiene\s+\[#######\.\.\.\]\s+73\.3 \(3\/3\)/);
+    assert.match(result.stdout, /Deprecation signalling\s+\[########\.\.\]\s+75 \(3\/3\)/);
+    assert.match(result.stdout, /Agent metadata\s+\[##\.\.\.\.\.\.\.\.]\s+22\.2 \(4\/5\)/);
     assert.match(result.stdout, /guidance\.alternatives-resolve - na/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);

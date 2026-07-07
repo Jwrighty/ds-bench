@@ -12,10 +12,10 @@ const m1FixturePath = (name: string) => join(repoRoot, "fixtures/m1", name);
 const agentMetadataFixturePath = (name: string) => join(repoRoot, "fixtures/agent-metadata", name);
 
 describe("audit seam", () => {
-  it("returns the ARS v0 report contract for a missing usage examples fixture", async () => {
+  it("returns the ARS v0.1 report contract for a missing usage examples fixture", async () => {
     const report = await audit(fixturePath);
 
-    assert.equal(report.rubricVersion, "ARS v0");
+    assert.equal(report.rubricVersion, "ARS v0.1");
     assert.equal(report.toolVersion, "0.0.0");
     assert.equal(report.target.name, "missing-usage-examples");
     assert.deepEqual(report.weights, {
@@ -29,7 +29,7 @@ describe("audit seam", () => {
         agent: 10,
       },
     });
-    assert.equal(report.composite, 38.2);
+    assert.equal(report.composite, 40.7);
     assert.deepEqual(report.applicability, {
       applicable: 14,
       total: 22,
@@ -38,7 +38,7 @@ describe("audit seam", () => {
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
       id: "docs",
-      score: 50,
+      score: 58.3,
       applicable: 4,
       total: 4,
       weightRedistributed: false,
@@ -152,7 +152,7 @@ describe("audit seam", () => {
     assert.equal(report.categories.find((category) => category.id === "deprecation")?.weightRedistributed, true);
   });
 
-  it("applies custom weights from config without mutating default ARS v0 weights", async () => {
+  it("applies custom weights from config without mutating default ARS v0.1 weights", async () => {
     const targetPath = join(repoRoot, "fixtures/scoring/deprecation-without-migration");
 
     const defaultReport = await audit(targetPath);
@@ -267,7 +267,7 @@ describe("audit seam", () => {
     assert.equal(finding(report, "api.barrel-completeness").measure.value, 1);
     assert.deepEqual(apiCategory, {
       id: "api",
-      score: 37.5,
+      score: 50,
       applicable: 4,
       total: 4,
       weightRedistributed: false,

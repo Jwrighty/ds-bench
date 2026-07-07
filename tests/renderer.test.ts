@@ -6,7 +6,7 @@ import type { AuditReport } from "../src/audit/types.ts";
 describe("terminal renderer", () => {
   it("renders a stable report snapshot", () => {
     const report: AuditReport = {
-      rubricVersion: "ARS v0",
+      rubricVersion: "ARS v0.1",
       toolVersion: "0.0.0",
       target: {
         name: "missing-usage-examples",
@@ -60,7 +60,7 @@ describe("terminal renderer", () => {
       renderAuditReport(report),
       `ds-bench audit: missing-usage-examples
 target: /fixtures/missing-usage-examples
-rubric: ARS v0 | tool: 0.0.0
+rubric: ARS v0.1 | tool: 0.0.0
 
 composite score: 50/100
 applicable checks: 1/1 (high confidence)
@@ -86,7 +86,7 @@ findings:
 
   it("caps long measure detail lists in terminal output", () => {
     const report: AuditReport = {
-      rubricVersion: "ARS v0",
+      rubricVersion: "ARS v0.1",
       toolVersion: "0.0.0",
       target: {
         name: "long-report",

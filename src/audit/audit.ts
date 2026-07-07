@@ -6,7 +6,7 @@ import { detectCarriers, getPackageName, isRecord, listTextFiles } from "./file-
 import { scoreFindings, toReportFinding, type FindingScoreInput } from "./scoring.ts";
 import type { AuditConfig, AuditFinding, AuditReport } from "./types.ts";
 
-const RUBRIC_VERSION = "ARS v0";
+const RUBRIC_VERSION = "ARS v0.1";
 
 export async function audit(targetPath: string, config: AuditConfig = {}): Promise<AuditReport> {
   const resolvedTarget = resolve(targetPath);
