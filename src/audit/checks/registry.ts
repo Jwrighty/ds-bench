@@ -1,5 +1,8 @@
 import type { AuditCheck } from "../types.ts";
 import { agentManifestCoverageCheck } from "./agent-manifest-coverage.ts";
+import { apiBarrelCompletenessCheck } from "./api-barrel-completeness.ts";
+import { apiNameCoherenceCheck } from "./api-name-coherence.ts";
+import { apiPropTypeSoundnessCheck } from "./api-prop-type-soundness.ts";
 import { apiTypesResolveCheck } from "./api-types-resolve.ts";
 import { deprecationMarkedCheck } from "./deprecation-marked.ts";
 import { deprecationMigrationNotesCheck } from "./deprecation-migration-notes.ts";
@@ -15,7 +18,10 @@ export const CHECK_REGISTRY: AuditCheck[] = [
   docsUsageExamplesCheck,
   docsExampleImportsRealCheck,
   docsUndocumentedExportsCheck,
+  apiPropTypeSoundnessCheck,
   apiTypesResolveCheck,
+  apiNameCoherenceCheck,
+  apiBarrelCompletenessCheck,
   guidanceWhenToUseCheck,
   tokensHardcodedValuesCheck,
   deprecationMarkedCheck,

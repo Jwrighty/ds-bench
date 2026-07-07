@@ -1,0 +1,5 @@
+{
+  "components": [
+    { "name": "Card", "filePath": "src/Tile.ts" }
+  ]
+}

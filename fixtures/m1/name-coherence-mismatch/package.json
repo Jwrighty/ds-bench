@@ -1,0 +1,5 @@
+{
+  "name": "name-coherence-mismatch",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

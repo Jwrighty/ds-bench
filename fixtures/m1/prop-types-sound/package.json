@@ -1,0 +1,5 @@
+{
+  "name": "prop-types-sound",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

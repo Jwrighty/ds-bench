@@ -30,8 +30,8 @@ describe("audit seam", () => {
     });
     assert.equal(report.composite, 46.4);
     assert.deepEqual(report.applicability, {
-      applicable: 7,
-      total: 10,
+      applicable: 10,
+      total: 13,
       confidence: "medium",
     });
     assert.equal(report.categories.length, 6);
@@ -45,8 +45,8 @@ describe("audit seam", () => {
     assert.deepEqual(report.categories[1], {
       id: "api",
       score: 100,
-      applicable: 1,
-      total: 1,
+      applicable: 4,
+      total: 4,
       weightRedistributed: false,
     });
     assert.deepEqual(report.categories[4], {
@@ -57,7 +57,7 @@ describe("audit seam", () => {
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 10);
+    assert.equal(report.findings.length, 13);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -114,7 +114,7 @@ describe("audit seam", () => {
       fix: "Add @deprecated to legacy exports.",
       receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
     });
-    assert.deepEqual(report.findings[8], {
+    assert.deepEqual(report.findings[10], {
       checkId: "deprecation.migration-notes",
       category: "deprecation",
       severity: "warning",
@@ -180,6 +180,97 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "api.types-resolve").evidence, ["types-do-not-resolve"]);
     assert.equal(finding(clean, "api.types-resolve").outcome, "pass");
     assert.equal(finding(clean, "api.types-resolve").measure.value, 1);
+  });
+
+  it("checks api.prop-type-soundness against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("unsound-prop-types"));
+    const clean = await audit(m1FixturePath("prop-types-sound"));
+
+    assert.deepEqual(finding(failing, "api.prop-type-soundness").measure, {
+      kind: "ratio",
+      value: 0.5,
+      detail: "3/6 exported component props use any/unknown; offenders: Button.data (any), Button.metadata (unknown), Dialog.payload (unknown)",
+    });
+    assert.equal(finding(failing, "api.prop-type-soundness").outcome, "fail");
+    assert.deepEqual(finding(failing, "api.prop-type-soundness").evidence, [
+      "Button.data (any)",
+      "Button.metadata (unknown)",
+      "Dialog.payload (unknown)",
+    ]);
+    assert.equal(finding(clean, "api.prop-type-soundness").outcome, "pass");
+    assert.deepEqual(finding(clean, "api.prop-type-soundness").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/2 exported component props use any/unknown; offenders: none",
+    });
+  });
+
+  it("reports api.prop-type-soundness as N/A when no TypeScript types ship", async () => {
+    const report = await audit(m1FixturePath("typeless-api"));
+
+    assert.equal(finding(report, "api.types-resolve").outcome, "fail");
+    assert.equal(finding(report, "api.prop-type-soundness").outcome, "na");
+    assert.deepEqual(finding(report, "api.prop-type-soundness").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No TypeScript types found; api.types-resolve carries the importability failure.",
+    });
+  });
+
+  it("checks api.name-coherence against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("name-coherence-mismatch"));
+    const clean = await audit(m1FixturePath("name-coherence-clean"));
+
+    assert.deepEqual(finding(failing, "api.name-coherence").measure, {
+      kind: "count",
+      value: 3,
+      detail:
+        "3 component name carrier mismatches: Button source file src/Primary.ts, Button story file src/Badge.stories.tsx, Card manifest file src/Tile.ts",
+    });
+    assert.equal(finding(failing, "api.name-coherence").outcome, "fail");
+    assert.deepEqual(finding(failing, "api.name-coherence").evidence, [
+      "Button source file src/Primary.ts",
+      "Button story file src/Badge.stories.tsx",
+      "Card manifest file src/Tile.ts",
+    ]);
+    assert.equal(finding(clean, "api.name-coherence").outcome, "pass");
+    assert.equal(finding(clean, "api.name-coherence").measure.value, 0);
+  });
+
+  it("checks api.barrel-completeness against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("incomplete-barrel"));
+    const clean = await audit(m1FixturePath("barrel-complete"));
+
+    assert.deepEqual(finding(failing, "api.barrel-completeness").measure, {
+      kind: "count",
+      value: 1,
+      detail: "1 component is deep-import-only and missing from the root barrel: Card",
+    });
+    assert.equal(finding(failing, "api.barrel-completeness").outcome, "fail");
+    assert.deepEqual(finding(failing, "api.barrel-completeness").evidence, ["Card"]);
+    assert.equal(finding(clean, "api.barrel-completeness").outcome, "pass");
+    assert.deepEqual(finding(clean, "api.barrel-completeness").measure, {
+      kind: "count",
+      value: 0,
+      detail: "0 components are deep-import-only and missing from the root barrel: none",
+    });
+  });
+
+  it("aggregates all four API clarity checks into the API category score", async () => {
+    const report = await audit(m1FixturePath("api-category-aggregate"));
+    const apiCategory = report.categories.find((category) => category.id === "api");
+
+    assert.equal(finding(report, "api.types-resolve").outcome, "pass");
+    assert.equal(finding(report, "api.prop-type-soundness").measure.value, 1);
+    assert.equal(finding(report, "api.name-coherence").measure.value, 1);
+    assert.equal(finding(report, "api.barrel-completeness").measure.value, 1);
+    assert.deepEqual(apiCategory, {
+      id: "api",
+      score: 37.5,
+      applicable: 4,
+      total: 4,
+      weightRedistributed: false,
+    });
   });
 
   it("derives component inventory from the public package entrypoint in monorepos", async () => {
@@ -407,8 +498,8 @@ describe("audit seam", () => {
   it("produces six real scored categories on the combined M1 fixture", async () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
-    assert.equal(report.applicability.applicable, 10);
-    assert.equal(report.applicability.total, 10);
+    assert.equal(report.applicability.applicable, 13);
+    assert.equal(report.applicability.total, 13);
     assert.equal(report.applicability.confidence, "high");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
@@ -421,7 +512,21 @@ describe("audit seam", () => {
 
     assert.deepEqual(
       report.findings.map((candidate) => candidate.severity),
-      ["critical", "critical", "critical", "critical", "warning", "warning", "warning", "warning", "warning", "warning"],
+      [
+        "critical",
+        "critical",
+        "critical",
+        "critical",
+        "warning",
+        "warning",
+        "warning",
+        "warning",
+        "warning",
+        "warning",
+        "warning",
+        "warning",
+        "info",
+      ],
     );
     for (const candidate of report.findings) {
       assert.ok(candidate.fix.length > 0, `${candidate.checkId} should carry a fix`);

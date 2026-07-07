@@ -1,0 +1,5 @@
+{
+  "components": [
+    { "name": "Button", "filePath": "src/Button.ts" }
+  ]
+}

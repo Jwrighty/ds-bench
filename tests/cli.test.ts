@@ -16,9 +16,9 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /composite score: 46\.4\/100/);
-    assert.match(result.stdout, /applicable checks: 7\/10 \(medium confidence\)/);
+    assert.match(result.stdout, /applicable checks: 10\/13 \(medium confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
-    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
+    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(1\/1\)/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
@@ -71,9 +71,9 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /composite score: 70\/100/);
-    assert.match(result.stdout, /applicable checks: 10\/10 \(high confidence\)/);
+    assert.match(result.stdout, /applicable checks: 13\/13 \(high confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
-    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
+    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
     assert.match(result.stdout, /Token hygiene\s+\[###\.{7}\]\s+33\.3 \(1\/1\)/);
     assert.match(result.stdout, /Deprecation signalling\s+\[#####\.{5}\]\s+50 \(2\/2\)/);

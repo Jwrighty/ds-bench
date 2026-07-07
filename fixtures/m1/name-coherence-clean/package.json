@@ -1,0 +1,5 @@
+{
+  "name": "name-coherence-clean",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

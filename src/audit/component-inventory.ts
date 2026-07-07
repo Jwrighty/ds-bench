@@ -33,14 +33,17 @@ export type ComponentImport = {
 
 export function getExportedComponents(files: TextFile[]): ComponentInventory {
   const components = new Set(
-    getExportedSymbols(files)
-      .filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name))
+    getExportedComponentSymbols(files)
       .map((symbol) => symbol.name),
   );
 
   return {
     components: Array.from(components).sort(),
   };
+}
+
+export function getExportedComponentSymbols(files: TextFile[]): ExportedSymbol[] {
+  return getExportedSymbols(files).filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name));
 }
 
 export function getExportedSymbols(files: TextFile[]): ExportedSymbol[] {

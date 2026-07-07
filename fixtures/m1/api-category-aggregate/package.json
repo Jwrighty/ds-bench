@@ -1,0 +1,5 @@
+{
+  "name": "api-category-aggregate",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}
