@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import { audit } from "./audit/audit.ts";
+import { loadAuditConfig } from "./audit/config.ts";
 import { renderAuditReport } from "./render/terminal.ts";
+import type { AuditConfig } from "./audit/types.ts";
 
 type CliOptions = {
   json: boolean;
   targetPath: string | null;
+  configPath: string | null;
 };
 
 async function main(argv: string[]): Promise<number> {
@@ -21,7 +24,12 @@ async function main(argv: string[]): Promise<number> {
     return 1;
   }
 
-  const report = await audit(options.targetPath);
+  let config: AuditConfig = {};
+  if (options.configPath) {
+    config = loadAuditConfig(options.configPath);
+  }
+
+  const report = await audit(options.targetPath, config);
   if (options.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
@@ -34,20 +42,27 @@ async function main(argv: string[]): Promise<number> {
 function parseAuditArgs(args: string[]): CliOptions {
   let json = false;
   let targetPath: string | null = null;
+  let configPath: string | null = null;
 
-  for (const arg of args) {
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
     if (arg === "--json") {
       json = true;
+    } else if (arg === "--config") {
+      configPath = args[index + 1] ?? null;
+      index += 1;
+    } else if (arg.startsWith("--config=")) {
+      configPath = arg.slice("--config=".length);
     } else if (!targetPath) {
       targetPath = arg;
     }
   }
 
-  return { json, targetPath };
+  return { json, targetPath, configPath };
 }
 
 function printUsage(): void {
-  process.stderr.write("Usage: ds-bench audit <path> [--json]\n");
+  process.stderr.write("Usage: ds-bench audit <path> [--json] [--config <path>]\n");
 }
 
 const exitCode = await main(process.argv.slice(2));

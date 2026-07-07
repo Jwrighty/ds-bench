@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { CHECK_REGISTRY } from "./checks/registry.ts";
 import { detectCarriers, getPackageName, isRecord, listTextFiles } from "./file-system.ts";
-import { scoreFindings } from "./scoring.ts";
+import { scoreFindings, type FindingScoreInput } from "./scoring.ts";
 import type { AuditConfig, AuditFinding, AuditReport } from "./types.ts";
 
 const RUBRIC_VERSION = "ARS v0";
@@ -11,21 +11,26 @@ const RUBRIC_VERSION = "ARS v0";
 export async function audit(targetPath: string, config: AuditConfig = {}): Promise<AuditReport> {
   const resolvedTarget = resolve(targetPath);
   const files = listTextFiles(resolvedTarget);
-  const findings: AuditFinding[] = [];
+  const findingsForScoring: FindingScoreInput[] = [];
 
   for (const check of CHECK_REGISTRY) {
     const result = await check.run({ targetPath: resolvedTarget });
-    findings.push({
+    findingsForScoring.push({
       checkId: check.id,
       category: check.category,
       severity: check.severity,
       outcome: result.outcome,
+      score: result.score,
       measure: result.measure,
       evidence: result.evidence,
       fix: check.fix,
       receipt: check.receipt,
     });
   }
+
+  const findings = sortFindingsForReport(
+    findingsForScoring.map(({ score: _score, ...finding }) => finding),
+  );
 
   return {
     rubricVersion: RUBRIC_VERSION,
@@ -35,9 +40,19 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
       path: resolvedTarget,
       detectedCarriers: detectCarriers(resolvedTarget, files),
     },
-    ...scoreFindings(CHECK_REGISTRY, findings, config),
+    ...scoreFindings(CHECK_REGISTRY, findingsForScoring, config),
     findings,
   };
+}
+
+const SEVERITY_RANK: Record<AuditFinding["severity"], number> = {
+  critical: 0,
+  warning: 1,
+  info: 2,
+};
+
+function sortFindingsForReport(findings: AuditFinding[]): AuditFinding[] {
+  return [...findings].sort((left, right) => SEVERITY_RANK[left.severity] - SEVERITY_RANK[right.severity]);
 }
 
 function getToolVersion(): string {

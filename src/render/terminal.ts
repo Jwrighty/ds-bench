@@ -14,7 +14,7 @@ export function renderAuditReport(report: AuditReport): string {
     "categories:",
     ...report.categories.map(
       (category) =>
-        `  ${CATEGORY_LABELS[category.id].padEnd(23)} ${renderBar(category.score)} ${formatCategoryScore(category.score)} (${category.applicable}/${category.total})`,
+        `  ${CATEGORY_LABELS[category.id].padEnd(23)} ${renderBar(category.score)} ${formatCategoryScore(category.score)} (${category.applicable}/${category.total})${category.weightRedistributed ? " weight redistributed" : ""}`,
     ),
     "",
     "findings:",

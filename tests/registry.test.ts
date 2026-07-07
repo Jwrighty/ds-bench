@@ -3,21 +3,38 @@ import { describe, it } from "node:test";
 import { CHECK_REGISTRY } from "../src/audit/checks/registry.ts";
 
 describe("check registry", () => {
-  it("contains exactly the fully metadata'd docs.usage-examples check for M0", () => {
-    assert.equal(CHECK_REGISTRY.length, 1);
+  it("contains fully metadata'd checks", () => {
+    assert.ok(CHECK_REGISTRY.length >= 1);
     assert.equal(CHECK_REGISTRY[0].id, "docs.usage-examples");
 
     for (const check of CHECK_REGISTRY) {
-      assert.ok(check.id);
-      assert.ok(check.category);
-      assert.ok(check.severity);
-      assert.ok(check.signal);
-      assert.ok(check.carriers.length > 0);
-      assert.ok(check.measure);
-      assert.ok(check.fix);
-      assert.ok(check.naBehavior);
-      assert.ok(check.receipt);
+      for (const field of ["id", "category", "severity", "signal", "carriers", "measure", "fix", "naBehavior", "receipt"] as const) {
+        assert.ok(Object.hasOwn(check, field), `${check.id ?? "unknown check"} is missing ${field}`);
+      }
+
+      assertNonEmptyString(check.id, "id");
+      assertNonEmptyString(check.category, `${check.id}.category`);
+      assertNonEmptyString(check.severity, `${check.id}.severity`);
+      assertNonEmptyString(check.signal, `${check.id}.signal`);
+      assert.ok(check.carriers.length > 0, `${check.id}.carriers must not be empty`);
+      for (const carrier of check.carriers) {
+        assertNonEmptyString(carrier, `${check.id}.carriers[]`);
+      }
+      assertNonEmptyString(check.measure, `${check.id}.measure`);
+      assertNonEmptyString(check.fix, `${check.id}.fix`);
+      assertNonEmptyString(check.naBehavior, `${check.id}.naBehavior`);
+      assertNonEmptyString(check.receipt, `${check.id}.receipt`);
       assert.equal(typeof check.run, "function");
     }
   });
+
+  it("does not register duplicate check ids", () => {
+    const ids = CHECK_REGISTRY.map((check) => check.id);
+    assert.deepEqual(ids, Array.from(new Set(ids)));
+  });
 });
+
+function assertNonEmptyString(value: string, label: string): void {
+  assert.equal(typeof value, "string", `${label} must be a string`);
+  assert.ok(value.trim().length > 0, `${label} must not be blank`);
+}

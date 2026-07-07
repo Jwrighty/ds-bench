@@ -50,6 +50,7 @@ export type AuditReport = {
     score: number | null;
     applicable: number;
     total: number;
+    weightRedistributed: boolean;
   }>;
   findings: AuditFinding[];
 };

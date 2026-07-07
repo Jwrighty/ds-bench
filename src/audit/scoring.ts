@@ -1,6 +1,10 @@
 import { CATEGORY_ORDER, DEFAULT_WEIGHTS } from "./categories.ts";
 import type { AuditCheck, AuditConfig, AuditFinding, CategoryId, Confidence } from "./types.ts";
 
+export type FindingScoreInput = AuditFinding & {
+  score: number | null;
+};
+
 export type ScoredReportParts = {
   weights: {
     source: "default" | "custom";
@@ -17,10 +21,11 @@ export type ScoredReportParts = {
     score: number | null;
     applicable: number;
     total: number;
+    weightRedistributed: boolean;
   }>;
 };
 
-export function scoreFindings(checks: AuditCheck[], findings: AuditFinding[], config: AuditConfig = {}): ScoredReportParts {
+export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[], config: AuditConfig = {}): ScoredReportParts {
   const weights = {
     source: config.weights ? ("custom" as const) : ("default" as const),
     values: { ...DEFAULT_WEIGHTS, ...config.weights },
@@ -29,7 +34,7 @@ export function scoreFindings(checks: AuditCheck[], findings: AuditFinding[], co
   const categories = CATEGORY_ORDER.map((id) => {
     const categoryChecks = checks.filter((check) => check.category === id);
     const categoryFindings = findings.filter((finding) => finding.category === id && finding.outcome !== "na");
-    const scores = categoryFindings.map((finding) => finding.measure.value);
+    const scores = categoryFindings.map((finding) => finding.score ?? 0);
     const score = scores.length === 0 ? null : roundScore(mean(scores) * 100);
 
     return {
@@ -37,6 +42,7 @@ export function scoreFindings(checks: AuditCheck[], findings: AuditFinding[], co
       score,
       applicable: categoryFindings.length,
       total: categoryChecks.length,
+      weightRedistributed: score === null && weights.values[id] > 0,
     };
   });
 

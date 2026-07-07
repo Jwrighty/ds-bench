@@ -31,12 +31,12 @@ describe("terminal renderer", () => {
         confidence: "high",
       },
       categories: [
-        { id: "docs", score: 50, applicable: 1, total: 1 },
-        { id: "api", score: null, applicable: 0, total: 0 },
-        { id: "guidance", score: null, applicable: 0, total: 0 },
-        { id: "tokens", score: null, applicable: 0, total: 0 },
-        { id: "deprecation", score: null, applicable: 0, total: 0 },
-        { id: "agent", score: null, applicable: 0, total: 0 },
+        { id: "docs", score: 50, applicable: 1, total: 1, weightRedistributed: false },
+        { id: "api", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "guidance", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "tokens", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "deprecation", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "agent", score: null, applicable: 0, total: 0, weightRedistributed: true },
       ],
       findings: [
         {
@@ -68,11 +68,11 @@ detected carriers: Storybook stories/MDX, TypeScript exports, package.json expor
 
 categories:
   Docs & examples         [#####.....]    50 (1/1)
-  API clarity             [N/A       ]   N/A (0/0)
-  Usage guidance          [N/A       ]   N/A (0/0)
-  Token hygiene           [N/A       ]   N/A (0/0)
-  Deprecation signalling  [N/A       ]   N/A (0/0)
-  Agent metadata          [N/A       ]   N/A (0/0)
+  API clarity             [N/A       ]   N/A (0/0) weight redistributed
+  Usage guidance          [N/A       ]   N/A (0/0) weight redistributed
+  Token hygiene           [N/A       ]   N/A (0/0) weight redistributed
+  Deprecation signalling  [N/A       ]   N/A (0/0) weight redistributed
+  Agent metadata          [N/A       ]   N/A (0/0) weight redistributed
 
 findings:
   [critical] docs.usage-examples - fail
