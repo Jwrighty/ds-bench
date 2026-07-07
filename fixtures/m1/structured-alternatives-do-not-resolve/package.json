@@ -1,0 +1,5 @@
+{
+  "name": "structured-alternatives-do-not-resolve",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

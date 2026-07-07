@@ -43,6 +43,7 @@ function splitMarkdownSections(file: TextFile, components: string[]): GuidanceSe
   }
 
   const sections: GuidanceSection[] = [];
+  const fileSubject = subjectFromPath(file.relativePath, components);
   let current: GuidanceSection | null = null;
 
   for (const line of file.content.split(/\r?\n/)) {
@@ -55,7 +56,7 @@ function splitMarkdownSections(file: TextFile, components: string[]): GuidanceSe
       const headingText = heading.groups?.text ?? "";
       current = {
         relativePath: file.relativePath,
-        subject: subjectFromText(headingText, components),
+        subject: subjectFromText(headingText, components) ?? fileSubject,
         content: line,
       };
       continue;
@@ -64,7 +65,7 @@ function splitMarkdownSections(file: TextFile, components: string[]): GuidanceSe
     if (!current) {
       current = {
         relativePath: file.relativePath,
-        subject: null,
+        subject: fileSubject,
         content: "",
       };
     }

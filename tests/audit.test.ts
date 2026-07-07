@@ -346,6 +346,36 @@ describe("audit seam", () => {
     });
   });
 
+  it("ignores unmarked capitalized prose in alternatives guidance", async () => {
+    const report = await audit(m1FixturePath("alternatives-prose-overmatch"));
+
+    assert.equal(finding(report, "guidance.alternatives-resolve").outcome, "na");
+    assert.deepEqual(finding(report, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No alternatives/instead component references found; alternatives resolution is not applicable.",
+    });
+  });
+
+  it("counts structured alternatives fields and fails unresolved structured references", async () => {
+    const clean = await audit(m1FixturePath("structured-alternatives-resolve-clean"));
+    const failing = await audit(m1FixturePath("structured-alternatives-do-not-resolve"));
+
+    assert.equal(finding(clean, "guidance.alternatives-resolve").outcome, "pass");
+    assert.deepEqual(finding(clean, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "2/2 alternatives/instead component references resolve to exported components; unresolved: none",
+    });
+    assert.equal(finding(failing, "guidance.alternatives-resolve").outcome, "fail");
+    assert.deepEqual(finding(failing, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 alternatives/instead component references resolve to exported components; unresolved: GhostButton",
+    });
+    assert.deepEqual(finding(failing, "guidance.alternatives-resolve").evidence, ["GhostButton"]);
+  });
+
   it("reports guidance.alternatives-resolve as N/A when no alternatives content exists", async () => {
     const report = await audit(m1FixturePath("usage-guidance-clean"));
 
