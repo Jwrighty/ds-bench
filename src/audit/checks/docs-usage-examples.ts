@@ -15,7 +15,7 @@ export const docsUsageExamplesCheck: AuditCheck = {
   naBehavior: "Never N/A; usage examples are a universal design-system signal, so absence fails.",
   receipt: "Agents recreate components they can't see used (Atlassian DESIGN.md experiment).",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const inventory = getExportedComponents(files);
     const exampleFiles = files.filter((file) => isExampleCarrier(file.relativePath));
     const covered = new Set<string>();

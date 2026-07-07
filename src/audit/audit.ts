@@ -14,7 +14,7 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
   const findingsForScoring: FindingScoreInput[] = [];
 
   for (const check of CHECK_REGISTRY) {
-    const result = await check.run({ targetPath: resolvedTarget });
+    const result = await check.run({ targetPath: resolvedTarget, files });
     findingsForScoring.push({
       checkId: check.id,
       category: check.category,

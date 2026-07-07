@@ -7,6 +7,20 @@ const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
 const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
 const DATA_EXTENSIONS = new Set([".json"]);
+const IGNORED_DIRECTORIES = new Set([
+  ".cache",
+  ".claude",
+  ".git",
+  ".next",
+  ".pnpm-store",
+  ".turbo",
+  ".worktrees",
+  "build",
+  "coverage",
+  "dist",
+  "node_modules",
+  "storybook-static",
+]);
 
 export type TextFile = {
   path: string;
@@ -98,7 +112,7 @@ function walk(root: string): string[] {
   }
 
   return entries.flatMap((entry) => {
-    if (entry === "node_modules" || entry === ".git") {
+    if (IGNORED_DIRECTORIES.has(entry)) {
       return [];
     }
 

@@ -27,7 +27,7 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
   naBehavior: "N/A when zero style-LOC detected across all style carriers.",
   receipt: "Agents imitate the system's own styling habits; hardcoded source values become copied output.",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const styleContents = files
       .map((file) => ({ relativePath: file.relativePath, styleContent: extractStyleContent(file.relativePath, file.content) }))
       .filter((file) => file.styleContent.length > 0);

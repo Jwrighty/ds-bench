@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { join } from "node:path";
-import { getExportedComponents } from "../component-inventory.ts";
+import { getExportedComponents, getPublicPackage, type PublicPackage } from "../component-inventory.ts";
 import { escapeRegExp, getPackageName, listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
@@ -16,8 +16,9 @@ export const apiTypesResolveCheck: AuditCheck = {
   naBehavior: "Never N/A; packages without resolvable public types fail this API clarity signal.",
   receipt: "Wrong import paths are a documented agent failure mode.",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const exportedNames = getExportedComponents(files).components;
+    const publicPackage = getPublicPackage(files);
 
     if (exportedNames.length === 0) {
       return {
@@ -32,7 +33,16 @@ export const apiTypesResolveCheck: AuditCheck = {
       };
     }
 
-    const unresolved = getUnresolvedSyntheticImports(context.targetPath, exportedNames);
+    if (!publicPackage) {
+      return entrypointUnresolvableResult("package entrypoint could not be identified", "unknown package");
+    }
+
+    const result = getUnresolvedSyntheticImports(context.targetPath, publicPackage, exportedNames);
+    if (result.kind === "entrypoint-unresolvable") {
+      return entrypointUnresolvableResult(result.detail, publicPackage.name);
+    }
+
+    const unresolved = result.unresolved;
     const resolvedCount = exportedNames.length - unresolved.length;
     const ratio = resolvedCount / exportedNames.length;
 
@@ -49,9 +59,14 @@ export const apiTypesResolveCheck: AuditCheck = {
   },
 };
 
-function getUnresolvedSyntheticImports(targetPath: string, exportNames: string[]): string[] {
-  const packageName = getPackageName(targetPath);
-  const probePath = join(targetPath, "__ds_bench_types_probe__.ts");
+type SyntheticImportResult =
+  | { kind: "checked"; unresolved: string[] }
+  | { kind: "entrypoint-unresolvable"; detail: string };
+
+function getUnresolvedSyntheticImports(targetPath: string, publicPackage: PublicPackage, exportNames: string[]): SyntheticImportResult {
+  const packageRootPath = join(targetPath, publicPackage.rootRelativePath);
+  const packageName = publicPackage.name || getPackageName(packageRootPath);
+  const probePath = join(packageRootPath, "__ds_bench_types_probe__.ts");
   const probe = [
     `import { ${exportNames.join(", ")} } from ${JSON.stringify(packageName)};`,
     `const __dsBenchProbe = [${exportNames.join(", ")}];`,
@@ -68,16 +83,32 @@ function getUnresolvedSyntheticImports(targetPath: string, exportNames: string[]
   const diagnostics = ts.getPreEmitDiagnostics(program).filter((diagnostic) => diagnostic.file?.fileName === probePath);
 
   if (diagnostics.length === 0) {
-    return [];
+    return { kind: "checked", unresolved: [] };
   }
 
   const hasModuleResolutionFailure = diagnostics.some((diagnostic) => MODULE_RESOLUTION_ERROR_CODES.has(diagnostic.code));
   if (hasModuleResolutionFailure) {
-    return exportNames;
+    return {
+      kind: "entrypoint-unresolvable",
+      detail: `package entrypoint for ${packageName} is unresolvable; synthetic package import could not be checked.`,
+    };
   }
 
   const text = diagnostics.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")).join("\n");
-  return exportNames.filter((name) => new RegExp(`\\b${escapeRegExp(name)}\\b`).test(text));
+  return { kind: "checked", unresolved: exportNames.filter((name) => new RegExp(`\\b${escapeRegExp(name)}\\b`).test(text)) };
+}
+
+function entrypointUnresolvableResult(detail: string, packageName: string): CheckResult {
+  return {
+    outcome: "fail",
+    score: 0,
+    measure: {
+      kind: "ratio",
+      value: 0,
+      detail,
+    },
+    evidence: [packageName],
+  };
 }
 
 // TS2307 "Cannot find module", TS7016/TS2792 (missing/untyped declaration file variants).

@@ -83,4 +83,66 @@ findings:
 `,
     );
   });
+
+  it("caps long measure detail lists in terminal output", () => {
+    const report: AuditReport = {
+      rubricVersion: "ARS v0",
+      toolVersion: "0.0.0",
+      target: {
+        name: "long-report",
+        path: "/fixtures/long-report",
+        detectedCarriers: [],
+      },
+      weights: {
+        source: "default",
+        values: {
+          docs: 25,
+          api: 20,
+          guidance: 15,
+          tokens: 15,
+          deprecation: 15,
+          agent: 10,
+        },
+      },
+      composite: 0,
+      applicability: {
+        applicable: 1,
+        total: 1,
+        confidence: "high",
+      },
+      categories: [
+        { id: "docs", score: 0, applicable: 1, total: 1, weightRedistributed: false },
+        { id: "api", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "guidance", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "tokens", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "deprecation", score: null, applicable: 0, total: 0, weightRedistributed: true },
+        { id: "agent", score: null, applicable: 0, total: 0, weightRedistributed: true },
+      ],
+      findings: [
+        {
+          checkId: "tokens.hardcoded-values",
+          category: "tokens",
+          severity: "warning",
+          outcome: "fail",
+          measure: {
+            kind: "count",
+            value: 10,
+            detail:
+              "12 magic values across 10 style LOC (120 per 100 LOC); token references: 0; offenders: one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve",
+          },
+          evidence: ["one", "two", "three"],
+          fix: "Use tokens.",
+          receipt: "Hardcoded values are copied.",
+        },
+      ],
+    };
+
+    const output = renderAuditReport(report);
+
+    assert.match(
+      output,
+      /offenders \(showing 8 of 12\): one, two, three, four, five, six, seven, eight/,
+    );
+    assert.doesNotMatch(output, /nine, ten, eleven, twelve/);
+  });
 });

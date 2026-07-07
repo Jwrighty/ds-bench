@@ -15,7 +15,7 @@ export const agentManifestCoverageCheck: AuditCheck = {
   naBehavior: "Never N/A; absent or partial manifests are scored as agent metadata gaps.",
   receipt: "Partial manifests force agents to guess the gaps.",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const components = getExportedComponents(files).components;
 
     if (components.length === 0) {

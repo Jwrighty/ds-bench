@@ -1,3 +1,5 @@
+import type { TextFile } from "./file-system.ts";
+
 export type CategoryId =
   | "docs"
   | "api"
@@ -80,6 +82,7 @@ export type CheckResult = {
 
 export type CheckContext = {
   targetPath: string;
+  files?: TextFile[];
 };
 
 export type AuditCheck = CheckMetadata & {

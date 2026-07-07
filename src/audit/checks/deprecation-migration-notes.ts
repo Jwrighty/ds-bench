@@ -19,7 +19,7 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
   naBehavior: "N/A when zero deprecated exports exist.",
   receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
   run(context: CheckContext): CheckResult {
-    const sourceFiles = listTextFiles(context.targetPath).filter((file) => !isExampleCarrier(file.relativePath));
+    const sourceFiles = (context.files ?? listTextFiles(context.targetPath)).filter((file) => !isExampleCarrier(file.relativePath));
     const deprecatedExports = sourceFiles.flatMap((file) => getDeprecatedExports(file.content));
 
     if (deprecatedExports.length === 0) {

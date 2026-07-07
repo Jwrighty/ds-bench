@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { join } from "node:path";
 import { audit, sortFindingsForReport } from "../src/audit/audit.ts";
+import { getExportedComponents, getPublicPackage } from "../src/audit/component-inventory.ts";
+import { listTextFiles } from "../src/audit/file-system.ts";
 import type { AuditFinding } from "../src/audit/types.ts";
 
 const repoRoot = process.cwd();
@@ -172,12 +174,40 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "api.types-resolve").measure, {
       kind: "ratio",
       value: 0,
-      detail: "0/1 exports typecheck from a synthetic package import; unresolved: Button",
+      detail: "package entrypoint for types-do-not-resolve is unresolvable; synthetic package import could not be checked.",
     });
     assert.equal(finding(failing, "api.types-resolve").outcome, "fail");
-    assert.deepEqual(finding(failing, "api.types-resolve").evidence, ["Button"]);
+    assert.deepEqual(finding(failing, "api.types-resolve").evidence, ["types-do-not-resolve"]);
     assert.equal(finding(clean, "api.types-resolve").outcome, "pass");
     assert.equal(finding(clean, "api.types-resolve").measure.value, 1);
+  });
+
+  it("derives component inventory from the public package entrypoint in monorepos", async () => {
+    const targetPath = join(repoRoot, "fixtures/public-api/monorepo-entrypoint");
+    const files = listTextFiles(targetPath);
+    const publicPackage = getPublicPackage(files);
+
+    assert.equal(publicPackage?.name, "@example/react");
+    assert.equal(publicPackage?.rootRelativePath, "packages/react");
+    assert.deepEqual(getExportedComponents(files).components, ["Button", "Card"]);
+
+    const report = await audit(targetPath);
+    const affectedChecks = [
+      "docs.usage-examples",
+      "api.types-resolve",
+      "guidance.when-to-use",
+      "deprecation.marked",
+      "agent.manifest-coverage",
+    ];
+
+    for (const checkId of affectedChecks) {
+      assert.doesNotMatch(finding(report, checkId).measure.detail, /\b(?:App|Default|GET|RouteWidget)\b/);
+      assert.doesNotMatch(finding(report, checkId).evidence.join(", "), /\b(?:App|Default|GET|RouteWidget)\b/);
+    }
+
+    assert.equal(finding(report, "api.types-resolve").outcome, "pass");
+    assert.equal(finding(report, "docs.usage-examples").measure.detail, "1/2 exported components have importable usage examples; missing: Card");
+    assert.equal(finding(report, "agent.manifest-coverage").measure.detail, "1/2 exported components are covered by a manifest; missing: Card");
   });
 
   it("checks guidance.when-to-use against failure and clean fixtures", async () => {

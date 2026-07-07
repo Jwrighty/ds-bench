@@ -16,7 +16,7 @@ export const guidanceWhenToUseCheck: AuditCheck = {
   naBehavior: "Never N/A; missing guidance is a scored selection gap.",
   receipt: "Agents must choose components, not just call them (Atlassian recreation finding).",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const components = getExportedComponents(files).components;
 
     if (components.length === 0) {

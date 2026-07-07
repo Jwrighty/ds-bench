@@ -1,10 +1,20 @@
+import { dirname, extname, join } from "node:path";
 import { isExampleCarrier } from "./example-carriers.ts";
-import { escapeRegExp, type TextFile } from "./file-system.ts";
+import { escapeRegExp, isRecord, type TextFile } from "./file-system.ts";
 
 export const COMPONENT_NAME = /^[A-Z][A-Za-z0-9]*$/;
+const SOURCE_MODULE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".d.ts"] as const;
 
 export type ComponentInventory = {
   components: string[];
+};
+
+export type PublicPackage = {
+  name: string;
+  rootRelativePath: string;
+  packageJsonPath: string;
+  declaredEntryRelativePaths: string[];
+  sourceEntryRelativePaths: string[];
 };
 
 export type ExportedSymbol = {
@@ -13,6 +23,7 @@ export type ExportedSymbol = {
   relativePath: string;
   declaration: string;
   leadingComment: string;
+  kind: "value" | "type";
 };
 
 export type ComponentImport = {
@@ -21,22 +32,11 @@ export type ComponentImport = {
 };
 
 export function getExportedComponents(files: TextFile[]): ComponentInventory {
-  const components = new Set<string>();
-
-  for (const file of files.filter((file) => !isExampleCarrier(file.relativePath))) {
-    for (const match of file.content.matchAll(/\bexport\s+(?:declare\s+)?(?:function|class|const|let|var)\s+([A-Z][A-Za-z0-9]*)\b/g)) {
-      components.add(match[1]);
-    }
-
-    for (const match of file.content.matchAll(/\bexport\s*\{\s*([^}]+)\s*\}/g)) {
-      for (const specifier of match[1].split(",")) {
-        const exported = specifier.trim().split(/\s+as\s+/).at(-1)?.trim();
-        if (exported && COMPONENT_NAME.test(exported)) {
-          components.add(exported);
-        }
-      }
-    }
-  }
+  const components = new Set(
+    getExportedSymbols(files)
+      .filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name))
+      .map((symbol) => symbol.name),
+  );
 
   return {
     components: Array.from(components).sort(),
@@ -44,6 +44,11 @@ export function getExportedComponents(files: TextFile[]): ComponentInventory {
 }
 
 export function getExportedSymbols(files: TextFile[]): ExportedSymbol[] {
+  const publicPackage = getPublicPackage(files);
+  if (publicPackage && publicPackage.sourceEntryRelativePaths.length > 0) {
+    return collectPublicEntrySymbols(files, publicPackage.sourceEntryRelativePaths);
+  }
+
   const symbols = new Map<string, ExportedSymbol>();
 
   for (const file of files.filter((file) => !isExampleCarrier(file.relativePath))) {
@@ -62,11 +67,12 @@ export function getExportedSymbols(files: TextFile[]): ExportedSymbol[] {
         relativePath: file.relativePath,
         declaration: match[0],
         leadingComment: match.groups?.comment?.trim() ?? "",
+        kind: declarationKind(match.groups?.kind),
       });
     }
 
-    for (const match of file.content.matchAll(/\bexport\s*\{\s*([^}]+)\s*\}/g)) {
-      for (const specifier of match[1].split(",")) {
+    for (const match of file.content.matchAll(/\bexport\s+(?<typeOnly>type\s+)?\{\s*(?<specifiers>[^}]+)\s*\}/g)) {
+      for (const specifier of (match.groups?.specifiers ?? "").split(",")) {
         const exported = specifier.trim().split(/\s+as\s+/).at(-1)?.trim();
         if (!exported || symbols.has(exported)) {
           continue;
@@ -78,12 +84,190 @@ export function getExportedSymbols(files: TextFile[]): ExportedSymbol[] {
           relativePath: file.relativePath,
           declaration: specifier.trim(),
           leadingComment: findLeadingCommentForName(file.content, exported),
+          kind: match.groups?.typeOnly ? "type" : "value",
         });
       }
     }
   }
 
   return Array.from(symbols.values()).sort((left, right) => left.name.localeCompare(right.name));
+}
+
+export function getPublicPackage(files: TextFile[]): PublicPackage | null {
+  const candidates = discoverPackageCandidates(files);
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const rootCandidate = candidates.find((candidate) => candidate.rootRelativePath === "");
+  if (rootCandidate && rootCandidate.componentCount > 0) {
+    return toPublicPackage(rootCandidate);
+  }
+
+  const componentCandidates = candidates.filter((candidate) => candidate.componentCount > 0);
+  if (componentCandidates.length > 0) {
+    componentCandidates.sort((left, right) => {
+      const componentDelta = right.componentCount - left.componentCount;
+      if (componentDelta !== 0) {
+        return componentDelta;
+      }
+
+      const nameDelta = packageNameScore(right.name) - packageNameScore(left.name);
+      if (nameDelta !== 0) {
+        return nameDelta;
+      }
+
+      return pathDepth(left.rootRelativePath) - pathDepth(right.rootRelativePath);
+    });
+    return toPublicPackage(componentCandidates[0]);
+  }
+
+  if (rootCandidate) {
+    return toPublicPackage(rootCandidate);
+  }
+
+  return toPublicPackage(candidates[0]);
+}
+
+type PackageCandidate = PublicPackage & {
+  componentCount: number;
+};
+
+function discoverPackageCandidates(files: TextFile[]): PackageCandidate[] {
+  const filesByPath = mapFilesByRelativePath(files);
+  const candidates: PackageCandidate[] = [];
+
+  for (const file of files.filter((candidate) => candidate.relativePath.endsWith("package.json"))) {
+    const packageJson = parseJsonObject(file.content);
+    if (!packageJson || typeof packageJson.name !== "string") {
+      continue;
+    }
+
+    const rootRelativePath = normalizeRelativePath(dirname(file.relativePath) === "." ? "" : dirname(file.relativePath));
+    const declaredEntryRelativePaths = getDeclaredEntryRelativePaths(rootRelativePath, packageJson);
+    if (declaredEntryRelativePaths.length === 0) {
+      continue;
+    }
+
+    const sourceEntryRelativePaths = getSourceEntryRelativePaths(rootRelativePath, declaredEntryRelativePaths, filesByPath);
+    const symbols = collectPublicEntrySymbols(files, sourceEntryRelativePaths);
+    candidates.push({
+      name: packageJson.name,
+      rootRelativePath,
+      packageJsonPath: file.relativePath,
+      declaredEntryRelativePaths,
+      sourceEntryRelativePaths,
+      componentCount: symbols.filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name)).length,
+    });
+  }
+
+  return candidates.sort((left, right) => pathDepth(left.rootRelativePath) - pathDepth(right.rootRelativePath));
+}
+
+function toPublicPackage(candidate: PackageCandidate): PublicPackage {
+  return {
+    name: candidate.name,
+    rootRelativePath: candidate.rootRelativePath,
+    packageJsonPath: candidate.packageJsonPath,
+    declaredEntryRelativePaths: candidate.declaredEntryRelativePaths,
+    sourceEntryRelativePaths: candidate.sourceEntryRelativePaths,
+  };
+}
+
+function collectPublicEntrySymbols(files: TextFile[], entryRelativePaths: string[]): ExportedSymbol[] {
+  const filesByPath = mapFilesByRelativePath(files);
+  const symbols = new Map<string, ExportedSymbol>();
+
+  for (const entryRelativePath of entryRelativePaths) {
+    const entryFile = filesByPath.get(entryRelativePath);
+    if (!entryFile) {
+      continue;
+    }
+
+    for (const symbol of collectSymbolsFromFile(entryFile, filesByPath, new Set())) {
+      symbols.set(symbol.name, symbol);
+    }
+  }
+
+  return Array.from(symbols.values()).sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function collectSymbolsFromFile(file: TextFile, filesByPath: Map<string, TextFile>, visited: Set<string>): ExportedSymbol[] {
+  if (visited.has(file.relativePath)) {
+    return [];
+  }
+  visited.add(file.relativePath);
+
+  const symbols: ExportedSymbol[] = [];
+  const declarationPattern =
+    /(?<comment>\/\*\*[\s\S]*?\*\/\s*)?\bexport\s+(?:declare\s+)?(?<kind>function|class|const|let|var|type|interface)\s+(?<name>[A-Za-z_$][A-Za-z0-9_$]*)\b/g;
+
+  for (const match of file.content.matchAll(declarationPattern)) {
+    const name = match.groups?.name;
+    if (!name) {
+      continue;
+    }
+
+    symbols.push({
+      name,
+      filePath: file.path,
+      relativePath: file.relativePath,
+      declaration: match[0],
+      leadingComment: match.groups?.comment?.trim() ?? "",
+      kind: declarationKind(match.groups?.kind),
+    });
+  }
+
+  const namedExportPattern = /\bexport\s+(?<typeOnly>type\s+)?\{\s*(?<specifiers>[^}]+)\s*\}(?:\s*from\s*["'](?<source>[^"']+)["'])?/g;
+  for (const match of file.content.matchAll(namedExportPattern)) {
+    const specifiers = match.groups?.specifiers ?? "";
+    const source = match.groups?.source;
+    const sourceFile = source ? resolveLocalSourceFile(file.relativePath, source, filesByPath) : file;
+    const typeOnly = Boolean(match.groups?.typeOnly);
+
+    for (const specifier of specifiers.split(",")) {
+      const parsed = parseExportSpecifier(specifier);
+      if (!parsed) {
+        continue;
+      }
+
+      const resolved = sourceFile ? findDeclaredSymbol(sourceFile, parsed.localName, filesByPath) : null;
+      symbols.push(
+        resolved
+          ? { ...resolved, name: parsed.exportedName, kind: typeOnly ? "type" : resolved.kind }
+          : {
+              name: parsed.exportedName,
+              filePath: file.path,
+              relativePath: file.relativePath,
+              declaration: specifier.trim(),
+              leadingComment: findLeadingCommentForName(file.content, parsed.localName),
+              kind: typeOnly ? "type" : "value",
+            },
+      );
+    }
+  }
+
+  const exportStarPattern = /\bexport\s+\*\s+from\s*["'](?<source>[^"']+)["']/g;
+  for (const match of file.content.matchAll(exportStarPattern)) {
+    const source = match.groups?.source;
+    const sourceFile = source ? resolveLocalSourceFile(file.relativePath, source, filesByPath) : null;
+    if (sourceFile) {
+      symbols.push(...collectSymbolsFromFile(sourceFile, filesByPath, new Set(visited)));
+    }
+  }
+
+  return symbols;
+}
+
+function findDeclaredSymbol(file: TextFile, name: string, filesByPath: Map<string, TextFile>): ExportedSymbol | null {
+  for (const symbol of collectSymbolsFromFile(file, filesByPath, new Set())) {
+    if (symbol.name === name) {
+      return symbol;
+    }
+  }
+
+  const declaration = findLocalDeclaration(file, name);
+  return declaration ? { ...declaration, name } : null;
 }
 
 /** Local names of JSX elements rendered in `content`, e.g. `<Button>` -> "Button". */
@@ -142,4 +326,201 @@ function findLeadingCommentForName(content: string, name: string): string {
     `/\\*\\*([\\s\\S]*?)\\*/\\s*(?:export\\s+)?(?:declare\\s+)?(?:function|class|const|let|var|type|interface)\\s+${escapedName}\\b`,
   );
   return declaration.exec(content)?.[0] ?? "";
+}
+
+function findLocalDeclaration(file: TextFile, name: string): ExportedSymbol | null {
+  const escapedName = escapeRegExp(name);
+  const declaration = new RegExp(
+    `(?<comment>/\\*\\*[\\s\\S]*?\\*/\\s*)?\\b(?:export\\s+)?(?:declare\\s+)?(?<kind>function|class|const|let|var|type|interface)\\s+${escapedName}\\b`,
+  );
+  const match = declaration.exec(file.content);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    name,
+    filePath: file.path,
+    relativePath: file.relativePath,
+    declaration: match[0],
+    leadingComment: match.groups?.comment?.trim() ?? "",
+    kind: declarationKind(match.groups?.kind),
+  };
+}
+
+function declarationKind(kind: string | undefined): ExportedSymbol["kind"] {
+  return kind === "type" || kind === "interface" ? "type" : "value";
+}
+
+function parseExportSpecifier(specifier: string): { localName: string; exportedName: string } | null {
+  const withoutType = specifier.trim().replace(/^type\s+/, "");
+  if (withoutType.length === 0) {
+    return null;
+  }
+
+  const parts = withoutType.split(/\s+as\s+/);
+  const localName = parts[0]?.trim();
+  const exportedName = (parts[1] ?? parts[0])?.trim();
+  if (!localName || !exportedName) {
+    return null;
+  }
+
+  return { localName, exportedName };
+}
+
+function resolveLocalSourceFile(currentRelativePath: string, specifier: string, filesByPath: Map<string, TextFile>): TextFile | null {
+  if (!specifier.startsWith(".")) {
+    return null;
+  }
+
+  const basePath = normalizeRelativePath(join(dirname(currentRelativePath), specifier));
+  return findModuleFile(basePath, filesByPath);
+}
+
+function findModuleFile(basePath: string, filesByPath: Map<string, TextFile>): TextFile | null {
+  const candidates = [
+    basePath,
+    ...SOURCE_MODULE_EXTENSIONS.map((extension) => `${basePath}${extension}`),
+    ...SOURCE_MODULE_EXTENSIONS.map((extension) => join(basePath, `index${extension}`)),
+  ].map(normalizeRelativePath);
+
+  for (const candidate of candidates) {
+    const file = filesByPath.get(candidate);
+    if (file) {
+      return file;
+    }
+  }
+
+  return null;
+}
+
+function getDeclaredEntryRelativePaths(rootRelativePath: string, packageJson: Record<string, unknown>): string[] {
+  const entries = new Set<string>();
+  const exportsValue = rootExportValue(packageJson.exports);
+
+  for (const entry of collectEntryTargets(exportsValue)) {
+    entries.add(joinRelativePath(rootRelativePath, entry));
+  }
+
+  for (const field of ["types", "typings", "module", "main"] as const) {
+    const value = packageJson[field];
+    if (typeof value === "string") {
+      entries.add(joinRelativePath(rootRelativePath, value));
+    }
+  }
+
+  return Array.from(entries).filter((entry) => entry.length > 0).sort();
+}
+
+function rootExportValue(exportsValue: unknown): unknown {
+  if (!isRecord(exportsValue)) {
+    return exportsValue;
+  }
+
+  const keys = Object.keys(exportsValue);
+  const hasSubpathKeys = keys.some((key) => key === "." || key.startsWith("./"));
+  return hasSubpathKeys ? exportsValue["."] : exportsValue;
+}
+
+function collectEntryTargets(value: unknown): string[] {
+  if (typeof value === "string") {
+    return value.includes("*") ? [] : [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(collectEntryTargets);
+  }
+
+  if (!isRecord(value)) {
+    return [];
+  }
+
+  return Object.values(value).flatMap(collectEntryTargets);
+}
+
+function getSourceEntryRelativePaths(
+  rootRelativePath: string,
+  declaredEntryRelativePaths: string[],
+  filesByPath: Map<string, TextFile>,
+): string[] {
+  const entries = new Set<string>();
+
+  for (const declaredEntry of declaredEntryRelativePaths) {
+    for (const candidate of sourceEntryCandidates(rootRelativePath, declaredEntry)) {
+      if (filesByPath.has(candidate)) {
+        entries.add(candidate);
+      }
+    }
+  }
+
+  for (const fallback of ["src/index.ts", "src/index.tsx", "index.ts", "index.tsx"]) {
+    const candidate = joinRelativePath(rootRelativePath, fallback);
+    if (filesByPath.has(candidate)) {
+      entries.add(candidate);
+    }
+  }
+
+  return Array.from(entries).sort();
+}
+
+function sourceEntryCandidates(rootRelativePath: string, declaredEntry: string): string[] {
+  const candidates = new Set<string>();
+  const normalized = normalizeRelativePath(declaredEntry);
+  candidates.add(normalized);
+
+  const withoutDeclarationExtension = normalized.replace(/\.d\.ts$/, ".ts").replace(/\.(js|jsx|mjs|cjs)$/, ".ts");
+  candidates.add(withoutDeclarationExtension);
+  candidates.add(withoutDeclarationExtension.replace(/\.ts$/, ".tsx"));
+
+  if (normalized.includes("/dist/")) {
+    const sourcePath = withoutDeclarationExtension.replace("/dist/", "/src/");
+    candidates.add(sourcePath);
+    candidates.add(sourcePath.replace(/\.ts$/, ".tsx"));
+  }
+
+  if (extname(normalized) === "") {
+    for (const extension of SOURCE_MODULE_EXTENSIONS) {
+      candidates.add(`${normalized}${extension}`);
+    }
+  }
+
+  const sourceIndex = joinRelativePath(rootRelativePath, "src/index.ts");
+  if (normalized.endsWith("/dist/index.d.ts") || normalized.endsWith("/dist/index.js")) {
+    candidates.add(sourceIndex);
+    candidates.add(sourceIndex.replace(/\.ts$/, ".tsx"));
+  }
+
+  return Array.from(candidates).map(normalizeRelativePath);
+}
+
+function parseJsonObject(content: string): Record<string, unknown> | null {
+  try {
+    const parsed = JSON.parse(content) as unknown;
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function mapFilesByRelativePath(files: TextFile[]): Map<string, TextFile> {
+  return new Map(files.map((file) => [normalizeRelativePath(file.relativePath), file]));
+}
+
+function joinRelativePath(rootRelativePath: string, childPath: string): string {
+  const cleanedChild = childPath.replace(/^\.\//, "");
+  return normalizeRelativePath(rootRelativePath.length === 0 ? cleanedChild : join(rootRelativePath, cleanedChild));
+}
+
+function normalizeRelativePath(path: string): string {
+  return path.replace(/\\/g, "/").replace(/^\.\//, "");
+}
+
+function packageNameScore(packageName: string): number {
+  return /\b(?:react|ui|components?)\b|(?:^|[-/])react(?:$|[-/])|(?:^|[-/])ui(?:$|[-/])|(?:^|[-/])components?(?:$|[-/])/i.test(packageName)
+    ? 1
+    : 0;
+}
+
+function pathDepth(path: string): number {
+  return path.length === 0 ? 0 : path.split("/").length;
 }

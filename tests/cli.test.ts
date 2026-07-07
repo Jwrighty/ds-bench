@@ -47,7 +47,7 @@ describe("CLI", () => {
     assert.equal(report.weights.source, "custom");
     assert.equal(report.weights.values.docs, 10);
     assert.equal(report.weights.values.deprecation, 90);
-    assert.equal(report.composite, 36.2);
+    assert.equal(report.composite, 51.7);
   });
 
   it("renders a coherent end-to-end report for the combined M1 six-pack fixture", () => {

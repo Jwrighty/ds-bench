@@ -16,7 +16,7 @@ export const deprecationMarkedCheck: AuditCheck = {
   naBehavior: "N/A when zero known-deprecated exports detected.",
   receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
   run(context: CheckContext): CheckResult {
-    const files = listTextFiles(context.targetPath);
+    const files = context.files ?? listTextFiles(context.targetPath);
     const exports = getExportedSymbols(files);
     const knownDeprecated = exports.filter((symbol) => isKnownDeprecated(symbol, files));
 
