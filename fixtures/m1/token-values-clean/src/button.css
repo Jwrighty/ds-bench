@@ -1,0 +1,5 @@
+.button {
+  color: var(--color-danger);
+  padding: var(--space-3);
+  z-index: var(--z-modal);
+}

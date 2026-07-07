@@ -14,8 +14,10 @@
     "build": "tsc -p tsconfig.build.json",
     "prepack": "npm run build"
   },
-  "devDependencies": {
-    "@types/node": "^24.0.0",
+  "dependencies": {
     "typescript": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
   }
 }

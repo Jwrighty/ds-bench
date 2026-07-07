@@ -7,6 +7,14 @@ export type ComponentInventory = {
   components: string[];
 };
 
+export type ExportedSymbol = {
+  name: string;
+  filePath: string;
+  relativePath: string;
+  declaration: string;
+  leadingComment: string;
+};
+
 export type ComponentImport = {
   importedName: string;
   localName: string;
@@ -33,6 +41,49 @@ export function getExportedComponents(files: TextFile[]): ComponentInventory {
   return {
     components: Array.from(components).sort(),
   };
+}
+
+export function getExportedSymbols(files: TextFile[]): ExportedSymbol[] {
+  const symbols = new Map<string, ExportedSymbol>();
+
+  for (const file of files.filter((file) => !isExampleCarrier(file.relativePath))) {
+    const declarationPattern =
+      /(?<comment>\/\*\*[\s\S]*?\*\/\s*)?\bexport\s+(?:declare\s+)?(?<kind>function|class|const|let|var|type|interface)\s+(?<name>[A-Za-z_$][A-Za-z0-9_$]*)\b/g;
+
+    for (const match of file.content.matchAll(declarationPattern)) {
+      const name = match.groups?.name;
+      if (!name) {
+        continue;
+      }
+
+      symbols.set(name, {
+        name,
+        filePath: file.path,
+        relativePath: file.relativePath,
+        declaration: match[0],
+        leadingComment: match.groups?.comment?.trim() ?? "",
+      });
+    }
+
+    for (const match of file.content.matchAll(/\bexport\s*\{\s*([^}]+)\s*\}/g)) {
+      for (const specifier of match[1].split(",")) {
+        const exported = specifier.trim().split(/\s+as\s+/).at(-1)?.trim();
+        if (!exported || symbols.has(exported)) {
+          continue;
+        }
+
+        symbols.set(exported, {
+          name: exported,
+          filePath: file.path,
+          relativePath: file.relativePath,
+          declaration: specifier.trim(),
+          leadingComment: findLeadingCommentForName(file.content, exported),
+        });
+      }
+    }
+  }
+
+  return Array.from(symbols.values()).sort((left, right) => left.name.localeCompare(right.name));
 }
 
 /** Local names of JSX elements rendered in `content`, e.g. `<Button>` -> "Button". */
@@ -83,4 +134,12 @@ export function hasImportableUsage(content: string, component: string): boolean 
   }
 
   return getComponentImports(content).some((componentImport) => componentImport.localName === component);
+}
+
+function findLeadingCommentForName(content: string, name: string): string {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declaration = new RegExp(
+    `/\\*\\*([\\s\\S]*?)\\*/\\s*(?:export\\s+)?(?:declare\\s+)?(?:function|class|const|let|var|type|interface)\\s+${escapedName}\\b`,
+  );
+  return declaration.exec(content)?.[0] ?? "";
 }

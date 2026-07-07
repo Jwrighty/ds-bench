@@ -1,0 +1,5 @@
+.button {
+  color: #ff0000;
+  padding: 12px;
+  background: var(--color-bg);
+}

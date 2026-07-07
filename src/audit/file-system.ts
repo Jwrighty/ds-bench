@@ -4,6 +4,8 @@ import { EXAMPLE_CARRIER_KINDS } from "./example-carriers.ts";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
+const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
+const DATA_EXTENSIONS = new Set([".json"]);
 
 export type TextFile = {
   path: string;
@@ -21,7 +23,13 @@ export function readJsonFile(path: string): unknown | null {
 
 export function listTextFiles(root: string): TextFile[] {
   return walk(root)
-    .filter((path) => SOURCE_EXTENSIONS.has(extname(path)) || EXAMPLE_EXTENSIONS.has(extname(path)))
+    .filter(
+      (path) =>
+        SOURCE_EXTENSIONS.has(extname(path)) ||
+        EXAMPLE_EXTENSIONS.has(extname(path)) ||
+        STYLE_EXTENSIONS.has(extname(path)) ||
+        DATA_EXTENSIONS.has(extname(path)),
+    )
     .map((path) => ({
       path,
       relativePath: relative(root, path),
@@ -56,6 +64,18 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
     carriers.add("package.json exports/types");
   }
 
+  if (files.some((file) => isManifestFile(file.relativePath))) {
+    carriers.add("manifests");
+  }
+
+  if (files.some((file) => STYLE_EXTENSIONS.has(extname(file.path)))) {
+    carriers.add("CSS files");
+  }
+
+  if (files.some((file) => /(--[A-Za-z0-9-]+\s*:)|(["']?\$?(?:color|space|spacing|zIndex|z-index)[A-Za-z0-9_.-]*["']?\s*:)/.test(file.content))) {
+    carriers.add("token files/CSS custom properties");
+  }
+
   return Array.from(carriers).sort();
 }
 
@@ -85,4 +105,8 @@ function walk(root: string): string[] {
 
     return stat.isFile() ? [path] : [];
   });
+}
+
+function isManifestFile(relativePath: string): boolean {
+  return /(^|[/.-])manifest\.(json|ts|js)$/.test(relativePath) || /storybook.*\.json$/.test(relativePath);
 }

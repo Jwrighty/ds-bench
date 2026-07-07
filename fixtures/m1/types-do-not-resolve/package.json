@@ -1,0 +1,9 @@
+{
+  "name": "types-do-not-resolve",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/missing.ts"
+  },
+  "types": "./src/missing.ts"
+}

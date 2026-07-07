@@ -7,7 +7,16 @@ describe("check registry", () => {
     const ids = CHECK_REGISTRY.map((check) => check.id);
     assert.deepEqual(
       new Set(ids),
-      new Set(["docs.usage-examples", "docs.example-imports-real", "deprecation.migration-notes"]),
+      new Set([
+        "docs.usage-examples",
+        "docs.example-imports-real",
+        "api.types-resolve",
+        "guidance.when-to-use",
+        "tokens.hardcoded-values",
+        "deprecation.marked",
+        "deprecation.migration-notes",
+        "agent.manifest-coverage",
+      ]),
     );
   });
 

@@ -6,6 +6,7 @@ import type { AuditFinding } from "../src/audit/types.ts";
 
 const repoRoot = process.cwd();
 const fixturePath = join(repoRoot, "fixtures/missing-usage-examples");
+const m1FixturePath = (name: string) => join(repoRoot, "fixtures/m1", name);
 
 describe("audit seam", () => {
   it("returns the ARS v0 report contract for a missing usage examples fixture", async () => {
@@ -25,11 +26,11 @@ describe("audit seam", () => {
         agent: 10,
       },
     });
-    assert.equal(report.composite, 75);
+    assert.equal(report.composite, 45.6);
     assert.deepEqual(report.applicability, {
-      applicable: 2,
-      total: 3,
-      confidence: "low",
+      applicable: 6,
+      total: 8,
+      confidence: "medium",
     });
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
@@ -41,20 +42,20 @@ describe("audit seam", () => {
     });
     assert.deepEqual(report.categories[1], {
       id: "api",
-      score: null,
-      applicable: 0,
-      total: 0,
-      weightRedistributed: true,
+      score: 100,
+      applicable: 1,
+      total: 1,
+      weightRedistributed: false,
     });
     assert.deepEqual(report.categories[4], {
       id: "deprecation",
       score: null,
       applicable: 0,
-      total: 1,
+      total: 2,
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 3);
+    assert.equal(report.findings.length, 8);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -84,6 +85,34 @@ describe("audit seam", () => {
       receipt: "Wrong import paths are a documented agent failure mode (Astryx self-checks).",
     });
     assert.deepEqual(report.findings[2], {
+      checkId: "api.types-resolve",
+      category: "api",
+      severity: "critical",
+      outcome: "pass",
+      measure: {
+        kind: "ratio",
+        value: 1,
+        detail: "2/2 exports typecheck from a synthetic package import; unresolved: none",
+      },
+      evidence: [],
+      fix: "Repair the package types/exports mapping so every public export is importable.",
+      receipt: "Wrong import paths are a documented agent failure mode.",
+    });
+    assert.deepEqual(report.findings[3], {
+      checkId: "deprecation.marked",
+      category: "deprecation",
+      severity: "critical",
+      outcome: "na",
+      measure: {
+        kind: "ratio",
+        value: 0,
+        detail: "0 known-deprecated exports found; deprecation marks are not applicable.",
+      },
+      evidence: [],
+      fix: "Add @deprecated to legacy exports.",
+      receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
+    });
+    assert.deepEqual(report.findings[6], {
       checkId: "deprecation.migration-notes",
       category: "deprecation",
       severity: "warning",
@@ -129,12 +158,116 @@ describe("audit seam", () => {
     assert.equal(defaultReport.weights.source, "default");
     assert.equal(defaultReport.weights.values.docs, 25);
     assert.equal(defaultReport.weights.values.deprecation, 15);
-    assert.equal(defaultReport.composite, 62.5);
+    assert.notEqual(defaultReport.composite, customReport.composite);
 
     assert.equal(customReport.weights.source, "custom");
     assert.equal(customReport.weights.values.docs, 10);
     assert.equal(customReport.weights.values.deprecation, 90);
-    assert.equal(customReport.composite, 10);
+  });
+
+  it("checks api.types-resolve against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("types-do-not-resolve"));
+    const clean = await audit(m1FixturePath("types-resolve-clean"));
+
+    assert.deepEqual(finding(failing, "api.types-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 exports typecheck from a synthetic package import; unresolved: Button",
+    });
+    assert.equal(finding(failing, "api.types-resolve").outcome, "fail");
+    assert.deepEqual(finding(failing, "api.types-resolve").evidence, ["Button"]);
+    assert.equal(finding(clean, "api.types-resolve").outcome, "pass");
+    assert.equal(finding(clean, "api.types-resolve").measure.value, 1);
+  });
+
+  it("checks guidance.when-to-use against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("missing-usage-guidance"));
+    const clean = await audit(m1FixturePath("usage-guidance-clean"));
+
+    assert.deepEqual(finding(failing, "guidance.when-to-use").measure, {
+      kind: "ratio",
+      value: 0.5,
+      detail: "1/2 exported components include when-to-use guidance; missing: Card",
+    });
+    assert.equal(finding(failing, "guidance.when-to-use").outcome, "fail");
+    assert.deepEqual(finding(failing, "guidance.when-to-use").evidence, ["Card"]);
+    assert.equal(finding(clean, "guidance.when-to-use").outcome, "pass");
+    assert.equal(finding(clean, "guidance.when-to-use").measure.value, 1);
+  });
+
+  it("checks tokens.hardcoded-values against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("hardcoded-token-values"));
+    const clean = await audit(m1FixturePath("token-values-clean"));
+
+    assert.equal(finding(failing, "tokens.hardcoded-values").outcome, "fail");
+    assert.deepEqual(finding(failing, "tokens.hardcoded-values").measure, {
+      kind: "count",
+      value: 50,
+      detail:
+        "3 magic values across 6 style LOC (50 per 100 LOC); token references: 1; offenders: #ff0000 in src/button.css:2, 12px in src/button.css:3, 999 in src/button.css:4",
+    });
+    assert.deepEqual(finding(failing, "tokens.hardcoded-values").evidence, [
+      "#ff0000 in src/button.css:2",
+      "12px in src/button.css:3",
+      "999 in src/button.css:4",
+    ]);
+    assert.equal(finding(clean, "tokens.hardcoded-values").outcome, "pass");
+    assert.equal(finding(clean, "tokens.hardcoded-values").measure.value, 0);
+  });
+
+  it("checks deprecation.marked against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("deprecated-without-mark"));
+    const clean = await audit(m1FixturePath("deprecated-mark-clean"));
+
+    assert.deepEqual(finding(failing, "deprecation.marked").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 known-deprecated exports carry @deprecated; missing: LegacyButton",
+    });
+    assert.equal(finding(failing, "deprecation.marked").outcome, "fail");
+    assert.deepEqual(finding(failing, "deprecation.marked").evidence, ["LegacyButton"]);
+    assert.equal(finding(clean, "deprecation.marked").outcome, "pass");
+    assert.equal(finding(clean, "deprecation.marked").measure.value, 1);
+  });
+
+  it("checks agent.manifest-coverage against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("storybook-without-manifest"));
+    const clean = await audit(m1FixturePath("manifest-coverage-clean"));
+
+    assert.deepEqual(finding(failing, "agent.manifest-coverage").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/2 exported components are covered by a manifest; missing: Button, Card",
+    });
+    assert.equal(finding(failing, "agent.manifest-coverage").outcome, "fail");
+    assert.deepEqual(finding(failing, "agent.manifest-coverage").evidence, ["Button", "Card"]);
+    assert.equal(finding(clean, "agent.manifest-coverage").outcome, "pass");
+    assert.equal(finding(clean, "agent.manifest-coverage").measure.value, 1);
+  });
+
+  it("produces six real scored categories on the combined M1 fixture", async () => {
+    const report = await audit(m1FixturePath("combined-six-pack"));
+
+    assert.equal(report.applicability.applicable, 8);
+    assert.equal(report.applicability.total, 8);
+    assert.equal(report.applicability.confidence, "high");
+    assert.ok(report.composite > 0);
+    assert.equal(finding(report, "deprecation.marked").outcome, "pass");
+    assert.equal(finding(report, "deprecation.marked").measure.detail, "1/1 known-deprecated exports carry @deprecated; missing: none");
+    assert.equal(report.categories.length, 6);
+    for (const category of report.categories) {
+      assert.notEqual(category.score, null, `${category.id} should produce a real score`);
+      assert.equal(category.applicable > 0, true, `${category.id} should have an applicable check`);
+    }
+
+    assert.deepEqual(
+      report.findings.map((candidate) => candidate.severity),
+      ["critical", "critical", "critical", "critical", "warning", "warning", "warning", "warning"],
+    );
+    for (const candidate of report.findings) {
+      assert.ok(candidate.fix.length > 0, `${candidate.checkId} should carry a fix`);
+      assert.ok(candidate.receipt.length > 0, `${candidate.checkId} should carry a receipt`);
+    }
   });
 });
 
