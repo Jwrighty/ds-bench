@@ -9,7 +9,7 @@ import {
 } from "../agent-metadata-carriers.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const agentInstructionManualCheck: AuditCheck = {
   id: "agent.instruction-manual",
@@ -26,16 +26,7 @@ export const agentInstructionManualCheck: AuditCheck = {
     const metadataFiles = getInstructionMetadataFiles(files);
 
     if (metadataFiles.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "0 agent metadata files found; instruction-manual orientation is not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "0 agent metadata files found; instruction-manual orientation is not applicable.");
     }
 
     const components = new Set(getExportedComponents(files).components);

@@ -1,8 +1,8 @@
 import { getExportedSymbols } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { hasDeprecatedTag, isKnownDeprecated } from "./deprecation-marked.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { hasDeprecatedTag } from "./deprecation-marked.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const deprecationMigrationNotesCheck: AuditCheck = {
   id: "deprecation.migration-notes",
@@ -12,30 +12,19 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
   carriers: ["JSDoc @deprecated"],
   measure: "% @deprecated marks naming a replacement or migration path",
   fix: "Append replacement guidance to every @deprecated mark.",
-  naBehavior: "N/A when zero known-deprecated exports exist.",
+  naBehavior: "N/A when zero @deprecated marks exist (unmarked deprecations stay deprecation.marked's gap).",
   receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
-    const deprecatedExports = getExportedSymbols(files).filter((symbol) => isKnownDeprecated(symbol, files));
+    const markedExports = getExportedSymbols(files).filter((symbol) => hasDeprecatedTag(symbol.leadingComment));
 
-    if (deprecatedExports.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "0 known-deprecated exports found; migration notes are not applicable.",
-        },
-        evidence: [],
-      };
+    if (markedExports.length === 0) {
+      return naResult("ratio", "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).");
     }
 
-    const withoutMigration = deprecatedExports.filter(
-      (deprecatedExport) => !hasDeprecatedTag(deprecatedExport.leadingComment) || !hasMigrationNote(deprecatedExport.leadingComment),
-    );
-    const migratedCount = deprecatedExports.length - withoutMigration.length;
-    const ratio = migratedCount / deprecatedExports.length;
+    const withoutMigration = markedExports.filter((markedExport) => !hasMigrationNote(markedExport.leadingComment));
+    const migratedCount = markedExports.length - withoutMigration.length;
+    const ratio = migratedCount / markedExports.length;
 
     return {
       outcome: withoutMigration.length === 0 ? "pass" : "fail",
@@ -43,9 +32,9 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
       measure: {
         kind: "ratio",
         value: roundRatio(ratio),
-        detail: `${migratedCount}/${deprecatedExports.length} known-deprecated exports include @deprecated migration guidance; missing: ${formatNames(withoutMigration.map((deprecatedExport) => deprecatedExport.name))}`,
+        detail: `${migratedCount}/${markedExports.length} @deprecated marks name a replacement or migration path; missing: ${formatNames(withoutMigration.map((markedExport) => markedExport.name))}`,
       },
-      evidence: withoutMigration.map((deprecatedExport) => deprecatedExport.name).slice(0, 20),
+      evidence: withoutMigration.map((markedExport) => markedExport.name).slice(0, 20),
     };
   },
 };

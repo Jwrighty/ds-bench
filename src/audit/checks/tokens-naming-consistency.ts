@@ -1,6 +1,6 @@
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 import { getTokenSources } from "./token-sources.ts";
 
 type NamingPattern = "kebab" | "dot" | "snake" | "camel" | "unknown";
@@ -15,23 +15,14 @@ export const tokensNamingConsistencyCheck: AuditCheck = {
   carriers: ["token source"],
   measure: "naming-pattern violation rate against the system's own dominant pattern",
   fix: "Rename token outliers to the dominant pattern.",
-  naBehavior: "N/A when no token names are available from machine-readable token sources.",
+  naBehavior: "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap).",
   receipt: "Inconsistent names invite fabricated tokens.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
     const tokenNames = getTokenSources(files).flatMap((source) => source.tokenNames);
 
     if (tokenNames.length === 0) {
-      return {
-        outcome: "fail",
-        score: 0,
-        measure: {
-          kind: "ratio",
-          value: 1,
-          detail: "0 token names found; no dominant naming pattern can be derived.",
-        },
-        evidence: ["no token names found"],
-      };
+      return naResult("ratio", "No token names found; naming consistency is not applicable (tokens.machine-readable carries the missing-token-source gap).");
     }
 
     const dominantPattern = getDominantPattern(tokenNames);

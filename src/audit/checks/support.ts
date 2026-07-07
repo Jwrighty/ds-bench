@@ -1,5 +1,21 @@
+import type { CheckResult, Measure } from "../types.ts";
+
 export function roundRatio(value: number): number {
   return Math.round(value * 1000) / 1000;
+}
+
+/** The standard not-applicable result: `detail` says why the check does not apply and which check carries the gap. */
+export function naResult(kind: Measure["kind"], detail: string): CheckResult {
+  return {
+    outcome: "na",
+    score: null,
+    measure: {
+      kind,
+      value: 0,
+      detail,
+    },
+    evidence: [],
+  };
 }
 
 export function formatNames(names: string[]): string {

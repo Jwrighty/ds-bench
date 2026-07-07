@@ -1,7 +1,7 @@
 import { getExportedComponents, COMPONENT_NAME } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 import { getGuidanceSections, type GuidanceSection } from "./guidance-support.ts";
 
 type AlternativeReference = {
@@ -43,16 +43,7 @@ export const guidanceAlternativesResolveCheck: AuditCheck = {
     const alternativeSections = sections.filter((section) => ALTERNATIVE_CONTENT.test(section.content));
 
     if (alternativeSections.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "No alternatives/instead guidance content found; alternatives resolution is not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "No alternatives/instead guidance content found; alternatives resolution is not applicable.");
     }
 
     const references = collectAlternativeReferences(alternativeSections);

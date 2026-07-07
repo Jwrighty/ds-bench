@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { getExportedComponents } from "../component-inventory.ts";
 import { isRecord, listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 import { getGuidanceSections, hasWord, type GuidanceSection } from "./guidance-support.ts";
 
 type ConfusablePair = readonly [string, string];
@@ -30,31 +30,12 @@ export const guidanceConfusablePairsCheck: AuditCheck = {
     const presentPairMembers = components.filter((component) => pairMembers.has(component));
 
     if (presentPairMembers.length < 2) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "Fewer than 2 seed confusable-pair members are in inventory; disambiguation is not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "Fewer than 2 seed confusable-pair members are in inventory; disambiguation is not applicable.");
     }
 
     const inventoryPairs = pairs.filter(([left, right]) => inventory.has(left) && inventory.has(right));
     if (inventoryPairs.length === 0) {
-      const detail = `no complete seed pairs among ${formatNames(presentPairMembers)}`;
-      return {
-        outcome: "fail",
-        score: 0,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: `0/0 detected confusable pairs reference each other; missing: ${detail}`,
-        },
-        evidence: [detail],
-      };
+      return naResult("ratio", `No complete seed pair among ${formatNames(presentPairMembers)}; disambiguation is not applicable.`);
     }
 
     const sections = getGuidanceSections(files, components);

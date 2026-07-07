@@ -1,6 +1,7 @@
 import { getPropsForComponent } from "../component-props.ts";
 import { getExportedSymbols, COMPONENT_NAME } from "../component-inventory.ts";
-import { isRecord, listTextFiles, type TextFile } from "../file-system.ts";
+import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
+import { MANIFEST_NAME_FIELDS } from "../manifest-carriers.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, hasCommentDescription, roundRatio } from "./support.ts";
 
@@ -75,32 +76,17 @@ function getManifestPropDescriptions(files: TextFile[], componentName: string): 
       continue;
     }
 
-    collectManifestPropDescriptions(parsed, componentName, descriptions);
+    walkJson(parsed, (node) => {
+      if (isRecord(node) && recordNamesComponent(node, componentName)) {
+        collectPropDescriptions(node.props, descriptions);
+        collectPropDescriptions(node.properties, descriptions);
+      }
+
+      return true;
+    });
   }
 
   return descriptions;
-}
-
-function collectManifestPropDescriptions(value: unknown, componentName: string, descriptions: Set<string>): void {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collectManifestPropDescriptions(item, componentName, descriptions);
-    }
-    return;
-  }
-
-  if (!isRecord(value)) {
-    return;
-  }
-
-  if (recordNamesComponent(value, componentName)) {
-    collectPropDescriptions(value.props, descriptions);
-    collectPropDescriptions(value.properties, descriptions);
-  }
-
-  for (const nested of Object.values(value)) {
-    collectManifestPropDescriptions(nested, componentName, descriptions);
-  }
 }
 
 function collectPropDescriptions(value: unknown, descriptions: Set<string>): void {
@@ -127,5 +113,5 @@ function collectPropDescriptions(value: unknown, descriptions: Set<string>): voi
 }
 
 function recordNamesComponent(record: Record<string, unknown>, componentName: string): boolean {
-  return ["name", "displayName", "exportName", "component"].some((field) => record[field] === componentName);
+  return MANIFEST_NAME_FIELDS.some((field) => record[field] === componentName);
 }

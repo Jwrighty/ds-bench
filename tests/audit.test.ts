@@ -31,7 +31,7 @@ describe("audit seam", () => {
     });
     assert.equal(report.composite, 38.2);
     assert.deepEqual(report.applicability, {
-      applicable: 15,
+      applicable: 14,
       total: 22,
       confidence: "low",
     });
@@ -123,7 +123,7 @@ describe("audit seam", () => {
       measure: {
         kind: "ratio",
         value: 0,
-        detail: "0 known-deprecated exports found; migration notes are not applicable.",
+        detail: "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).",
       },
       evidence: [],
       fix: "Append replacement guidance to every @deprecated mark.",
@@ -387,16 +387,16 @@ describe("audit seam", () => {
     });
   });
 
-  it("fails guidance.confusable-pairs when seed members exist without a complete configured pair", async () => {
+  it("reports guidance.confusable-pairs as N/A when seed members exist without a complete configured pair", async () => {
     const report = await audit(m1FixturePath("confusable-pairs-unpaired-members"));
 
-    assert.equal(finding(report, "guidance.confusable-pairs").outcome, "fail");
+    assert.equal(finding(report, "guidance.confusable-pairs").outcome, "na");
     assert.deepEqual(finding(report, "guidance.confusable-pairs").measure, {
       kind: "ratio",
       value: 0,
-      detail: "0/0 detected confusable pairs reference each other; missing: no complete seed pairs among Button, Dialog",
+      detail: "No complete seed pair among Button, Dialog; disambiguation is not applicable.",
     });
-    assert.deepEqual(finding(report, "guidance.confusable-pairs").evidence, ["no complete seed pairs among Button, Dialog"]);
+    assert.deepEqual(finding(report, "guidance.confusable-pairs").evidence, []);
   });
 
   it("aggregates all three Usage guidance checks into the guidance category score", async () => {
@@ -567,6 +567,19 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "tokens.naming-consistency").measure.value, 0);
   });
 
+  it("reports tokens.naming-consistency as N/A when no token names are available", async () => {
+    const report = await audit(m1FixturePath("types-resolve-clean"));
+
+    assert.equal(finding(report, "tokens.machine-readable").outcome, "fail");
+    assert.equal(finding(report, "tokens.naming-consistency").outcome, "na");
+    assert.deepEqual(finding(report, "tokens.naming-consistency").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No token names found; naming consistency is not applicable (tokens.machine-readable carries the missing-token-source gap).",
+    });
+    assert.deepEqual(finding(report, "tokens.naming-consistency").evidence, []);
+  });
+
   it("checks deprecation.marked against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("deprecated-without-mark"));
     const clean = await audit(m1FixturePath("deprecated-mark-clean"));
@@ -580,6 +593,19 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "deprecation.marked").evidence, ["GhostButton", "LegacyButton"]);
     assert.equal(finding(clean, "deprecation.marked").outcome, "pass");
     assert.equal(finding(clean, "deprecation.marked").measure.value, 1);
+  });
+
+  it("keeps unmarked deprecations out of deprecation.migration-notes (deprecation.marked carries the gap)", async () => {
+    const report = await audit(m1FixturePath("deprecated-without-mark"));
+
+    assert.equal(finding(report, "deprecation.marked").outcome, "fail");
+    assert.equal(finding(report, "deprecation.migration-notes").outcome, "na");
+    assert.deepEqual(finding(report, "deprecation.migration-notes").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).",
+    });
+    assert.deepEqual(finding(report, "deprecation.migration-notes").evidence, []);
   });
 
   it("reports deprecation.marked as N/A when zero known-deprecated exports are detected", async () => {
@@ -601,7 +627,7 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "deprecation.migration-notes").measure, {
       kind: "ratio",
       value: 0,
-      detail: "0/1 known-deprecated exports include @deprecated migration guidance; missing: LegacyButton",
+      detail: "0/1 @deprecated marks name a replacement or migration path; missing: LegacyButton",
     });
     assert.equal(finding(failing, "deprecation.migration-notes").outcome, "fail");
     assert.deepEqual(finding(failing, "deprecation.migration-notes").evidence, ["LegacyButton"]);
@@ -630,7 +656,7 @@ describe("audit seam", () => {
     assert.deepEqual(finding(report, "deprecation.migration-notes").measure, {
       kind: "ratio",
       value: 0,
-      detail: "0 known-deprecated exports found; migration notes are not applicable.",
+      detail: "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).",
     });
     assert.equal(finding(report, "deprecation.migration-notes").outcome, "na");
     assert.deepEqual(finding(report, "deprecation.manifest-exclusion").measure, {

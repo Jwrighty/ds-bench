@@ -1,6 +1,6 @@
 import { dirname, extname, join, normalize } from "node:path";
 import { getComponentImports, getPublicPackage, getRenderedComponentNames, COMPONENT_NAME } from "./component-inventory.ts";
-import { isRecord, type TextFile } from "./file-system.ts";
+import { isRecord, walkJson, type TextFile } from "./file-system.ts";
 import { AGENT_CONTEXT_FILE_PATTERN, AGENT_INSTRUCTION_FILE_PATTERN, LLMS_TXT_FILE_PATTERN } from "./agent-metadata-paths.ts";
 
 const COMMON_NON_COMPONENT_WORDS = new Set([
@@ -222,15 +222,17 @@ function isPackageImport(source: string, packageNames: string[]): boolean {
 }
 
 function hasMcpServersConfig(value: unknown): boolean {
-  if (!isRecord(value)) {
-    return false;
-  }
+  let found = false;
+  walkJson(value, (node) => {
+    if (isRecord(node) && isRecord(node.mcpServers)) {
+      found = true;
+    }
 
-  if (isRecord(value.mcpServers)) {
-    return true;
-  }
+    // Records only: array items never carry an mcpServers config.
+    return !found && isRecord(node);
+  });
 
-  return Object.values(value).some((nested) => hasMcpServersConfig(nested));
+  return found;
 }
 
 function packageDependencyNames(packageJson: Record<string, unknown>): string[] {

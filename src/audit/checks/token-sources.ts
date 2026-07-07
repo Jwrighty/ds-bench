@@ -1,5 +1,5 @@
 import { basename, dirname, extname } from "node:path";
-import { isRecord, type TextFile } from "../file-system.ts";
+import { isRecord, walkJson, SOURCE_EXTENSIONS, STYLE_EXTENSIONS, type TextFile } from "../file-system.ts";
 
 export type TokenSource = {
   relativePath: string;
@@ -8,8 +8,6 @@ export type TokenSource = {
   invalidReason: string | null;
 };
 
-const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
-const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const TOKEN_FILE_NAME = /(?:^|[-_.])(?:tokens?|theme)(?:[-_.]|$)/i;
 const DTCG_TYPES = new Set([
   "border",
@@ -118,48 +116,39 @@ function readJsonTokenSource(file: TextFile): TokenSource {
 }
 
 function claimsDtcg(value: unknown): boolean {
-  if (Array.isArray(value)) {
-    return value.some(claimsDtcg);
-  }
+  let claims = false;
+  walkJson(value, (node) => {
+    if (isRecord(node)) {
+      claims =
+        claims ||
+        (typeof node.$schema === "string" && /\b(?:design-tokens|dtcg|tokens)\b/i.test(node.$schema)) ||
+        Object.hasOwn(node, "$value") ||
+        Object.hasOwn(node, "$type");
+    }
 
-  if (!isRecord(value)) {
-    return false;
-  }
+    return !claims;
+  });
 
-  if (typeof value.$schema === "string" && /\b(?:design-tokens|dtcg|tokens)\b/i.test(value.$schema)) {
-    return true;
-  }
-
-  if (Object.hasOwn(value, "$value") || Object.hasOwn(value, "$type")) {
-    return true;
-  }
-
-  return Object.values(value).some(claimsDtcg);
+  return claims;
 }
 
 function getDtcgTokenNames(value: unknown): string[] {
   const names: string[] = [];
-  collectDtcgTokenNames(value, [], names);
-  return names;
-}
-
-function collectDtcgTokenNames(value: unknown, path: string[], names: string[]): void {
-  if (Array.isArray(value) || !isRecord(value)) {
-    return;
-  }
-
-  if (Object.hasOwn(value, "$value")) {
-    names.push(path.join("."));
-    return;
-  }
-
-  for (const [key, nested] of Object.entries(value)) {
-    if (key.startsWith("$")) {
-      continue;
+  walkJson(value, (node, path) => {
+    // DTCG token trees are pure records; arrays and "$"-prefixed keys ($extensions, ...) never hold groups.
+    if (Array.isArray(node) || !isRecord(node) || path[path.length - 1]?.startsWith("$")) {
+      return false;
     }
 
-    collectDtcgTokenNames(nested, [...path, key], names);
-  }
+    if (Object.hasOwn(node, "$value")) {
+      names.push(path.join("."));
+      return false;
+    }
+
+    return true;
+  });
+
+  return names;
 }
 
 function validateDtcgTokens(value: unknown): string | null {

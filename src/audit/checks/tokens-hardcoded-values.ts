@@ -2,7 +2,7 @@ import { extname } from "node:path";
 import { getLibraryPackageRootPaths } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 type HardcodedValue = {
   value: string;
@@ -37,16 +37,7 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
     const styleLoc = styleContents.reduce((sum, file) => sum + countStyleLines(file.styleContent), 0);
 
     if (styleLoc === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "count",
-          value: 0,
-          detail: "0 style LOC found across CSS files, CSS-in-JS, and style props; token discipline is not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("count", "0 style LOC found across CSS files, CSS-in-JS, and style props; token discipline is not applicable.");
     }
 
     const hardcoded = styleContents.flatMap((file) => getHardcodedValues(file.relativePath, file.styleContent));

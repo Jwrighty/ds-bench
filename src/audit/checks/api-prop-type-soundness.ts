@@ -2,7 +2,7 @@ import { getPropsForComponent, hasTypeScriptTypes } from "../component-props.ts"
 import { getExportedComponentSymbols } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 type UnsoundProp = {
   component: string;
@@ -23,16 +23,7 @@ export const apiPropTypeSoundnessCheck: AuditCheck = {
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
     if (!hasTypeScriptTypes(files)) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "No TypeScript types found; api.types-resolve carries the importability failure.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "No TypeScript types found; api.types-resolve carries the importability failure.");
     }
 
     const filesByPath = new Map(files.map((file) => [file.relativePath, file]));

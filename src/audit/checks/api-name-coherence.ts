@@ -6,8 +6,8 @@ import {
   getRenderedComponentNames,
 } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { isRecord, listTextFiles, type TextFile } from "../file-system.ts";
-import { isManifestCarrier } from "../manifest-carriers.ts";
+import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
+import { isManifestCarrier, MANIFEST_NAME_FIELDS } from "../manifest-carriers.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames } from "./support.ts";
 
@@ -94,40 +94,27 @@ function manifestNameChecks(files: TextFile[], componentNames: Set<string>): Nam
     }
 
     const checks: NameCheck[] = [];
-    collectManifestNameChecks(parsed, componentNames, checks);
+    walkJson(parsed, (node) => {
+      if (isRecord(node)) {
+        const componentName = manifestComponentName(node, componentNames);
+        const filePath = manifestFilePath(node);
+        if (componentName && filePath) {
+          const fileStem = stripKnownSuffixes(basename(filePath, extname(filePath)));
+          checks.push({
+            label: `${componentName} manifest file ${filePath}`,
+            mismatch: fileStem !== componentName,
+          });
+        }
+      }
+
+      return true;
+    });
     return checks;
   });
 }
 
-function collectManifestNameChecks(value: unknown, componentNames: Set<string>, checks: NameCheck[]): void {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collectManifestNameChecks(item, componentNames, checks);
-    }
-    return;
-  }
-
-  if (!isRecord(value)) {
-    return;
-  }
-
-  const componentName = manifestComponentName(value, componentNames);
-  const filePath = manifestFilePath(value);
-  if (componentName && filePath) {
-    const fileStem = stripKnownSuffixes(basename(filePath, extname(filePath)));
-    checks.push({
-      label: `${componentName} manifest file ${filePath}`,
-      mismatch: fileStem !== componentName,
-    });
-  }
-
-  for (const nested of Object.values(value)) {
-    collectManifestNameChecks(nested, componentNames, checks);
-  }
-}
-
 function manifestComponentName(record: Record<string, unknown>, componentNames: Set<string>): string | null {
-  for (const field of ["name", "displayName", "exportName", "component"]) {
+  for (const field of MANIFEST_NAME_FIELDS) {
     const value = record[field];
     if (typeof value === "string" && componentNames.has(value)) {
       return value;

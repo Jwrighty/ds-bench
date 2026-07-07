@@ -16,7 +16,7 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /composite score: 38\.2\/100/);
-    assert.match(result.stdout, /applicable checks: 15\/22 \(low confidence\)/);
+    assert.match(result.stdout, /applicable checks: 14\/22 \(low confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(4\/5\)/);

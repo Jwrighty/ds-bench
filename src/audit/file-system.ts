@@ -4,9 +4,9 @@ import { EXAMPLE_CARRIER_KINDS } from "./example-carriers.ts";
 import { isManifestCarrier } from "./manifest-carriers.ts";
 import { isAgentMetadataFile, isLlmsTxtFile } from "./agent-metadata-paths.ts";
 
-const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
+export const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
-const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
+export const STYLE_EXTENSIONS = new Set([".css", ".scss", ".sass", ".less"]);
 const DATA_EXTENSIONS = new Set([".json"]);
 const TEXT_EXTENSIONS = new Set([".txt"]);
 const SPECIAL_TEXT_FILES = new Set([".cursorrules"]);
@@ -116,6 +116,42 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Depth-first walk over a parsed JSON value. Calls `visit` on every node — the root, record
+ * values, and array items — with the record-key path from the root (array items keep their
+ * parent's path). Recurses into a record's values or an array's items only while `visit`
+ * returns true; primitives have no children, so their return value is moot.
+ */
+export function walkJson(value: unknown, visit: (node: unknown, path: string[]) => boolean): void {
+  if (!visit(value, [])) {
+    return;
+  }
+
+  walkJsonChildren(value, [], visit);
+}
+
+function walkJsonChildren(node: unknown, path: string[], visit: (node: unknown, path: string[]) => boolean): void {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      if (visit(item, path)) {
+        walkJsonChildren(item, path, visit);
+      }
+    }
+    return;
+  }
+
+  if (!isRecord(node)) {
+    return;
+  }
+
+  for (const [key, nested] of Object.entries(node)) {
+    const nestedPath = [...path, key];
+    if (visit(nested, nestedPath)) {
+      walkJsonChildren(nested, nestedPath, visit);
+    }
+  }
 }
 
 /** Escapes regex metacharacters so `value` can be embedded literally in a `RegExp`. */

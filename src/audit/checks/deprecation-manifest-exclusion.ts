@@ -1,10 +1,10 @@
 import { getExportedComponentSymbols } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { isRecord, listTextFiles, type TextFile } from "../file-system.ts";
+import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
 import { isManifestCarrier, recordNamesExport } from "../manifest-carriers.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { isKnownDeprecated } from "./deprecation-marked.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const deprecationManifestExclusionCheck: AuditCheck = {
   id: "deprecation.manifest-exclusion",
@@ -21,31 +21,13 @@ export const deprecationManifestExclusionCheck: AuditCheck = {
     const deprecatedComponents = getExportedComponentSymbols(files).filter((symbol) => isKnownDeprecated(symbol, files));
 
     if (deprecatedComponents.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "0 deprecated components found; manifest deprecation signalling is not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "0 deprecated components found; manifest deprecation signalling is not applicable.");
     }
 
     const manifestFiles = files.filter((file) => isManifestCarrier(file.relativePath));
     const hasStorybookExclusion = deprecatedComponents.some((component) => hasStorybookManifestExclusion(files, component.name));
     if (manifestFiles.length === 0 && !hasStorybookExclusion) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.");
     }
 
     const missing = deprecatedComponents.filter((component) => !isExcludedOrTagged(files, manifestFiles, component.name));
@@ -84,31 +66,16 @@ function findManifestRecordsNaming(content: string, componentName: string): Arra
   try {
     const parsed = JSON.parse(content) as unknown;
     const records: Array<Record<string, unknown>> = [];
-    collectManifestRecordsNaming(parsed, componentName, records);
+    walkJson(parsed, (node) => {
+      if (isRecord(node) && recordNamesExport(node, componentName)) {
+        records.push(node);
+      }
+
+      return true;
+    });
     return records;
   } catch {
     return [];
-  }
-}
-
-function collectManifestRecordsNaming(value: unknown, componentName: string, records: Array<Record<string, unknown>>): void {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collectManifestRecordsNaming(item, componentName, records);
-    }
-    return;
-  }
-
-  if (!isRecord(value)) {
-    return;
-  }
-
-  if (recordNamesExport(value, componentName)) {
-    records.push(value);
-  }
-
-  for (const nested of Object.values(value)) {
-    collectManifestRecordsNaming(nested, componentName, records);
   }
 }
 

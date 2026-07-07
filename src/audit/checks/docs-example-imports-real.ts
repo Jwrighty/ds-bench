@@ -2,7 +2,7 @@ import { getComponentImports, getExportedComponents, getRenderedComponentNames }
 import { EXAMPLE_CARRIER_LABELS, isExampleCarrier } from "../example-carriers.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const docsExampleImportsRealCheck: AuditCheck = {
   id: "docs.example-imports-real",
@@ -20,16 +20,7 @@ export const docsExampleImportsRealCheck: AuditCheck = {
     const exampleFiles = files.filter((file) => isExampleCarrier(file.relativePath));
 
     if (exampleFiles.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "No examples exist; docs.usage-examples carries the absence.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "No examples exist; docs.usage-examples carries the absence.");
     }
 
     const importedAndRendered = exampleFiles.flatMap((file) => {

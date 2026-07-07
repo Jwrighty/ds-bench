@@ -2,7 +2,7 @@ import { getExportedSymbols, type ExportedSymbol } from "../component-inventory.
 import { escapeRegExp, isRecord, listTextFiles } from "../file-system.ts";
 import { recordNamesExport } from "../manifest-carriers.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const deprecationMarkedCheck: AuditCheck = {
   id: "deprecation.marked",
@@ -21,16 +21,7 @@ export const deprecationMarkedCheck: AuditCheck = {
     const knownDeprecated = exports.filter((symbol) => isKnownDeprecated(symbol, files));
 
     if (knownDeprecated.length === 0) {
-      return {
-        outcome: "na",
-        score: null,
-        measure: {
-          kind: "ratio",
-          value: 0,
-          detail: "0 known-deprecated exports found; deprecation marks are not applicable.",
-        },
-        evidence: [],
-      };
+      return naResult("ratio", "0 known-deprecated exports found; deprecation marks are not applicable.");
     }
 
     const unmarked = knownDeprecated.filter((symbol) => !hasDeprecatedTag(symbol.leadingComment));
