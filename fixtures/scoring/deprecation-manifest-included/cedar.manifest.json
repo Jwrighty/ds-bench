@@ -1,0 +1,6 @@
+{
+  "components": [
+    { "name": "Button" },
+    { "name": "LegacyButton" }
+  ]
+}

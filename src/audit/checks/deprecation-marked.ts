@@ -50,7 +50,7 @@ export const deprecationMarkedCheck: AuditCheck = {
   },
 };
 
-function isKnownDeprecated(symbol: ExportedSymbol, files: ReturnType<typeof listTextFiles>): boolean {
+export function isKnownDeprecated(symbol: ExportedSymbol, files: ReturnType<typeof listTextFiles>): boolean {
   if (hasDeprecatedTag(symbol.leadingComment)) {
     return true;
   }
@@ -113,6 +113,6 @@ function jsonValueMarksDeprecated(value: unknown, exportName: string): boolean {
   return Object.values(value).some((nested) => jsonValueMarksDeprecated(nested, exportName));
 }
 
-function hasDeprecatedTag(comment: string): boolean {
+export function hasDeprecatedTag(comment: string): boolean {
   return /@deprecated\b/i.test(comment);
 }

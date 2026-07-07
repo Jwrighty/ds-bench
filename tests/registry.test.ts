@@ -18,8 +18,12 @@ describe("check registry", () => {
         "api.barrel-completeness",
         "guidance.when-to-use",
         "tokens.hardcoded-values",
+        "tokens.machine-readable",
+        "tokens.naming-consistency",
         "deprecation.marked",
         "deprecation.migration-notes",
+        "deprecation.manifest-exclusion",
+        "deprecation.zombie-exports",
         "agent.manifest-coverage",
       ]),
     );

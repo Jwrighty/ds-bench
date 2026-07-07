@@ -76,6 +76,33 @@ describe("scoring machinery", () => {
 
     assert.equal(scoreFindings(critical, criticalFindings).composite, scoreFindings(swapped, swappedFindings).composite);
   });
+
+  it("reports unscored checks without moving category, composite, or applicability math", () => {
+    const checks = [
+      check("deprecation.marked", "deprecation", "critical"),
+      { ...check("deprecation.zombie-exports", "deprecation", "info"), scored: false },
+    ];
+    const findings = [
+      finding("deprecation.marked", "deprecation", "critical", "pass", 1),
+      finding("deprecation.zombie-exports", "deprecation", "info", "fail", null),
+    ];
+
+    const scored = scoreFindings(checks, findings);
+
+    assert.deepEqual(scored.categories.find((category) => category.id === "deprecation"), {
+      id: "deprecation",
+      score: 100,
+      applicable: 1,
+      total: 1,
+      weightRedistributed: false,
+    });
+    assert.equal(scored.composite, 100);
+    assert.deepEqual(scored.applicability, {
+      applicable: 1,
+      total: 1,
+      confidence: "high",
+    });
+  });
 });
 
 function confidenceForApplicableCount(applicable: number) {

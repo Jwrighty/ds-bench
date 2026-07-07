@@ -15,8 +15,8 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 46\.4\/100/);
-    assert.match(result.stdout, /applicable checks: 10\/13 \(medium confidence\)/);
+    assert.match(result.stdout, /composite score: 38\.2\/100/);
+    assert.match(result.stdout, /applicable checks: 12\/16 \(medium confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(1\/1\)/);
@@ -47,7 +47,7 @@ describe("CLI", () => {
     assert.equal(report.weights.source, "custom");
     assert.equal(report.weights.values.docs, 10);
     assert.equal(report.weights.values.deprecation, 90);
-    assert.equal(report.composite, 50);
+    assert.equal(report.composite, 45.3);
   });
 
   it("--exclude filters files through shared discovery", () => {
@@ -70,13 +70,13 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 70\/100/);
-    assert.match(result.stdout, /applicable checks: 13\/13 \(high confidence\)/);
+    assert.match(result.stdout, /composite score: 79\.2\/100/);
+    assert.match(result.stdout, /applicable checks: 16\/16 \(high confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
     assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
-    assert.match(result.stdout, /Token hygiene\s+\[###\.{7}\]\s+33\.3 \(1\/1\)/);
-    assert.match(result.stdout, /Deprecation signalling\s+\[#####\.{5}\]\s+50 \(2\/2\)/);
+    assert.match(result.stdout, /Token hygiene\s+\[########\.\.\]\s+77\.8 \(3\/3\)/);
+    assert.match(result.stdout, /Deprecation signalling\s+\[#######\.\.\.\]\s+66\.7 \(3\/3\)/);
     assert.match(result.stdout, /Agent metadata\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
     assert.doesNotMatch(result.stdout, /N\/A/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);

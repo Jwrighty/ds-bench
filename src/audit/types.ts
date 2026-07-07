@@ -66,6 +66,7 @@ export type CheckMetadata = {
   id: string;
   category: CategoryId;
   severity: Severity;
+  scored?: boolean;
   signal: string;
   carriers: string[];
   measure: string;

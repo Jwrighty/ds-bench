@@ -31,14 +31,18 @@ export type ScoredReportParts = {
 };
 
 export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[], config: AuditConfig = {}): ScoredReportParts {
+  const scoredChecks = checks.filter((check) => check.scored !== false);
+  const scoredCheckIds = new Set(scoredChecks.map((check) => check.id));
   const weights = {
     source: config.weights ? ("custom" as const) : ("default" as const),
     values: { ...DEFAULT_WEIGHTS, ...config.weights },
   };
 
   const categories = CATEGORY_ORDER.map((id) => {
-    const categoryChecks = checks.filter((check) => check.category === id);
-    const categoryFindings = findings.filter((finding) => finding.category === id && finding.outcome !== "na");
+    const categoryChecks = scoredChecks.filter((check) => check.category === id);
+    const categoryFindings = findings.filter(
+      (finding) => scoredCheckIds.has(finding.checkId) && finding.category === id && finding.outcome !== "na",
+    );
     const scores = categoryFindings.map((finding) => finding.score ?? 0);
     const score = scores.length === 0 ? null : roundScore(mean(scores) * 100);
 
@@ -62,8 +66,8 @@ export function scoreFindings(checks: AuditCheck[], findings: FindingScoreInput[
           }, 0) / weightTotal,
         );
 
-  const applicable = findings.filter((finding) => finding.outcome !== "na").length;
-  const total = checks.length;
+  const applicable = findings.filter((finding) => scoredCheckIds.has(finding.checkId) && finding.outcome !== "na").length;
+  const total = scoredChecks.length;
 
   return {
     weights,

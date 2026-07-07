@@ -28,10 +28,10 @@ describe("audit seam", () => {
         agent: 10,
       },
     });
-    assert.equal(report.composite, 46.4);
+    assert.equal(report.composite, 38.2);
     assert.deepEqual(report.applicability, {
-      applicable: 10,
-      total: 13,
+      applicable: 12,
+      total: 16,
       confidence: "medium",
     });
     assert.equal(report.categories.length, 6);
@@ -53,11 +53,11 @@ describe("audit seam", () => {
       id: "deprecation",
       score: null,
       applicable: 0,
-      total: 2,
+      total: 3,
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 13);
+    assert.equal(report.findings.length, 17);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -114,7 +114,7 @@ describe("audit seam", () => {
       fix: "Add @deprecated to legacy exports.",
       receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
     });
-    assert.deepEqual(report.findings[10], {
+    assert.deepEqual(finding(report, "deprecation.migration-notes"), {
       checkId: "deprecation.migration-notes",
       category: "deprecation",
       severity: "warning",
@@ -122,7 +122,7 @@ describe("audit seam", () => {
       measure: {
         kind: "ratio",
         value: 0,
-        detail: "0 @deprecated-marked exports found; migration notes are not applicable.",
+        detail: "0 known-deprecated exports found; migration notes are not applicable.",
       },
       evidence: [],
       fix: "Append replacement guidance to every @deprecated mark.",
@@ -442,6 +442,42 @@ describe("audit seam", () => {
     assert.equal(finding(report, "tokens.hardcoded-values").measure.value, 0);
   });
 
+  it("checks tokens.machine-readable against failure and clean fixtures", async () => {
+    const failing = await audit(join(repoRoot, "fixtures/scoring/tokens-unreadable"));
+    const clean = await audit(join(repoRoot, "fixtures/scoring/tokens-machine-readable-clean"));
+
+    assert.deepEqual(finding(failing, "tokens.machine-readable").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 token sources are present and parseable; invalid: tokens.json (DTCG token color.brand is missing $type)",
+    });
+    assert.equal(finding(failing, "tokens.machine-readable").outcome, "fail");
+    assert.deepEqual(finding(failing, "tokens.machine-readable").evidence, [
+      "tokens.json (DTCG token color.brand is missing $type)",
+    ]);
+    assert.equal(finding(clean, "tokens.machine-readable").outcome, "pass");
+    assert.deepEqual(finding(clean, "tokens.machine-readable").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 token sources are present and parseable; invalid: none",
+    });
+  });
+
+  it("checks tokens.naming-consistency against failure and clean fixtures", async () => {
+    const failing = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-inconsistent"));
+    const clean = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-clean"));
+
+    assert.deepEqual(finding(failing, "tokens.naming-consistency").measure, {
+      kind: "ratio",
+      value: 0.25,
+      detail: "1/4 token names violate the dominant kebab pattern; offenders: colorAccent",
+    });
+    assert.equal(finding(failing, "tokens.naming-consistency").outcome, "fail");
+    assert.deepEqual(finding(failing, "tokens.naming-consistency").evidence, ["colorAccent"]);
+    assert.equal(finding(clean, "tokens.naming-consistency").outcome, "pass");
+    assert.equal(finding(clean, "tokens.naming-consistency").measure.value, 0);
+  });
+
   it("checks deprecation.marked against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("deprecated-without-mark"));
     const clean = await audit(m1FixturePath("deprecated-mark-clean"));
@@ -467,6 +503,75 @@ describe("audit seam", () => {
       detail: "0 known-deprecated exports found; deprecation marks are not applicable.",
     });
     assert.deepEqual(finding(report, "deprecation.marked").evidence, []);
+  });
+
+  it("checks deprecation.migration-notes against failure and clean fixtures", async () => {
+    const failing = await audit(join(repoRoot, "fixtures/scoring/deprecation-without-migration"));
+    const clean = await audit(join(repoRoot, "fixtures/scoring/deprecation-migration-clean"));
+
+    assert.deepEqual(finding(failing, "deprecation.migration-notes").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 known-deprecated exports include @deprecated migration guidance; missing: LegacyButton",
+    });
+    assert.equal(finding(failing, "deprecation.migration-notes").outcome, "fail");
+    assert.deepEqual(finding(failing, "deprecation.migration-notes").evidence, ["LegacyButton"]);
+    assert.equal(finding(clean, "deprecation.migration-notes").outcome, "pass");
+    assert.equal(finding(clean, "deprecation.migration-notes").measure.value, 1);
+  });
+
+  it("checks deprecation.manifest-exclusion against failure and clean fixtures", async () => {
+    const failing = await audit(join(repoRoot, "fixtures/scoring/deprecation-manifest-included"));
+    const clean = await audit(join(repoRoot, "fixtures/scoring/deprecation-manifest-clean"));
+
+    assert.deepEqual(finding(failing, "deprecation.manifest-exclusion").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 deprecated components are excluded from or tagged in a manifest; missing: LegacyButton",
+    });
+    assert.equal(finding(failing, "deprecation.manifest-exclusion").outcome, "fail");
+    assert.deepEqual(finding(failing, "deprecation.manifest-exclusion").evidence, ["LegacyButton"]);
+    assert.equal(finding(clean, "deprecation.manifest-exclusion").outcome, "pass");
+    assert.equal(finding(clean, "deprecation.manifest-exclusion").measure.value, 1);
+  });
+
+  it("reports deprecation migration and manifest checks as N/A when zero deprecated exports exist", async () => {
+    const report = await audit(m1FixturePath("types-resolve-clean"));
+
+    assert.deepEqual(finding(report, "deprecation.migration-notes").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0 known-deprecated exports found; migration notes are not applicable.",
+    });
+    assert.equal(finding(report, "deprecation.migration-notes").outcome, "na");
+    assert.deepEqual(finding(report, "deprecation.manifest-exclusion").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0 deprecated components found; manifest deprecation signalling is not applicable.",
+    });
+    assert.equal(finding(report, "deprecation.manifest-exclusion").outcome, "na");
+  });
+
+  it("reports deprecation.zombie-exports without scoring it", async () => {
+    const failing = await audit(join(repoRoot, "fixtures/scoring/deprecation-zombie-exports"));
+    const clean = await audit(join(repoRoot, "fixtures/scoring/deprecation-zombie-clean"));
+    const deprecationCategory = failing.categories.find((category) => category.id === "deprecation");
+
+    assert.deepEqual(finding(failing, "deprecation.zombie-exports").measure, {
+      kind: "count",
+      value: 1,
+      detail: "1 barrel export is absent from docs/stories: GhostButton",
+    });
+    assert.equal(finding(failing, "deprecation.zombie-exports").outcome, "fail");
+    assert.deepEqual(finding(failing, "deprecation.zombie-exports").evidence, ["GhostButton"]);
+    assert.deepEqual(deprecationCategory, {
+      id: "deprecation",
+      score: null,
+      applicable: 0,
+      total: 3,
+      weightRedistributed: true,
+    });
+    assert.equal(finding(clean, "deprecation.zombie-exports").outcome, "pass");
   });
 
   it("uses precise markdown deprecation statements instead of proximity matches", async () => {
@@ -498,8 +603,8 @@ describe("audit seam", () => {
   it("produces six real scored categories on the combined M1 fixture", async () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
-    assert.equal(report.applicability.applicable, 13);
-    assert.equal(report.applicability.total, 13);
+    assert.equal(report.applicability.applicable, 16);
+    assert.equal(report.applicability.total, 16);
     assert.equal(report.applicability.confidence, "high");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
@@ -525,6 +630,10 @@ describe("audit seam", () => {
         "warning",
         "warning",
         "warning",
+        "warning",
+        "warning",
+        "info",
+        "info",
         "info",
       ],
     );
