@@ -15,6 +15,8 @@
 3. **Field survey (must-ship):** ~10 public systems (MUI, Chakra, Polaris, Carbon, Primer, shadcn, Astryx, Cedar…). Field priors extracted ("everyone hardcodes spacing…") — these seed the behavioral battery design.
 4. **Third-party remediation arc (stretch):** no-surface DS, apply Advisor suggestions, re-audit. First thing cut if schedule tightens.
 
+Essay framing inputs (quotes, terminology, market-gap evidence) are collected in [research/ai-ready-design-systems-southleft.md](research/ai-ready-design-systems-southleft.md) §6; external sources indexed in [research/resources.md](research/resources.md). Headlines: "you cannot govern what you cannot measure" (the market thesis, stated by the field's editor); "machine-readable, not machine-governed" (positions ds-bench on the human-judgment side); avoid the term "agentic design systems".
+
 ## Weeks (agent-assisted estimates)
 
 - **W1:** CLI scaffold + check engine + Docs/API/Agent-metadata categories; first real report on Cedar; repo public. Cedar Select/Combobox extension (1–2h) whenever convenient before behavioral runs — not a blocker for the audit.
@@ -39,6 +41,6 @@ Release CTA throughout: **run `npx ds-bench audit` on your own system** — the 
 ## Risks & mitigations
 
 - **Usage-guidance checks too noisy** → pilot gate; weight rolls back into Docs & examples (ADR 0003).
-- **Static tier commoditised by a vendor** → accepted knowingly (ADR 0002); behavioral tier is the moat and stays scheduled.
+- **Static tier commoditised by a vendor** → accepted knowingly (ADR 0002); behavioral tier is the moat and stays scheduled. Landscape check 2026-07-07: the niche is still empty — DSAudit (Southleft) shipped quietly but measures codebase health, not agent-readiness, and never reached npm; the only other instruments are manual questionnaires. Nearest behavioral-tier cousin is Southleft's active [ds-contracts-poc](https://github.com/southleft/ds-contracts-poc) (governed-vs-ungoverned agent scoring — watch it, plus agentic-spec and Clementine). Details: [research/ai-ready-design-systems-southleft.md](research/ai-ready-design-systems-southleft.md) §2.
 - **Schedule tightens** → minimum publishable unit: audit tool + Cedar arc + partial field survey; each week ends in a shippable state.
 - **Two identical scores mislead** → applicability count + confidence label always displayed.
