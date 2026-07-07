@@ -1,5 +1,5 @@
 import { isExampleCarrier } from "./example-carriers.ts";
-import type { TextFile } from "./file-system.ts";
+import { escapeRegExp, type TextFile } from "./file-system.ts";
 
 export const COMPONENT_NAME = /^[A-Z][A-Za-z0-9]*$/;
 
@@ -137,7 +137,7 @@ export function hasImportableUsage(content: string, component: string): boolean 
 }
 
 function findLeadingCommentForName(content: string, name: string): string {
-  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedName = escapeRegExp(name);
   const declaration = new RegExp(
     `/\\*\\*([\\s\\S]*?)\\*/\\s*(?:export\\s+)?(?:declare\\s+)?(?:function|class|const|let|var|type|interface)\\s+${escapedName}\\b`,
   );

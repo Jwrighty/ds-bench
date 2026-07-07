@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import { join } from "node:path";
 import { getExportedComponents } from "../component-inventory.ts";
-import { getPackageName, listTextFiles } from "../file-system.ts";
+import { escapeRegExp, getPackageName, listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
@@ -10,7 +10,7 @@ export const apiTypesResolveCheck: AuditCheck = {
   category: "api",
   severity: "critical",
   signal: "importable TypeScript exports",
-  carriers: ["package.json types/exports fields", "TypeScript exports"],
+  carriers: ["package.json types/exports fields"],
   measure: "synthetic import of every export typechecks",
   fix: "Repair the package types/exports mapping so every public export is importable.",
   naBehavior: "Never N/A; packages without resolvable public types fail this API clarity signal.",
@@ -71,11 +71,17 @@ function getUnresolvedSyntheticImports(targetPath: string, exportNames: string[]
     return [];
   }
 
-  const text = diagnostics.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")).join("\n");
-  const unresolved = exportNames.filter((name) => new RegExp(`\\b${escapeRegExp(name)}\\b`).test(text));
+  const hasModuleResolutionFailure = diagnostics.some((diagnostic) => MODULE_RESOLUTION_ERROR_CODES.has(diagnostic.code));
+  if (hasModuleResolutionFailure) {
+    return exportNames;
+  }
 
-  return unresolved.length === 0 ? exportNames : unresolved;
+  const text = diagnostics.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")).join("\n");
+  return exportNames.filter((name) => new RegExp(`\\b${escapeRegExp(name)}\\b`).test(text));
 }
+
+// TS2307 "Cannot find module", TS7016/TS2792 (missing/untyped declaration file variants).
+const MODULE_RESOLUTION_ERROR_CODES = new Set([2307, 7016, 2792]);
 
 const compilerOptions: ts.CompilerOptions = {
   allowJs: true,
@@ -88,7 +94,3 @@ const compilerOptions: ts.CompilerOptions = {
   strict: false,
   target: ts.ScriptTarget.ES2022,
 };
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}

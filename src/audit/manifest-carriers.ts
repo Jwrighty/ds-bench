@@ -1,14 +1,37 @@
 import { basename } from "node:path";
-import { isRecord, type TextFile } from "./file-system.ts";
+import { escapeRegExp, isRecord, type TextFile } from "./file-system.ts";
 
 export type ManifestCoverage = {
   manifestFiles: TextFile[];
   coveredNames: Set<string>;
 };
 
+/** JSON object keys that manifest/metadata records conventionally use to name an export or component. */
+export const MANIFEST_NAME_FIELDS = ["name", "displayName", "exportName", "component"] as const;
+
+/** Whether `record` names `exportName` via a bare key or one of the conventional name fields. */
+export function recordNamesExport(record: Record<string, unknown>, exportName: string): boolean {
+  if (Object.hasOwn(record, exportName)) {
+    return true;
+  }
+
+  return Object.entries(record).some(
+    ([key, nested]) => (MANIFEST_NAME_FIELDS as readonly string[]).includes(key) && nested === exportName,
+  );
+}
+
+/**
+ * Whether `relativePath` is a manifest carrier: any file whose name mentions "manifest",
+ * the conventional `components.json`/`component-metadata.json` names, or a `storybook*.json` file.
+ */
 export function isManifestCarrier(relativePath: string): boolean {
   const fileName = basename(relativePath).toLowerCase();
-  return fileName.includes("manifest") || fileName === "components.json" || fileName === "component-metadata.json";
+  return (
+    fileName.includes("manifest") ||
+    fileName === "components.json" ||
+    fileName === "component-metadata.json" ||
+    /storybook.*\.json$/.test(fileName)
+  );
 }
 
 export function getManifestCoverage(files: TextFile[], componentNames: string[]): ManifestCoverage {
@@ -63,7 +86,7 @@ function visitManifestValue(value: unknown, componentSet: Set<string>, coveredNa
       coveredNames.add(key);
     }
 
-    if ((key === "name" || key === "displayName" || key === "exportName" || key === "component") && typeof nested === "string") {
+    if ((MANIFEST_NAME_FIELDS as readonly string[]).includes(key) && typeof nested === "string") {
       if (componentSet.has(nested)) {
         coveredNames.add(nested);
       }
@@ -71,8 +94,4 @@ function visitManifestValue(value: unknown, componentSet: Set<string>, coveredNa
 
     visitManifestValue(nested, componentSet, coveredNames);
   }
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

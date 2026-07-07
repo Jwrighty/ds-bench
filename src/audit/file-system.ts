@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, extname, join, relative } from "node:path";
 import { EXAMPLE_CARRIER_KINDS } from "./example-carriers.ts";
+import { isManifestCarrier } from "./manifest-carriers.ts";
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts"]);
 const EXAMPLE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".md", ".mdx"]);
@@ -64,7 +65,7 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
     carriers.add("package.json exports/types");
   }
 
-  if (files.some((file) => isManifestFile(file.relativePath))) {
+  if (files.some((file) => isManifestCarrier(file.relativePath))) {
     carriers.add("manifests");
   }
 
@@ -81,6 +82,11 @@ export function detectCarriers(targetPath: string, files: TextFile[]): string[] 
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Escapes regex metacharacters so `value` can be embedded literally in a `RegExp`. */
+export function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function walk(root: string): string[] {
@@ -105,8 +111,4 @@ function walk(root: string): string[] {
 
     return stat.isFile() ? [path] : [];
   });
-}
-
-function isManifestFile(relativePath: string): boolean {
-  return /(^|[/.-])manifest\.(json|ts|js)$/.test(relativePath) || /storybook.*\.json$/.test(relativePath);
 }

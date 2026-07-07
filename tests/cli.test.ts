@@ -5,6 +5,7 @@ import { join } from "node:path";
 
 const repoRoot = process.cwd();
 const fixturePath = join(repoRoot, "fixtures/missing-usage-examples");
+const combinedFixturePath = join(repoRoot, "fixtures/m1/combined-six-pack");
 const cliPath = join(repoRoot, "dist/src/cli.js");
 
 describe("CLI", () => {
@@ -14,8 +15,8 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 45\.6\/100/);
-    assert.match(result.stdout, /applicable checks: 6\/8 \(medium confidence\)/);
+    assert.match(result.stdout, /composite score: 55\.4\/100/);
+    assert.match(result.stdout, /applicable checks: 5\/8 \(low confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+75 \(2\/2\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(1\/1\)/);
@@ -46,6 +47,25 @@ describe("CLI", () => {
     assert.equal(report.weights.source, "custom");
     assert.equal(report.weights.values.docs, 10);
     assert.equal(report.weights.values.deprecation, 90);
-    assert.notEqual(report.composite, 0);
+    assert.equal(report.composite, 36.2);
+  });
+
+  it("renders a coherent end-to-end report for the combined M1 six-pack fixture", () => {
+    const result = spawnSync(process.execPath, [cliPath, "audit", combinedFixturePath], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /composite score: 70\/100/);
+    assert.match(result.stdout, /applicable checks: 8\/8 \(high confidence\)/);
+    assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(2\/2\)/);
+    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
+    assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
+    assert.match(result.stdout, /Token hygiene\s+\[###\.{7}\]\s+33\.3 \(1\/1\)/);
+    assert.match(result.stdout, /Deprecation signalling\s+\[#####\.{5}\]\s+50 \(2\/2\)/);
+    assert.match(result.stdout, /Agent metadata\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
+    assert.doesNotMatch(result.stdout, /N\/A/);
+    assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
+    assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
   });
 });

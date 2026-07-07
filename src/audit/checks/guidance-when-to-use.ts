@@ -1,7 +1,7 @@
 import { extname } from "node:path";
 import { getExportedComponents } from "../component-inventory.ts";
-import { getManifestCoverage, isManifestCarrier } from "../manifest-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
+import { isManifestCarrier } from "../manifest-carriers.ts";
+import { escapeRegExp, listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
@@ -43,12 +43,6 @@ export const guidanceWhenToUseCheck: AuditCheck = {
       }
     }
 
-    for (const component of getManifestCoverage(files, components).coveredNames) {
-      if (files.some((file) => isManifestCarrier(file.relativePath) && hasGuidanceForComponent(file.content, component))) {
-        covered.add(component);
-      }
-    }
-
     const missing = components.filter((component) => !covered.has(component));
     const ratio = covered.size / components.length;
 
@@ -72,8 +66,4 @@ function hasGuidanceForComponent(content: string, component: string): boolean {
   }
 
   return /\bwhen\s+(?:not\s+)?to\s+use\b|when[-_\s]?not|when[-_\s]?to[-_\s]?use|usageGuidance|useWhen|avoidWhen/i.test(content);
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

@@ -1,5 +1,6 @@
 import { getExportedSymbols, type ExportedSymbol } from "../component-inventory.ts";
-import { isRecord, listTextFiles } from "../file-system.ts";
+import { escapeRegExp, isRecord, listTextFiles } from "../file-system.ts";
+import { recordNamesExport } from "../manifest-carriers.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
@@ -9,9 +10,10 @@ export const deprecationMarkedCheck: AuditCheck = {
   severity: "critical",
   signal: "deprecation marks",
   carriers: ["JSDoc @deprecated"],
-  measure: "% known-deprecated exports carrying @deprecated",
+  measure:
+    "% known-deprecated exports carrying the mark (known-deprecated = docs/changelog/manifest cross-reference where available, plus name-pattern inference: Legacy*/Deprecated*/Old* prefixes and suffixes)",
   fix: "Add @deprecated to legacy exports.",
-  naBehavior: "N/A when no known-deprecated exports can be inferred from source, docs, changelog, or manifest carriers.",
+  naBehavior: "N/A when zero known-deprecated exports detected.",
   receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
   run(context: CheckContext): CheckResult {
     const files = listTextFiles(context.targetPath);
@@ -88,12 +90,7 @@ function jsonValueMarksDeprecated(value: unknown, exportName: string): boolean {
     return false;
   }
 
-  const namesExport =
-    Object.entries(value).some(([key, nested]) => {
-      return ["name", "displayName", "exportName", "component"].includes(key) && nested === exportName;
-    }) || Object.hasOwn(value, exportName);
-
-  if (namesExport && (value.deprecated === true || value.status === "deprecated")) {
+  if (recordNamesExport(value, exportName) && (value.deprecated === true || value.status === "deprecated")) {
     return true;
   }
 
@@ -102,8 +99,4 @@ function jsonValueMarksDeprecated(value: unknown, exportName: string): boolean {
 
 function hasDeprecatedTag(comment: string): boolean {
   return /@deprecated\b/i.test(comment);
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

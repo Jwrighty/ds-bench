@@ -26,11 +26,11 @@ describe("audit seam", () => {
         agent: 10,
       },
     });
-    assert.equal(report.composite, 45.6);
+    assert.equal(report.composite, 55.4);
     assert.deepEqual(report.applicability, {
-      applicable: 6,
+      applicable: 5,
       total: 8,
-      confidence: "medium",
+      confidence: "low",
     });
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
@@ -215,6 +215,13 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "tokens.hardcoded-values").measure.value, 0);
   });
 
+  it("reports tokens.hardcoded-values as N/A when zero style-LOC is detected", async () => {
+    const report = await audit(m1FixturePath("types-resolve-clean"));
+
+    assert.equal(finding(report, "tokens.hardcoded-values").outcome, "na");
+    assert.equal(finding(report, "tokens.hardcoded-values").measure.value, 0);
+  });
+
   it("checks deprecation.marked against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("deprecated-without-mark"));
     const clean = await audit(m1FixturePath("deprecated-mark-clean"));
@@ -222,12 +229,24 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "deprecation.marked").measure, {
       kind: "ratio",
       value: 0,
-      detail: "0/1 known-deprecated exports carry @deprecated; missing: LegacyButton",
+      detail: "0/2 known-deprecated exports carry @deprecated; missing: GhostButton, LegacyButton",
     });
     assert.equal(finding(failing, "deprecation.marked").outcome, "fail");
-    assert.deepEqual(finding(failing, "deprecation.marked").evidence, ["LegacyButton"]);
+    assert.deepEqual(finding(failing, "deprecation.marked").evidence, ["GhostButton", "LegacyButton"]);
     assert.equal(finding(clean, "deprecation.marked").outcome, "pass");
     assert.equal(finding(clean, "deprecation.marked").measure.value, 1);
+  });
+
+  it("reports deprecation.marked as N/A when zero known-deprecated exports are detected", async () => {
+    const report = await audit(m1FixturePath("types-resolve-clean"));
+
+    assert.equal(finding(report, "deprecation.marked").outcome, "na");
+    assert.deepEqual(finding(report, "deprecation.marked").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0 known-deprecated exports found; deprecation marks are not applicable.",
+    });
+    assert.deepEqual(finding(report, "deprecation.marked").evidence, []);
   });
 
   it("checks agent.manifest-coverage against failure and clean fixtures", async () => {
