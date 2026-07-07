@@ -3,9 +3,9 @@ import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 import { getTokenSources } from "./token-sources.ts";
 
-type NamingPattern = "kebab" | "dot" | "snake" | "camel" | "unknown";
+type NamingPattern = "kebab" | "dot-kebab" | "dot-snake" | "snake" | "camel" | "unknown";
 
-const PATTERN_ORDER: NamingPattern[] = ["kebab", "dot", "snake", "camel", "unknown"];
+const PATTERN_ORDER: NamingPattern[] = ["dot-kebab", "kebab", "dot-snake", "snake", "camel", "unknown"];
 
 export const tokensNamingConsistencyCheck: AuditCheck = {
   id: "tokens.naming-consistency",
@@ -15,7 +15,8 @@ export const tokensNamingConsistencyCheck: AuditCheck = {
   carriers: ["token source"],
   measure: "naming-pattern violation rate against the system's own dominant pattern",
   fix: "Rename token outliers to the dominant pattern.",
-  naBehavior: "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap).",
+  naBehavior:
+    "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap), or when token names use an unmodeled convention the classifier cannot score.",
   receipt: "Inconsistent names invite fabricated tokens.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
@@ -26,6 +27,10 @@ export const tokensNamingConsistencyCheck: AuditCheck = {
     }
 
     const dominantPattern = getDominantPattern(tokenNames);
+    if (dominantPattern === "unknown") {
+      return naResult("ratio", "Token names use an unmodeled naming convention; naming consistency is not applicable until the classifier is taught that convention.");
+    }
+
     const offenders = tokenNames.filter((name) => classifyName(name) !== dominantPattern);
     const violationRate = offenders.length / tokenNames.length;
 
@@ -55,15 +60,20 @@ function getDominantPattern(names: string[]): NamingPattern {
 }
 
 function classifyName(name: string): NamingPattern {
-  if (/^[a-z][a-z0-9]*(?:-[a-z0-9]+)+$/.test(name)) {
+  const dotSegments = name.split(".");
+  if (dotSegments.length > 1 && dotSegments.every(isKebabSegment)) {
+    return "dot-kebab";
+  }
+
+  if (dotSegments.length > 1 && dotSegments.every(isSnakeSegment)) {
+    return "dot-snake";
+  }
+
+  if (isKebabName(name)) {
     return "kebab";
   }
 
-  if (/^[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)+$/.test(name)) {
-    return "dot";
-  }
-
-  if (/^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(name)) {
+  if (isSnakeName(name)) {
     return "snake";
   }
 
@@ -72,4 +82,24 @@ function classifyName(name: string): NamingPattern {
   }
 
   return "unknown";
+}
+
+function isKebabName(name: string): boolean {
+  return name.includes("-") && name.split("-").every(isLowerOrNumericSegment);
+}
+
+function isKebabSegment(segment: string): boolean {
+  return segment.split("-").every(isLowerOrNumericSegment);
+}
+
+function isSnakeName(name: string): boolean {
+  return name.includes("_") && name.split("_").every(isLowerOrNumericSegment);
+}
+
+function isSnakeSegment(segment: string): boolean {
+  return segment.split("_").every(isLowerOrNumericSegment);
+}
+
+function isLowerOrNumericSegment(segment: string): boolean {
+  return /^[a-z][a-z0-9]*$/.test(segment) || /^[0-9]+$/.test(segment);
 }

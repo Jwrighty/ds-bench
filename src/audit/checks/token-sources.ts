@@ -1,4 +1,5 @@
 import { basename, dirname, extname } from "node:path";
+import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
 import { isRecord, walkJson, SOURCE_EXTENSIONS, STYLE_EXTENSIONS, type TextFile } from "../file-system.ts";
 
 export type TokenSource = {
@@ -26,10 +27,11 @@ const DTCG_TYPES = new Set([
 ]);
 
 export function getTokenSources(files: TextFile[]): TokenSource[] {
+  const scopedFiles = scopeFilesToLibraryPackages(files, { includeRootFiles: true });
   const tokenPackageRoots = getTokenPackageRoots(files);
   const sources: TokenSource[] = [];
 
-  for (const file of files) {
+  for (const file of scopedFiles) {
     const extension = extname(file.relativePath);
 
     if (extension === ".json" && file.relativePath.endsWith("package.json") === false && isTokenJsonCandidate(file)) {
@@ -152,39 +154,39 @@ function getDtcgTokenNames(value: unknown): string[] {
 }
 
 function validateDtcgTokens(value: unknown): string | null {
-  return validateDtcgValue(value, [], null);
+  const errors = validateDtcgValue(value, [], null);
+  return errors.length === 0 ? null : errors.join("; ");
 }
 
-function validateDtcgValue(value: unknown, path: string[], inheritedType: string | null): string | null {
+function validateDtcgValue(value: unknown, path: string[], inheritedType: string | null): string[] {
   if (Array.isArray(value) || !isRecord(value)) {
-    return null;
+    return [];
   }
 
   const type = typeof value.$type === "string" ? value.$type : inheritedType;
   if (Object.hasOwn(value, "$value")) {
     if (!type) {
-      return `DTCG token ${path.join(".") || "(root)"} is missing $type`;
+      return [`DTCG token ${path.join(".") || "(root)"} is missing $type`];
     }
 
     if (!DTCG_TYPES.has(type)) {
-      return `DTCG token ${path.join(".") || "(root)"} has unknown $type ${type}`;
+      return [`DTCG token ${path.join(".") || "(root)"} has unknown $type ${type}`];
     }
 
-    return validateDtcgTokenValue(value.$value, type, path.join(".") || "(root)");
+    const tokenValueError = validateDtcgTokenValue(value.$value, type, path.join(".") || "(root)");
+    return tokenValueError ? [tokenValueError] : [];
   }
 
+  const errors: string[] = [];
   for (const [key, nested] of Object.entries(value)) {
     if (key.startsWith("$")) {
       continue;
     }
 
-    const error = validateDtcgValue(nested, [...path, key], type);
-    if (error) {
-      return error;
-    }
+    errors.push(...validateDtcgValue(nested, [...path, key], type));
   }
 
-  return null;
+  return errors;
 }
 
 function validateDtcgTokenValue(value: unknown, type: string, name: string): string | null {

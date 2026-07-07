@@ -31,6 +31,10 @@ export type ComponentImport = {
   localName: string;
 };
 
+export type LibraryPackageScopeOptions = {
+  includeRootFiles?: boolean;
+};
+
 export function getExportedComponents(files: TextFile[]): ComponentInventory {
   const components = new Set(
     getExportedComponentSymbols(files)
@@ -146,6 +150,19 @@ export function getLibraryPackageRootPaths(files: TextFile[]): string[] {
     .sort();
 
   return Array.from(new Set(libraryRoots));
+}
+
+export function scopeFilesToLibraryPackages(files: TextFile[], options: LibraryPackageScopeOptions = {}): TextFile[] {
+  const roots = getLibraryPackageRootPaths(files);
+  if (roots.length === 0 || roots.includes("")) {
+    return files.filter((file) => !isConsumerWorkspacePath(file.relativePath));
+  }
+
+  return files.filter(
+    (file) =>
+      (options.includeRootFiles === true && isRootLevelPath(file.relativePath)) ||
+      roots.some((root) => file.relativePath === root || file.relativePath.startsWith(`${root}/`)),
+  );
 }
 
 type PackageCandidate = PublicPackage & {
@@ -534,6 +551,10 @@ function normalizeRelativePath(path: string): string {
   return path.replace(/\\/g, "/").replace(/^\.\//, "");
 }
 
+function isRootLevelPath(path: string): boolean {
+  return !path.includes("/");
+}
+
 function packageNameScore(packageName: string): number {
   return /\b(?:react|ui|components?)\b|(?:^|[-/])react(?:$|[-/])|(?:^|[-/])ui(?:$|[-/])|(?:^|[-/])components?(?:$|[-/])/i.test(packageName)
     ? 1
@@ -546,7 +567,7 @@ function pathDepth(path: string): number {
 
 function isLibraryPackageCandidate(candidate: PackageCandidate): boolean {
   const [workspaceRoot] = candidate.rootRelativePath.split("/");
-  if (workspaceRoot === "apps" || workspaceRoot === "examples" || workspaceRoot === "docs") {
+  if (isConsumerWorkspaceRoot(workspaceRoot)) {
     return false;
   }
 
@@ -555,4 +576,13 @@ function isLibraryPackageCandidate(candidate: PackageCandidate): boolean {
   }
 
   return packageNameScore(candidate.name) > 0 || /\b(?:tokens?|theme|design-system)\b/i.test(candidate.name);
+}
+
+function isConsumerWorkspacePath(relativePath: string): boolean {
+  const [workspaceRoot] = normalizeRelativePath(relativePath).split("/");
+  return isConsumerWorkspaceRoot(workspaceRoot);
+}
+
+function isConsumerWorkspaceRoot(workspaceRoot: string | undefined): boolean {
+  return workspaceRoot === "apps" || workspaceRoot === "examples" || workspaceRoot === "docs";
 }

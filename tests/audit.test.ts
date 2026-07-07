@@ -584,6 +584,36 @@ describe("audit seam", () => {
     assert.deepEqual(tokenFinding.evidence, ["#123456 in packages/react/src/Button.css:2"]);
   });
 
+  it("scopes token sources to library package files", async () => {
+    const report = await audit(join(repoRoot, "fixtures/token-scope/token-sources-app-css"));
+    const machineReadableFinding = finding(report, "tokens.machine-readable");
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(machineReadableFinding.outcome, "pass");
+    assert.deepEqual(machineReadableFinding.measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 token sources are present and parseable; invalid: none",
+    });
+    assert.equal(namingFinding.outcome, "pass");
+    assert.doesNotMatch(namingFinding.measure.detail, /observe|sidebar/);
+  });
+
+  it("excludes app token sources when the library package is the repo root", async () => {
+    const report = await audit(join(repoRoot, "fixtures/token-scope/token-sources-root-package"));
+    const machineReadableFinding = finding(report, "tokens.machine-readable");
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(machineReadableFinding.outcome, "pass");
+    assert.deepEqual(machineReadableFinding.measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 token sources are present and parseable; invalid: none",
+    });
+    assert.equal(namingFinding.outcome, "pass");
+    assert.doesNotMatch(namingFinding.measure.detail, /observe|sidebar/);
+  });
+
   it("reports tokens.hardcoded-values as N/A when zero style-LOC is detected", async () => {
     const report = await audit(m1FixturePath("types-resolve-clean"));
 
@@ -625,6 +655,49 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "tokens.naming-consistency").evidence, ["colorAccent"]);
     assert.equal(finding(clean, "tokens.naming-consistency").outcome, "pass");
     assert.equal(finding(clean, "tokens.naming-consistency").measure.value, 0);
+  });
+
+  it("classifies compound dot paths with kebab and numeric segments as one convention", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-compound"));
+
+    assert.equal(finding(report, "tokens.naming-consistency").outcome, "pass");
+    assert.deepEqual(finding(report, "tokens.naming-consistency").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/3 token names violate the dominant dot-kebab pattern; offenders: none",
+    });
+  });
+
+  it("fails genuinely mixed token naming conventions", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-mixed"));
+
+    assert.equal(finding(report, "tokens.naming-consistency").outcome, "fail");
+    assert.deepEqual(finding(report, "tokens.naming-consistency").measure, {
+      kind: "ratio",
+      value: 0.333,
+      detail: "1/3 token names violate the dominant dot-kebab pattern; offenders: colorAccent",
+    });
+    assert.deepEqual(finding(report, "tokens.naming-consistency").evidence, ["colorAccent"]);
+  });
+
+  it("reports unmodeled token naming conventions as a classifier-gap N/A", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-unmodeled"));
+
+    assert.equal(finding(report, "tokens.naming-consistency").outcome, "na");
+    assert.deepEqual(finding(report, "tokens.naming-consistency").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "Token names use an unmodeled naming convention; naming consistency is not applicable until the classifier is taught that convention.",
+    });
+  });
+
+  it("reports all DTCG validation errors found in a token file", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-multiple-invalid"));
+
+    assert.equal(finding(report, "tokens.machine-readable").outcome, "fail");
+    assert.deepEqual(finding(report, "tokens.machine-readable").evidence, [
+      "tokens.json (DTCG token easing.out is missing $type; DTCG token easing.snap is missing $type; DTCG token spring.gentle is missing $type; DTCG token spring.snappy is missing $type)",
+    ]);
   });
 
   it("reports tokens.naming-consistency as N/A when no token names are available", async () => {
