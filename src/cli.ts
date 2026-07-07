@@ -5,6 +5,7 @@ import { renderAuditReport } from "./render/terminal.ts";
 import type { AuditConfig } from "./audit/types.ts";
 
 type CliOptions = {
+  exclude: string[];
   json: boolean;
   targetPath: string | null;
   configPath: string | null;
@@ -28,6 +29,9 @@ async function main(argv: string[]): Promise<number> {
   if (options.configPath) {
     config = loadAuditConfig(options.configPath);
   }
+  if (options.exclude.length > 0) {
+    config = { ...config, exclude: [...(config.exclude ?? []), ...options.exclude] };
+  }
 
   const report = await audit(options.targetPath, config);
   if (options.json) {
@@ -40,6 +44,7 @@ async function main(argv: string[]): Promise<number> {
 }
 
 function parseAuditArgs(args: string[]): CliOptions {
+  const exclude: string[] = [];
   let json = false;
   let targetPath: string | null = null;
   let configPath: string | null = null;
@@ -53,16 +58,24 @@ function parseAuditArgs(args: string[]): CliOptions {
       index += 1;
     } else if (arg.startsWith("--config=")) {
       configPath = arg.slice("--config=".length);
+    } else if (arg === "--exclude") {
+      const pattern = args[index + 1];
+      if (pattern) {
+        exclude.push(pattern);
+      }
+      index += 1;
+    } else if (arg.startsWith("--exclude=")) {
+      exclude.push(arg.slice("--exclude=".length));
     } else if (!targetPath) {
       targetPath = arg;
     }
   }
 
-  return { json, targetPath, configPath };
+  return { exclude, json, targetPath, configPath };
 }
 
 function printUsage(): void {
-  process.stderr.write("Usage: ds-bench audit <path> [--json] [--config <path>]\n");
+  process.stderr.write("Usage: ds-bench audit <path> [--json] [--config <path>] [--exclude <glob>]\n");
 }
 
 const exitCode = await main(process.argv.slice(2));

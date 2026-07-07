@@ -50,6 +50,20 @@ describe("CLI", () => {
     assert.equal(report.composite, 51.7);
   });
 
+  it("--exclude filters files through shared discovery", () => {
+    const targetPath = join(repoRoot, "fixtures/m1/hardcoded-token-values");
+    const result = spawnSync(process.execPath, [cliPath, "audit", targetPath, "--exclude", "src/button.css", "--json"], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0);
+    const report = JSON.parse(result.stdout) as { findings: Array<{ checkId: string; outcome: string; evidence: string[] }> };
+    const tokenFinding = report.findings.find((finding) => finding.checkId === "tokens.hardcoded-values");
+
+    assert.equal(tokenFinding?.outcome, "na");
+    assert.deepEqual(tokenFinding?.evidence, []);
+  });
+
   it("renders a coherent end-to-end report for the combined M1 six-pack fixture", () => {
     const result = spawnSync(process.execPath, [cliPath, "audit", combinedFixturePath], {
       encoding: "utf8",

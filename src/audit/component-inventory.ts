@@ -129,6 +129,22 @@ export function getPublicPackage(files: TextFile[]): PublicPackage | null {
   return toPublicPackage(candidates[0]);
 }
 
+export function getLibraryPackageRootPaths(files: TextFile[]): string[] {
+  const candidates = discoverPackageCandidates(files);
+  const nonRootCandidates = candidates.filter((candidate) => candidate.rootRelativePath.length > 0);
+
+  if (nonRootCandidates.length === 0) {
+    return candidates.some((candidate) => candidate.rootRelativePath === "") ? [""] : [];
+  }
+
+  const libraryRoots = nonRootCandidates
+    .filter(isLibraryPackageCandidate)
+    .map((candidate) => candidate.rootRelativePath)
+    .sort();
+
+  return Array.from(new Set(libraryRoots));
+}
+
 type PackageCandidate = PublicPackage & {
   componentCount: number;
 };
@@ -270,11 +286,11 @@ function findDeclaredSymbol(file: TextFile, name: string, filesByPath: Map<strin
   return declaration ? { ...declaration, name } : null;
 }
 
-/** Local names of JSX elements rendered in `content`, e.g. `<Button>` -> "Button". */
+/** Local names of JSX elements rendered in `content`, e.g. `<Button>` or `<Dialog.Root>` -> the imported root name. */
 export function getRenderedComponentNames(content: string): Set<string> {
   const names = new Set<string>();
 
-  for (const match of content.matchAll(/<([A-Z][A-Za-z0-9]*)(?:\s|>|\/)/g)) {
+  for (const match of content.matchAll(/<([A-Z][A-Za-z0-9]*)(?:\.|\s|>|\/)/g)) {
     names.add(match[1]);
   }
 
@@ -523,4 +539,17 @@ function packageNameScore(packageName: string): number {
 
 function pathDepth(path: string): number {
   return path.length === 0 ? 0 : path.split("/").length;
+}
+
+function isLibraryPackageCandidate(candidate: PackageCandidate): boolean {
+  const [workspaceRoot] = candidate.rootRelativePath.split("/");
+  if (workspaceRoot === "apps" || workspaceRoot === "examples" || workspaceRoot === "docs") {
+    return false;
+  }
+
+  if (workspaceRoot === "packages") {
+    return true;
+  }
+
+  return packageNameScore(candidate.name) > 0 || /\b(?:tokens?|theme|design-system)\b/i.test(candidate.name);
 }

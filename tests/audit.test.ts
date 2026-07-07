@@ -122,7 +122,7 @@ describe("audit seam", () => {
       measure: {
         kind: "ratio",
         value: 0,
-        detail: "0 deprecated exports found; migration notes are not applicable.",
+        detail: "0 @deprecated-marked exports found; migration notes are not applicable.",
       },
       evidence: [],
       fix: "Append replacement guidance to every @deprecated mark.",
@@ -210,6 +210,16 @@ describe("audit seam", () => {
     assert.equal(finding(report, "agent.manifest-coverage").measure.detail, "1/2 exported components are covered by a manifest; missing: Card");
   });
 
+  it("counts member-expression JSX as importable component usage", async () => {
+    const report = await audit(m1FixturePath("compound-jsx-usage"));
+
+    assert.equal(finding(report, "docs.usage-examples").outcome, "pass");
+    assert.equal(
+      finding(report, "docs.usage-examples").measure.detail,
+      "1/1 exported components have importable usage examples; missing: none",
+    );
+  });
+
   it("checks guidance.when-to-use against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("missing-usage-guidance"));
     const clean = await audit(m1FixturePath("usage-guidance-clean"));
@@ -245,6 +255,18 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "tokens.hardcoded-values").measure.value, 0);
   });
 
+  it("scopes token hygiene to library package files while keeping repo-wide carriers", async () => {
+    const report = await audit(join(repoRoot, "fixtures/token-scope/library-vs-app"));
+    const tokenFinding = finding(report, "tokens.hardcoded-values");
+
+    assert.equal(finding(report, "docs.usage-examples").outcome, "pass");
+    assert.equal(finding(report, "agent.manifest-coverage").outcome, "pass");
+    assert.equal(tokenFinding.outcome, "fail");
+    assert.match(tokenFinding.measure.detail, /packages\/react\/src\/Button\.css/);
+    assert.doesNotMatch(tokenFinding.measure.detail, /apps\/demo/);
+    assert.deepEqual(tokenFinding.evidence, ["#123456 in packages/react/src/Button.css:2"]);
+  });
+
   it("reports tokens.hardcoded-values as N/A when zero style-LOC is detected", async () => {
     const report = await audit(m1FixturePath("types-resolve-clean"));
 
@@ -277,6 +299,17 @@ describe("audit seam", () => {
       detail: "0 known-deprecated exports found; deprecation marks are not applicable.",
     });
     assert.deepEqual(finding(report, "deprecation.marked").evidence, []);
+  });
+
+  it("uses precise markdown deprecation statements instead of proximity matches", async () => {
+    const report = await audit(join(repoRoot, "fixtures/deprecation/heuristic-precision"));
+
+    assert.equal(finding(report, "deprecation.marked").outcome, "fail");
+    assert.equal(
+      finding(report, "deprecation.marked").measure.detail,
+      "0/1 known-deprecated exports carry @deprecated; missing: Modal",
+    );
+    assert.deepEqual(finding(report, "deprecation.marked").evidence, ["Modal"]);
   });
 
   it("checks agent.manifest-coverage against failure and clean fixtures", async () => {

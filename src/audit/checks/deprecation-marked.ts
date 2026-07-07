@@ -68,9 +68,25 @@ function isKnownDeprecated(symbol: ExportedSymbol, files: ReturnType<typeof list
       return false;
     }
 
-    const nearby = new RegExp(`\\b${escapeRegExp(symbol.name)}\\b[\\s\\S]{0,120}\\bdeprecated\\b|\\bdeprecated\\b[\\s\\S]{0,120}\\b${escapeRegExp(symbol.name)}\\b`, "i");
-    return nearby.test(file.content);
+    return markdownMarksDeprecated(file.content, symbol.name);
   });
+}
+
+function markdownMarksDeprecated(content: string, exportName: string): boolean {
+  const text = stripFencedCodeBlocks(content);
+  const name = `(?:\`${escapeRegExp(exportName)}\`|\\b${escapeRegExp(exportName)}\\b|~~${escapeRegExp(exportName)}~~)`;
+  const patterns = [
+    new RegExp(`${name}\\s+(?:is|was|has been|is now)?\\s*[Dd]eprecated\\b`),
+    new RegExp(`${name}\\s*\\([^)]*\\b[Dd]eprecated\\b[^)]*\\)`),
+    new RegExp(`\\b[Dd]eprecated\\s*[:\\-]\\s*${name}`),
+    new RegExp(`~~${escapeRegExp(exportName)}~~\\s*(?:is\\s+)?[Dd]eprecated\\b`),
+  ];
+
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function stripFencedCodeBlocks(content: string): string {
+  return content.replace(/```[\s\S]*?```/g, "");
 }
 
 function isDeprecatedInJson(content: string, exportName: string): boolean {

@@ -30,5 +30,13 @@ export function loadAuditConfig(configPath: string): AuditConfig {
     }
   }
 
+  if (parsed.exclude !== undefined) {
+    if (!Array.isArray(parsed.exclude) || !parsed.exclude.every((value) => typeof value === "string")) {
+      throw new Error("Audit config exclude must be an array of glob strings.");
+    }
+
+    config.exclude = parsed.exclude;
+  }
+
   return config;
 }

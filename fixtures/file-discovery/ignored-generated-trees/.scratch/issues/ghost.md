@@ -1,0 +1,1 @@
+GhostGenerated is deprecated.

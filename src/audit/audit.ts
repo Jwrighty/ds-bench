@@ -10,7 +10,7 @@ const RUBRIC_VERSION = "ARS v0";
 
 export async function audit(targetPath: string, config: AuditConfig = {}): Promise<AuditReport> {
   const resolvedTarget = resolve(targetPath);
-  const files = listTextFiles(resolvedTarget);
+  const files = listTextFiles(resolvedTarget, { exclude: config.exclude });
   const findingsForScoring: FindingScoreInput[] = [];
 
   for (const check of CHECK_REGISTRY) {

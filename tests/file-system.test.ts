@@ -28,6 +28,7 @@ describe("file discovery", () => {
     const serializedFindings = JSON.stringify(report.findings);
 
     assert.doesNotMatch(serializedFindings, /\.claude|\.next|\.worktrees|dist|storybook-static/);
+    assert.doesNotMatch(serializedFindings, /\.scratch/);
     assert.doesNotMatch(serializedFindings, /GhostGenerated/);
     assert.equal(report.target.detectedCarriers.includes("CSS files"), true);
     assert.equal(report.target.detectedCarriers.includes("Storybook stories/MDX"), true);

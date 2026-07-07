@@ -13,6 +13,7 @@ const IGNORED_DIRECTORIES = new Set([
   ".git",
   ".next",
   ".pnpm-store",
+  ".scratch",
   ".turbo",
   ".worktrees",
   "build",
@@ -28,6 +29,10 @@ export type TextFile = {
   content: string;
 };
 
+export type FileDiscoveryOptions = {
+  exclude?: string[];
+};
+
 export function readJsonFile(path: string): unknown | null {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -36,8 +41,10 @@ export function readJsonFile(path: string): unknown | null {
   }
 }
 
-export function listTextFiles(root: string): TextFile[] {
-  return walk(root)
+export function listTextFiles(root: string, options: FileDiscoveryOptions = {}): TextFile[] {
+  const excludeMatchers = (options.exclude ?? []).map(globToRegExp);
+
+  return walk(root, root, excludeMatchers)
     .filter(
       (path) =>
         SOURCE_EXTENSIONS.has(extname(path)) ||
@@ -103,7 +110,7 @@ export function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function walk(root: string): string[] {
+function walk(root: string, baseRoot: string, excludeMatchers: RegExp[]): string[] {
   let entries: string[];
   try {
     entries = readdirSync(root);
@@ -117,12 +124,44 @@ function walk(root: string): string[] {
     }
 
     const path = join(root, entry);
+    const relativePath = relative(baseRoot, path).replace(/\\/g, "/");
+    if (matchesExclude(relativePath, excludeMatchers)) {
+      return [];
+    }
+
     const stat = statSync(path);
 
     if (stat.isDirectory()) {
-      return walk(path);
+      return walk(path, baseRoot, excludeMatchers);
     }
 
     return stat.isFile() ? [path] : [];
   });
+}
+
+function matchesExclude(relativePath: string, excludeMatchers: RegExp[]): boolean {
+  return excludeMatchers.some((matcher) => matcher.test(relativePath));
+}
+
+function globToRegExp(glob: string): RegExp {
+  const normalized = glob.replace(/\\/g, "/").replace(/^\.\//, "");
+  let source = "^";
+
+  for (let index = 0; index < normalized.length; index += 1) {
+    const char = normalized[index];
+    const next = normalized[index + 1];
+
+    if (char === "*" && next === "*") {
+      source += ".*";
+      index += 1;
+    } else if (char === "*") {
+      source += "[^/]*";
+    } else if (char === "?") {
+      source += "[^/]";
+    } else {
+      source += escapeRegExp(char);
+    }
+  }
+
+  return new RegExp(`${source}(?:/.*)?$`);
 }

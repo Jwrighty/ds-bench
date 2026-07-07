@@ -16,7 +16,7 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
   carriers: ["JSDoc @deprecated"],
   measure: "% @deprecated marks naming a replacement or migration path",
   fix: "Append replacement guidance to every @deprecated mark.",
-  naBehavior: "N/A when zero deprecated exports exist.",
+  naBehavior: "N/A when zero @deprecated-marked exports exist.",
   receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
   run(context: CheckContext): CheckResult {
     const sourceFiles = (context.files ?? listTextFiles(context.targetPath)).filter((file) => !isExampleCarrier(file.relativePath));
@@ -29,7 +29,7 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
         measure: {
           kind: "ratio",
           value: 0,
-          detail: "0 deprecated exports found; migration notes are not applicable.",
+          detail: "0 @deprecated-marked exports found; migration notes are not applicable.",
         },
         evidence: [],
       };
@@ -45,7 +45,7 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
       measure: {
         kind: "ratio",
         value: roundRatio(ratio),
-        detail: `${migratedCount}/${deprecatedExports.length} deprecated exports include migration guidance; missing: ${formatNames(withoutMigration.map((deprecatedExport) => deprecatedExport.name))}`,
+        detail: `${migratedCount}/${deprecatedExports.length} @deprecated-marked exports include migration guidance; missing: ${formatNames(withoutMigration.map((deprecatedExport) => deprecatedExport.name))}`,
       },
       evidence: withoutMigration.map((deprecatedExport) => deprecatedExport.name).slice(0, 20),
     };

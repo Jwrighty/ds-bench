@@ -58,6 +58,7 @@ export type AuditReport = {
 };
 
 export type AuditConfig = {
+  exclude?: string[];
   weights?: Partial<Record<CategoryId, number>>;
 };
 

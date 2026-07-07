@@ -1,4 +1,5 @@
 import { extname } from "node:path";
+import { getLibraryPackageRootPaths } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
@@ -28,7 +29,8 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
   receipt: "Agents imitate the system's own styling habits; hardcoded source values become copied output.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
-    const styleContents = files
+    const scopedFiles = scopeToLibraryPackages(files);
+    const styleContents = scopedFiles
       .map((file) => ({ relativePath: file.relativePath, styleContent: extractStyleContent(file.relativePath, file.content) }))
       .filter((file) => file.styleContent.length > 0);
 
@@ -65,6 +67,15 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
     };
   },
 };
+
+function scopeToLibraryPackages(files: ReturnType<typeof listTextFiles>): ReturnType<typeof listTextFiles> {
+  const roots = getLibraryPackageRootPaths(files);
+  if (roots.length === 0 || roots.includes("")) {
+    return files;
+  }
+
+  return files.filter((file) => roots.some((root) => file.relativePath === root || file.relativePath.startsWith(`${root}/`)));
+}
 
 /**
  * Returns the portion of a file's content that counts as style source.
