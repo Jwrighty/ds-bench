@@ -1,0 +1,5 @@
+{
+  "name": "confusable-pairs-meta-clean",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

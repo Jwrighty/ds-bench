@@ -1,0 +1,14 @@
+{
+  "components": [
+    {
+      "name": "Dialog",
+      "whenToUse": "Use Dialog for blocking decisions.",
+      "useInstead": "Popover"
+    },
+    {
+      "name": "Popover",
+      "whenToUse": "Use Popover for anchored disclosure.",
+      "useInstead": "Dialog"
+    }
+  ]
+}

@@ -406,6 +406,36 @@ describe("audit seam", () => {
     });
   });
 
+  it("checks guidance.confusable-pairs from .meta.ts structured guidance", async () => {
+    const clean = await audit(m1FixturePath("confusable-pairs-meta-clean"));
+    const missingDirection = await audit(m1FixturePath("confusable-pairs-meta-missing-direction"));
+
+    assert.equal(finding(clean, "guidance.confusable-pairs").outcome, "pass");
+    assert.deepEqual(finding(clean, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 detected confusable pairs reference each other; missing: none",
+    });
+    assert.equal(finding(missingDirection, "guidance.confusable-pairs").outcome, "fail");
+    assert.deepEqual(finding(missingDirection, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 detected confusable pairs reference each other; missing: Checkbox/Switch",
+    });
+    assert.deepEqual(finding(missingDirection, "guidance.confusable-pairs").evidence, ["Checkbox/Switch"]);
+  });
+
+  it("checks guidance.confusable-pairs from per-component manifest JSON entries", async () => {
+    const report = await audit(m1FixturePath("confusable-pairs-manifest-clean"));
+
+    assert.equal(finding(report, "guidance.confusable-pairs").outcome, "pass");
+    assert.deepEqual(finding(report, "guidance.confusable-pairs").measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 detected confusable pairs reference each other; missing: none",
+    });
+  });
+
   it("reports guidance.confusable-pairs as N/A when fewer than two seed pair members are present", async () => {
     const report = await audit(m1FixturePath("usage-guidance-clean"));
 
