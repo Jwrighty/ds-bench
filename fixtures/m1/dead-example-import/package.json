@@ -1,0 +1,5 @@
+{
+  "name": "dead-example-import",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

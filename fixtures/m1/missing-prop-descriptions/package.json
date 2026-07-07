@@ -1,0 +1,5 @@
+{
+  "name": "missing-prop-descriptions",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

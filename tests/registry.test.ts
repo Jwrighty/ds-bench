@@ -8,8 +8,10 @@ describe("check registry", () => {
     assert.deepEqual(
       new Set(ids),
       new Set([
+        "docs.prop-descriptions",
         "docs.usage-examples",
         "docs.example-imports-real",
+        "docs.undocumented-exports",
         "api.types-resolve",
         "guidance.when-to-use",
         "tokens.hardcoded-values",

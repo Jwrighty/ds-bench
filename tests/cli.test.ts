@@ -15,9 +15,9 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 55\.4\/100/);
-    assert.match(result.stdout, /applicable checks: 5\/8 \(low confidence\)/);
-    assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+75 \(2\/2\)/);
+    assert.match(result.stdout, /composite score: 46\.4\/100/);
+    assert.match(result.stdout, /applicable checks: 7\/10 \(medium confidence\)/);
+    assert.match(result.stdout, /Docs & examples\s+\[#####\.\.\.\.\.\]\s+50 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
     assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(1\/1\)/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
@@ -47,7 +47,7 @@ describe("CLI", () => {
     assert.equal(report.weights.source, "custom");
     assert.equal(report.weights.values.docs, 10);
     assert.equal(report.weights.values.deprecation, 90);
-    assert.equal(report.composite, 51.7);
+    assert.equal(report.composite, 50);
   });
 
   it("--exclude filters files through shared discovery", () => {
@@ -71,8 +71,8 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /composite score: 70\/100/);
-    assert.match(result.stdout, /applicable checks: 8\/8 \(high confidence\)/);
-    assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(2\/2\)/);
+    assert.match(result.stdout, /applicable checks: 10\/10 \(high confidence\)/);
+    assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
     assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(1\/1\)/);
     assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/1\)/);
     assert.match(result.stdout, /Token hygiene\s+\[###\.{7}\]\s+33\.3 \(1\/1\)/);

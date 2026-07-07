@@ -28,18 +28,18 @@ describe("audit seam", () => {
         agent: 10,
       },
     });
-    assert.equal(report.composite, 55.4);
+    assert.equal(report.composite, 46.4);
     assert.deepEqual(report.applicability, {
-      applicable: 5,
-      total: 8,
-      confidence: "low",
+      applicable: 7,
+      total: 10,
+      confidence: "medium",
     });
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
       id: "docs",
-      score: 75,
-      applicable: 2,
-      total: 2,
+      score: 50,
+      applicable: 4,
+      total: 4,
       weightRedistributed: false,
     });
     assert.deepEqual(report.categories[1], {
@@ -57,7 +57,7 @@ describe("audit seam", () => {
       weightRedistributed: true,
     });
 
-    assert.equal(report.findings.length, 8);
+    assert.equal(report.findings.length, 10);
     assert.deepEqual(report.findings[0], {
       checkId: "docs.usage-examples",
       category: "docs",
@@ -114,7 +114,7 @@ describe("audit seam", () => {
       fix: "Add @deprecated to legacy exports.",
       receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
     });
-    assert.deepEqual(report.findings[6], {
+    assert.deepEqual(report.findings[8], {
       checkId: "deprecation.migration-notes",
       category: "deprecation",
       severity: "warning",
@@ -235,6 +235,83 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "guidance.when-to-use").measure.value, 1);
   });
 
+  it("checks docs.prop-descriptions against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("missing-prop-descriptions"));
+    const clean = await audit(m1FixturePath("prop-descriptions-clean"));
+
+    assert.deepEqual(finding(failing, "docs.prop-descriptions").measure, {
+      kind: "ratio",
+      value: 0.5,
+      detail: "1/2 exported components have documented public props; missing: Card",
+    });
+    assert.equal(finding(failing, "docs.prop-descriptions").outcome, "fail");
+    assert.deepEqual(finding(failing, "docs.prop-descriptions").evidence, ["Card: title"]);
+    assert.equal(finding(clean, "docs.prop-descriptions").outcome, "pass");
+    assert.equal(finding(clean, "docs.prop-descriptions").measure.value, 1);
+  });
+
+  it("checks docs.example-imports-real against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("dead-example-import"));
+    const clean = await audit(m1FixturePath("example-imports-clean"));
+
+    assert.deepEqual(finding(failing, "docs.example-imports-real").measure, {
+      kind: "ratio",
+      value: 0.5,
+      detail: "1/2 example component imports resolve against exported components; unresolved: GhostButton",
+    });
+    assert.equal(finding(failing, "docs.example-imports-real").outcome, "fail");
+    assert.deepEqual(finding(failing, "docs.example-imports-real").evidence, ["GhostButton"]);
+    assert.equal(finding(clean, "docs.example-imports-real").outcome, "pass");
+    assert.equal(finding(clean, "docs.example-imports-real").measure.value, 1);
+  });
+
+  it("reports docs.example-imports-real as N/A when zero examples exist", async () => {
+    const report = await audit(join(repoRoot, "fixtures/missing-vs-na/no-carrier-anywhere"));
+
+    assert.equal(finding(report, "docs.example-imports-real").outcome, "na");
+    assert.deepEqual(finding(report, "docs.example-imports-real").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No examples exist; docs.usage-examples carries the absence.",
+    });
+  });
+
+  it("checks docs.undocumented-exports against failure and clean fixtures", async () => {
+    const failing = await audit(m1FixturePath("undocumented-exports"));
+    const clean = await audit(m1FixturePath("documented-exports-clean"));
+
+    assert.deepEqual(finding(failing, "docs.undocumented-exports").measure, {
+      kind: "count",
+      value: 1,
+      detail: "1 exported symbol has no docs presence anywhere: Card",
+    });
+    assert.equal(finding(failing, "docs.undocumented-exports").outcome, "fail");
+    assert.deepEqual(finding(failing, "docs.undocumented-exports").evidence, ["Card"]);
+    assert.equal(finding(clean, "docs.undocumented-exports").outcome, "pass");
+    assert.deepEqual(finding(clean, "docs.undocumented-exports").measure, {
+      kind: "count",
+      value: 0,
+      detail: "0 exported symbols have no docs presence anywhere: none",
+    });
+  });
+
+  it("aggregates all four Docs & examples checks into the docs category score", async () => {
+    const report = await audit(m1FixturePath("docs-category-aggregate"));
+    const docsCategory = report.categories.find((category) => category.id === "docs");
+
+    assert.equal(finding(report, "docs.prop-descriptions").measure.value, 0.5);
+    assert.equal(finding(report, "docs.usage-examples").measure.value, 0.5);
+    assert.equal(finding(report, "docs.example-imports-real").measure.value, 0.5);
+    assert.equal(finding(report, "docs.undocumented-exports").measure.value, 1);
+    assert.deepEqual(docsCategory, {
+      id: "docs",
+      score: 50,
+      applicable: 4,
+      total: 4,
+      weightRedistributed: false,
+    });
+  });
+
   it("checks tokens.hardcoded-values against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("hardcoded-token-values"));
     const clean = await audit(m1FixturePath("token-values-clean"));
@@ -330,8 +407,8 @@ describe("audit seam", () => {
   it("produces six real scored categories on the combined M1 fixture", async () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
-    assert.equal(report.applicability.applicable, 8);
-    assert.equal(report.applicability.total, 8);
+    assert.equal(report.applicability.applicable, 10);
+    assert.equal(report.applicability.total, 10);
     assert.equal(report.applicability.confidence, "high");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
@@ -344,7 +421,7 @@ describe("audit seam", () => {
 
     assert.deepEqual(
       report.findings.map((candidate) => candidate.severity),
-      ["critical", "critical", "critical", "critical", "warning", "warning", "warning", "warning"],
+      ["critical", "critical", "critical", "critical", "warning", "warning", "warning", "warning", "warning", "warning"],
     );
     for (const candidate of report.findings) {
       assert.ok(candidate.fix.length > 0, `${candidate.checkId} should carry a fix`);
