@@ -210,17 +210,34 @@ function toPublicPackage(candidate: PackageCandidate): PublicPackage {
   };
 }
 
+/**
+ * Shared state for one entry-symbol resolution pass. `resolved` memoizes each file's
+ * fully-collected symbols so a barrel that re-exports the same source for several
+ * specifiers pays for it once; `inProgress` marks files on the current traversal path
+ * so re-export cycles (common in large barrels — MUI/Chakra/Polaris) terminate instead
+ * of overflowing the stack.
+ */
+type SymbolResolution = {
+  filesByPath: Map<string, TextFile>;
+  resolved: Map<string, ExportedSymbol[]>;
+  inProgress: Set<string>;
+};
+
 function collectPublicEntrySymbols(files: TextFile[], entryRelativePaths: string[]): ExportedSymbol[] {
-  const filesByPath = mapFilesByRelativePath(files);
+  const resolution: SymbolResolution = {
+    filesByPath: mapFilesByRelativePath(files),
+    resolved: new Map(),
+    inProgress: new Set(),
+  };
   const symbols = new Map<string, ExportedSymbol>();
 
   for (const entryRelativePath of entryRelativePaths) {
-    const entryFile = filesByPath.get(entryRelativePath);
+    const entryFile = resolution.filesByPath.get(entryRelativePath);
     if (!entryFile) {
       continue;
     }
 
-    for (const symbol of collectSymbolsFromFile(entryFile, filesByPath, new Set())) {
+    for (const symbol of collectSymbolsFromFile(entryFile, resolution)) {
       symbols.set(symbol.name, symbol);
     }
   }
@@ -228,12 +245,18 @@ function collectPublicEntrySymbols(files: TextFile[], entryRelativePaths: string
   return Array.from(symbols.values()).sort((left, right) => left.name.localeCompare(right.name));
 }
 
-function collectSymbolsFromFile(file: TextFile, filesByPath: Map<string, TextFile>, visited: Set<string>): ExportedSymbol[] {
-  if (visited.has(file.relativePath)) {
+function collectSymbolsFromFile(file: TextFile, resolution: SymbolResolution): ExportedSymbol[] {
+  const cached = resolution.resolved.get(file.relativePath);
+  if (cached) {
+    return cached;
+  }
+  if (resolution.inProgress.has(file.relativePath)) {
+    // Re-export cycle: break without caching this partial view.
     return [];
   }
-  visited.add(file.relativePath);
+  resolution.inProgress.add(file.relativePath);
 
+  const filesByPath = resolution.filesByPath;
   const symbols: ExportedSymbol[] = [];
   const declarationPattern =
     /(?<comment>\/\*\*[\s\S]*?\*\/\s*)?\bexport\s+(?:declare\s+)?(?<kind>function|class|const|let|var|type|interface)\s+(?<name>[A-Za-z_$][A-Za-z0-9_$]*)\b/g;
@@ -267,7 +290,7 @@ function collectSymbolsFromFile(file: TextFile, filesByPath: Map<string, TextFil
         continue;
       }
 
-      const resolved = sourceFile ? findDeclaredSymbol(sourceFile, parsed.localName, filesByPath) : null;
+      const resolved = sourceFile ? findDeclaredSymbol(sourceFile, parsed.localName, resolution) : null;
       symbols.push(
         resolved
           ? { ...resolved, name: parsed.exportedName, kind: typeOnly ? "type" : resolved.kind }
@@ -288,15 +311,17 @@ function collectSymbolsFromFile(file: TextFile, filesByPath: Map<string, TextFil
     const source = match.groups?.source;
     const sourceFile = source ? resolveLocalSourceFile(file.relativePath, source, filesByPath) : null;
     if (sourceFile) {
-      symbols.push(...collectSymbolsFromFile(sourceFile, filesByPath, new Set(visited)));
+      symbols.push(...collectSymbolsFromFile(sourceFile, resolution));
     }
   }
 
+  resolution.inProgress.delete(file.relativePath);
+  resolution.resolved.set(file.relativePath, symbols);
   return symbols;
 }
 
-function findDeclaredSymbol(file: TextFile, name: string, filesByPath: Map<string, TextFile>): ExportedSymbol | null {
-  for (const symbol of collectSymbolsFromFile(file, filesByPath, new Set())) {
+function findDeclaredSymbol(file: TextFile, name: string, resolution: SymbolResolution): ExportedSymbol | null {
+  for (const symbol of collectSymbolsFromFile(file, resolution)) {
     if (symbol.name === name) {
       return symbol;
     }
