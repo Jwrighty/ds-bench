@@ -26,7 +26,8 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
   carriers: ["CSS files", "CSS-in-JS", "style props"],
   measure: "magic colors/spacing/z-index per 100 style-LOC vs token references",
   fix: "Replace named hardcoded colors, spacing, and z-index values with token references.",
-  naBehavior: "N/A when zero style-LOC detected across all style carriers.",
+  naBehavior: "N/A when zero style-LOC detected across all style carriers (clean).",
+  naReason: "clean",
   receipt: "Agents imitate the system's own styling habits; hardcoded source values become copied output.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

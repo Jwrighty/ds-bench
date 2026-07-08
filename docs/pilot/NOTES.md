@@ -124,7 +124,7 @@ audited from its local checkout, not a public clone — it is the fourth calibra
 input for the weight freeze, not part of the generalization pilot. Artifacts:
 `cedar.{json,txt}`, same binary and rubric, run 2026-07-08.
 
-**Composite 96.0 · medium confidence · 19/22 applicable · 1.0s.** Cedar is the
+**Composite 96.0 · high confidence · 19/19 applicable · 1.0s.** Cedar is the
 only system of the four that ships the full agent-metadata surface (manifest,
 llms.txt, agent metadata files, canonical examples) — which is expected, since it
 was built against this rubric. That makes it the calibration anchor for the top of

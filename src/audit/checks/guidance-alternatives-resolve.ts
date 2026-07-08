@@ -24,7 +24,8 @@ export const guidanceAlternativesResolveCheck: AuditCheck = {
   carriers: ["meta files", "manifest fields", "docs sections"],
   measure: '% "alternatives/instead" references that resolve to real exports',
   fix: "Reference real components in alternatives guidance.",
-  naBehavior: "N/A when no alternatives content exists anywhere; guidance.when-to-use carries the selection gap.",
+  naBehavior: "N/A when no alternatives content exists anywhere; guidance.when-to-use carries the selection gap (uncovered).",
+  naReason: "uncovered",
   receipt: "Resolvable cross-references can't be faked by boilerplate.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

@@ -18,8 +18,8 @@ describe("CLI", () => {
     assert.equal(result.status, 0);
     assert.match(result.stdout, /DS Bench Audit: missing-usage-examples/);
     assert.match(result.stdout, /Score: 40\.7 \/ 100 - Not agent-ready/);
-    assert.match(result.stdout, /Applicable Checks: 14 \/ 22/);
-    assert.match(result.stdout, /Confidence: low/);
+    assert.match(result.stdout, /Applicable Checks: 14 \/ 17 \(3 N\/A\)/);
+    assert.doesNotMatch(result.stdout, /Confidence:/);
     assert.match(result.stdout, /Category Scores/);
     assert.match(result.stdout, /Docs & examples\s+58\.3\s+4\/4/);
     assert.match(result.stdout, /API clarity\s+100\s+4\/4/);
@@ -68,10 +68,11 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    const report = JSON.parse(result.stdout) as { findings: Array<{ checkId: string; outcome: string; evidence: string[] }> };
+    const report = JSON.parse(result.stdout) as { findings: Array<{ checkId: string; outcome: string; naReason?: string; evidence: string[] }> };
     const tokenFinding = report.findings.find((finding) => finding.checkId === "tokens.hardcoded-values");
 
     assert.equal(tokenFinding?.outcome, "na");
+    assert.equal(tokenFinding?.naReason, "clean");
     assert.deepEqual(tokenFinding?.evidence, []);
   });
 
@@ -82,7 +83,7 @@ describe("CLI", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Score: 75\.3 \/ 100 - Needs targeted work/);
-    assert.match(result.stdout, /Applicable Checks: 19 \/ 22/);
+    assert.match(result.stdout, /Applicable Checks: 19 \/ 21 \(2 N\/A\)/);
     assert.match(result.stdout, /Docs & examples\s+83\.3\s+4\/4/);
     assert.match(result.stdout, /API clarity\s+100\s+4\/4/);
     assert.match(result.stdout, /Usage guidance\s+66\.7\s+1\/3/);

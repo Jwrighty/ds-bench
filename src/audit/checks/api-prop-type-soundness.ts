@@ -18,7 +18,8 @@ export const apiPropTypeSoundnessCheck: AuditCheck = {
   carriers: ["TS types"],
   measure: "any/unknown rate on exported component props",
   fix: "Replace any/unknown props with precise public prop types.",
-  naBehavior: "N/A when the system ships no TypeScript types; api.types-resolve carries the importability failure.",
+  naBehavior: "N/A when the system ships no TypeScript types; api.types-resolve carries the importability failure (uncovered).",
+  naReason: "uncovered",
   receipt: "Hallucinated-prop detection depends on sound public prop types.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

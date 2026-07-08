@@ -1,132 +1,202 @@
-ds-bench audit: @mui/material
-target: mui/packages/mui-material
-rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
+ds-bench audit @mui/material
 
-composite score: 45.9/100
-applicable checks: 17/22 (medium confidence)
-detected carriers: TypeScript exports, package.json exports/types, token files/CSS custom properties
+DS Bench Audit: @mui/material
+Score: 45.9 / 100 - Not agent-ready
+Applicable Checks: 17 / 22 (5 N/A)
+Target: mui/packages/mui-material
+Carriers: TypeScript exports, package.json exports/types, token files/CSS custom properties
 
-categories:
-  Docs & examples         [###.......]  25.1 (3/4)
-  API clarity             [#########.]  89.2 (4/4)
-  Usage guidance          [..........]   4.4 (2/3)
-  Token hygiene           [####......]  40.9 (2/3)
-  Deprecation signalling  [##########]   100 (2/3)
-  Agent metadata          [..........]     0 (4/5)
+Category Scores
+Category                Score  Checks
+----------------------  -----  ------
+Docs & examples          25.1  3/4
+API clarity              89.2  4/4
+Usage guidance            4.4  2/3
+Token hygiene            40.9  2/3
+Deprecation signalling    100  2/3
+Agent metadata              0  4/5
 
-findings:
-  [critical] docs.usage-examples - fail
-    measure: 0/148 exported components have importable usage examples; missing (showing 8 of 148): Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete
-    evidence: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext
-    fix: Add one canonical story/example per component.
-    receipt: Agents recreate components they can't see used (Atlassian DESIGN.md experiment).
-  [critical] docs.example-imports-real - na
-    measure: No examples exist; docs.usage-examples carries the absence.
-    evidence: none
-    fix: Correct or delete examples with dead imports.
-    receipt: Wrong import paths are a documented agent failure mode (Astryx self-checks).
-  [critical] api.types-resolve - fail
-    measure: 144/148 exports typecheck from a synthetic package import; unresolved: FormLabel, FormLabelRoot, StepContext, StepperContext
-    evidence: FormLabel, FormLabelRoot, StepContext, StepperContext
-    fix: Repair the package types/exports mapping so every public export is importable.
-    receipt: Wrong import paths are a documented agent failure mode.
-  [critical] deprecation.marked - pass
-    measure: 1/1 known-deprecated exports carry @deprecated; missing: none
-    evidence: none
-    fix: Add @deprecated to legacy exports.
-    receipt: Deprecated patterns dominate training data unless current source clearly marks them as deprecated.
-  [critical] agent.instruction-manual - na
-    measure: 0 agent metadata files found; instruction-manual orientation is not applicable.
-    evidence: none
-    fix: Rewrite metadata examples to import the design-system components instead of re-implementing them.
-    receipt: Re-implementation specs cause agents to recreate components instead of using the system.
-  [warning] docs.prop-descriptions - fail
-    measure: 147/148 exported components have documented public props; missing: ClickAwayListener
-    evidence: ClickAwayListener: event
-    fix: Add TSDoc descriptions to public props, starting with the most-used components.
-    receipt: Agents invent props when public prop contracts lack descriptions.
-  [warning] docs.undocumented-exports - fail
-    measure: 705 exported symbols have no docs presence anywhere: Accordion, AccordionActions, accordionActionsClasses, AccordionActionsClasses, AccordionActionsClassKey, accordionClasses, AccordionClasses, AccordionClassKey, AccordionDetails, accordionDetailsClasses, AccordionDetailsClasses, AccordionDetailsClassKey, AccordionSummary, accordionSummaryClasses, AccordionSummaryClasses, AccordionSummaryClassKey, adaptV4Theme, Alert, alertClasses, AlertClasses, AlertClassKey, AlertTitle, alertTitleClasses, Aler... (truncated)
-    evidence: Accordion, AccordionActions, accordionActionsClasses, AccordionActionsClasses, AccordionActionsClassKey, accordionClasses, AccordionClasses, AccordionClassKey, AccordionDetails, accordionDetailsClasses, AccordionDetailsClasses, AccordionDetailsClassKey, AccordionSummary, accordionSummaryClasses, AccordionSummaryClasses, AccordionSummaryClassKey, adaptV4Theme, Alert, alertClasses, AlertClasses
-    fix: Document or un-export undocumented public exports.
-    receipt: Undocumented public exports are trap surface for agents choosing from the design system.
-  [warning] api.prop-type-soundness - fail
-    measure: 1/6 exported component props use any/unknown; offenders: ClickAwayListener.children (any)
-    evidence: ClickAwayListener.children (any)
-    fix: Replace any/unknown props with precise public prop types.
-    receipt: Hallucinated-prop detection depends on sound public prop types.
-  [warning] api.name-coherence - fail
-    measure: 12 component name carrier mismatches: CssVarsProvider source file src/styles/ThemeProviderWithVars.tsx, FormLabelRoot source file src/FormLabel/FormLabel.js, PopoverPaper source file src/Popover/Popover.js, PopoverRoot source file src/Popover/Popover.js, SelectFocusSourceProvider source file src/Select/utils/SelectFocusSourceContext.ts, SliderMark source file src/Slider/Slider.js, SliderMarkLabel source file src/Slider/Slider.js, SliderRail source file src/Slider/Slider.js, SliderRoot source fil... (truncated)
-    evidence: CssVarsProvider source file src/styles/ThemeProviderWithVars.tsx, FormLabelRoot source file src/FormLabel/FormLabel.js, PopoverPaper source file src/Popover/Popover.js, PopoverRoot source file src/Popover/Popover.js, SelectFocusSourceProvider source file src/Select/utils/SelectFocusSourceContext.ts, SliderMark source file src/Slider/Slider.js, SliderMarkLabel source file src/Slider/Slider.js, SliderRail source file src/Slider/Slider.js, SliderRoot source file src/Slider/Slider.js, SliderThumb source file src/Slider/Slider.js, SliderTrack source file src/Slider/Slider.js, SliderValueLabel source file src/Slider/Slider.js
-    fix: Align component names across source files, stories, and manifest entries.
-    receipt: Name mismatch drives discovery-driven component recreation.
-  [warning] guidance.when-to-use - fail
-    measure: 13/148 exported components include when-to-use guidance; missing (showing 8 of 135): Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Avatar
-    evidence: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext, ButtonGroupContext
-    fix: Add when-to-use/when-not sections to component docs.
-    receipt: Agents must choose components, not just call them (Atlassian recreation finding).
-  [warning] guidance.alternatives-resolve - na
-    measure: No alternatives/instead component references found; alternatives resolution is not applicable.
-    evidence: none
-    fix: Reference real components in alternatives guidance.
-    receipt: Resolvable cross-references can't be faked by boilerplate.
-  [warning] guidance.confusable-pairs - fail
-    measure: 0/4 detected confusable pairs reference each other; missing: Button/Link, Checkbox/Switch, Dialog/Popover, RadioGroup/Select
-    evidence: Button/Link, Checkbox/Switch, Dialog/Popover, RadioGroup/Select
-    fix: Add mutual "use X instead when..." notes.
-    receipt: Wrong-component selection is a recurring design-system agent failure mode.
-  [warning] tokens.hardcoded-values - fail
-    measure: 2 magic values across 226 style LOC (0.885 per 100 LOC); token references: 9; offenders: #fff in src/Paper/Paper.js:10, #fff in src/Paper/Paper.js:12
-    evidence: #fff in src/Paper/Paper.js:10, #fff in src/Paper/Paper.js:12
-    fix: Replace named hardcoded colors, spacing, and z-index values with token references.
-    receipt: Agents imitate the system's own styling habits; hardcoded source values become copied output.
-  [warning] tokens.machine-readable - fail
-    measure: 0/0 token sources are present and parseable; invalid: no machine-readable token source found
-    evidence: no machine-readable token source found
-    fix: Publish tokens in a machine-readable format.
-    receipt: Machine-readable tokens are the theming signal agents can consume.
-  [warning] deprecation.migration-notes - pass
-    measure: 1/1 @deprecated marks name a replacement or migration path; missing: none
-    evidence: none
-    fix: Append replacement guidance to every @deprecated mark.
-    receipt: A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.
-  [warning] deprecation.manifest-exclusion - na
-    measure: No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.
-    evidence: none
-    fix: Tag deprecated entries in the manifest or exclude them from generated agent metadata.
-    receipt: Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.
-  [warning] agent.context-file-quality - fail
-    measure: 0 agent context files found; dead references: no context file
-    evidence: none
-    fix: Regenerate or correct stale component references in agent context files.
-    receipt: Stale context misleads agents worse than no context.
-  [warning] agent.manifest-coverage - fail
-    measure: 0/148 exported components are covered by a manifest; missing (showing 8 of 148): Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete
-    evidence: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext
-    fix: Generate or complete the component manifest.
-    receipt: Partial manifests force agents to guess the gaps.
-  [info] api.barrel-completeness - fail
-    measure: 85 components are deep-import-only and missing from the root barrel: AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteCloseReason, AutocompleteInputChangeReason, AutocompleteValue, BackdropRoot, BadgeMark, BadgeRoot, Breakpoint, BreakpointOverrides, Breakpoints, BreakpointsOptions, ButtonBaseRoot, CSSInterpolation, CSSObject, CSSProperties, Color, ColorFormat, ColorObject, CommonColors, ComponentNameToClassKey, Components, ComponentsOverrides, ComponentsProps, ComponentsPropsList... (truncated)
-    evidence: AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteCloseReason, AutocompleteInputChangeReason, AutocompleteValue, BackdropRoot, BadgeMark, BadgeRoot, Breakpoint, BreakpointOverrides, Breakpoints, BreakpointsOptions, ButtonBaseRoot, CSSInterpolation, CSSObject, CSSProperties, Color, ColorFormat, ColorObject, CommonColors
-    fix: Re-export deep-only components from the root barrel or document deep paths in agent metadata.
-    receipt: Agents guess deep paths when components are not reachable from the root package import.
-  [info] tokens.naming-consistency - na
-    measure: No token names found; naming consistency is not applicable (tokens.machine-readable carries the missing-token-source gap).
-    evidence: none
-    fix: Rename token outliers to the dominant pattern.
-    receipt: Inconsistent names invite fabricated tokens.
-  [info] deprecation.zombie-exports - fail
-    measure: 468 barrel exports are absent from docs/stories: Accordion, AccordionActions, accordionActionsClasses, accordionClasses, AccordionDetails, accordionDetailsClasses, AccordionSummary, accordionSummaryClasses, adaptV4Theme, Alert, alertClasses, AlertTitle, alertTitleClasses, alpha, AppBar, appBarClasses, areEqualValues, Autocomplete, autocompleteClasses, Avatar, avatarClasses, AvatarGroup, avatarGroupClasses, Backdrop, backdropClasses, Badge, badgeClasses, BottomNavigation, BottomNavigationAction,... (truncated)
-    evidence: Accordion, AccordionActions, accordionActionsClasses, accordionClasses, AccordionDetails, accordionDetailsClasses, AccordionSummary, accordionSummaryClasses, adaptV4Theme, Alert, alertClasses, AlertTitle, alertTitleClasses, alpha, AppBar, appBarClasses, areEqualValues, Autocomplete, autocompleteClasses, Avatar
-    fix: Document, deprecate, or remove zombie exports.
-    receipt: Zombie exports are trap surface for training-data gravity.
-  [info] agent.llms-txt - fail
-    measure: 0 llms.txt files found; invalid references: missing llms.txt
-    evidence: none
-    fix: Add or repair llms.txt references.
-    receipt: llms.txt is a contested convention, so it is weighted low but still captures discovery intent.
-  [info] agent.mcp-present - fail
-    measure: 0 MCP package/config carriers detected: none
-    evidence: none
-    fix: Consider shipping an MCP server or checked-in MCP configuration for agent context.
-    receipt: On-demand context delivery can outperform portable files for agent workflows.
+Legend: redistributed = N/A category weight moved to applicable categories.
+
+Top Findings
+1. [critical] docs.usage-examples
+   0/148 exported components have importable usage examples
+   Missing: 148 total; showing 8.
+     Accordion
+     AccordionActions
+     AccordionDetails
+     AccordionSummary
+     Alert
+     AlertTitle
+     AppBar
+     Autocomplete
+   Run with --verbose to see all 148.
+   Fix: Add one canonical story/example per component.
+
+2. [critical] api.types-resolve
+   144/148 exports typecheck from a synthetic package import
+   Unresolved: 4 total; showing 4.
+     FormLabel
+     FormLabelRoot
+     StepContext
+     StepperContext
+   Fix: Repair the package types/exports mapping so every public export is importable.
+
+3. [warning] docs.prop-descriptions
+   147/148 exported components have documented public props
+   Missing: ClickAwayListener
+   Fix: Add TSDoc descriptions to public props, starting with the most-used components.
+
+4. [warning] docs.undocumented-exports
+   705 exported symbols have no docs presence anywhere: Accordion, AccordionActions, accordionActionsClasses,
+   AccordionActionsClasses, AccordionActionsClassKey, accordionClasses, AccordionClasses, AccordionClassKey,
+   AccordionDetails, accordionDetailsClasses, AccordionDetailsClasses, AccordionDetailsClassKey,
+   AccordionSummary, accordionSummaryClasses, AccordionSummaryClasses, AccordionSummaryClassKey, adaptV4Theme,
+   Alert, alertClasses, AlertClasses, AlertClassKey, AlertTitle, alertTitleClasses, AlertTitleClasses,
+   AlertTitleClassKey, alpha, AppBar, appBarClasses, AppBarClasses, AppBarClassKey, areEqualValues,
+   Autocomplete, autocompleteClasses, AutocompleteClasses, AutocompleteClassKey, Avatar, avatarClasses,
+   AvatarClasses, AvatarClassKey, AvatarGroup, avatarGroupClasses, AvatarGroupClasses, AvatarGroupClassKey,
+   Backdrop, backdropClasses, BackdropClasses, BackdropClassKey, Badge, badgeClasses, BadgeClasses,
+   BadgeClassKey, BottomNavigation, BottomNavigationAction, bottomNavigationActionClasses,
+   BottomNavigationActionClasses, BottomNavigationActionClassKey, bottomNavigationClasses,
+   BottomNavigationClasses, BottomNavigationClassKey, Box, boxClasses, BoxClasses, BoxClassKey, Breadcrumbs,
+   breadcrumbsClasses, BreadcrumbsClasses, BreadcrumbsClassKey, Button, ButtonBase, buttonBaseClasses,
+   ButtonBaseClasses, ButtonBaseClassKey, buttonClasses, ButtonClasses, ButtonClassKey, ButtonGroup,
+   ButtonGroupButtonContext, buttonGroupClasses, ButtonGroupClasses, ButtonGroupClassKey, ButtonGroupContext,
+   capitalize, Card, CardActionArea, cardActionAreaClasses, CardActionAreaClasses, CardActionAreaClassKey,
+   CardActions, cardActionsClasses, CardActionsClasses, CardActionsClassKey, cardClasses, CardClasses,
+   CardClassKey, CardContent, cardContentClasses, CardContentClasses, CardContentClassKey, CardHeader,
+   cardHeaderClasses, CardHeaderClasses, CardHeaderClassKey, CardMedia, cardMediaClasses, CardMediaClasses,
+   CardMediaClassKey, Checkbox, checkboxClasses, CheckboxClasses, CheckboxClassKey, Chip, chipClasses,
+   ChipClasses, ChipClassKey, CircularProgress, circularProgressClasses, CircularProgressClasses,
+   CircularProgressClassKey, ClickAwayListenerProps, Collapse, collapseClasses, CollapseClasses,
+   CollapseClassKey, colors, Container, containerClasses, ContainerClasses, ContainerClassKey,
+   createChainedFunction, createColorScheme, createFilterOptions, createStyles, createSvgIcon, createTheme,
+   createTransitions, css, CssBaseline, darken, darkScrollbar, debounce, decomposeColor, default,
+   deprecatedPropType, Dialog, DialogActions, dialogActionsClasses, DialogActionsClasses, DialogActionsClassKey,
+   dialogClasses, DialogClasses, DialogClassKey, DialogContent, dialogContentClasses, DialogContentClasses,
+   DialogContentClassKey, DialogContentText, dialogContentTextClasses, DialogContentTextClasses,
+   DialogContentTextClassKey, DialogTitle, dialogTitleClasses, DialogTitleClasses, DialogTitleClassKey, Divider,
+   dividerClasses, DividerClasses, DividerClassKey, Drawer, drawerClasses, DrawerClasses, DrawerClassKey,
+   duration, easing, emphasize, enhanceHighContrast, Experimental_CssVarsProvider, experimental_extendTheme,
+   experimental_sx, extendTheme, Fab, fabClasses, FabClasses, FabClassKey, Fade, FilledInput,
+   filledInputClasses, FilledInputClasses, FilledInputClassKey, FormControl, formControlClasses,
+   FormControlClasses, FormControlClassKey, FormControlLabel, formControlLabelClasses, FormControlLabelClasses,
+   FormControlLabelClassKey, FormGroup, formGroupClasses, FormGroupClasses, FormGroupClassKey, FormHelperText,
+   formHelperTextClasses, FormHelperTextClasses, FormHelperTextClassKey, FormLabel, formLabelClasses,
+   FormLabelClasses, FormLabelClassKey, FormLabelRoot, generateUtilityClass, generateUtilityClasses,
+   getAccordionActionsUtilityClass, getAccordionDetailsUtilityClass, getAccordionSummaryUtilityClass,
+   getAccordionUtilityClass, getActiveElement, getAlertTitleUtilityClass, getAlertUtilityClass,
+   getAppBarUtilityClass, getAutocompleteUtilityClass, getAvatarGroupUtilityClass, getAvatarUtilityClass,
+   getBackdropUtilityClass, getBadgeUtilityClass, getBottomNavigationActionUtilityClass,
+   getBottomNavigationUtilityClass, getBreadcrumbsUtilityClass, getButtonBaseUtilityClass,
+   getButtonGroupUtilityClass, getButtonUtilityClass, getCardActionAreaUtilityClass, getCardActionsUtilityClass,
+   getCardContentUtilityClass, getCardHeaderUtilityClass, getCardMediaUtilityClass, getCardUtilityClass,
+   getCheckboxUtilityClass, getChipUtilityClass, getCircularProgressUtilityClass, getCollapseUtilityClass,
+   getContainerUtilityClass, getContrastRatio, getDialogActionsUtilityClass, getDialogContentTextUtilityClass,
+   getDialogContentUtilityClass, getDialogTitleUtilityClass, getDialogUtilityClass, getDividerUtilityClass,
+   getDrawerUtilityClass, getFabUtilityClass, getFilledInputUtilityClass, getFormControlLabelUtilityClasses,
+   getFormControlUtilityClasses, getFormGroupUtilityClass, getFormHelperTextUtilityClasses,
+   getFormLabelUtilityClasses, getGridUtilityClass, getIconButtonUtilityClass, getIconUtilityClass,
+   getImageListItemBarUtilityClass, getImageListItemUtilityClass, getImageListUtilityClass,
+   getInitColorSchemeScript, getInputAdornmentUtilityClass, getInputBaseUtilityClass,
+   getInputLabelUtilityClasses, getInputUtilityClass, getLinearProgressUtilityClass, getLinkUtilityClass,
+   getListItemAvatarUtilityClass, getListItemButtonUtilityClass, getListItemIconUtilityClass,
+   getListItemSecondaryActionClassesUtilityClass, getListItemTextUtilityClass, getListItemUtilityClass,
+   getListSubheaderUtilityClass, getListUtilityClass, getLuminance, getMenuItemUtilityClass,
+   getMenuUtilityClass, getMobileStepperUtilityClass, getModalUtilityClass, getNativeSelectUtilityClasses,
+   getOffsetLeft, getOffsetTop, getOpenInteractionType, getOutlinedInputUtilityClass, getOverlayAlpha,
+   getPaginationItemUtilityClass, getPaginationUtilityClass, getPaperUtilityClass, getPopoverUtilityClass,
+   getPopperUtilityClass, getRadioGroupUtilityClass, getRadioUtilityClass, getRatingUtilityClass,
+   getScopedCssBaselineUtilityClass, getSelectUtilityClasses, getSkeletonUtilityClass, getSliderUtilityClass,
+   getSnackbarContentUtilityClass, getSnackbarUtilityClass, getSpeedDialActionUtilityClass,
+   getSpeedDialIconUtilityClass, getSpeedDialUtilityClass, getStepButtonUtilityClass,
+   getStepConnectorUtilityClass, getStepContentUtilityClass, getStepIconUtilityClass, getStepLabelUtilityClass,
+   getStepperUtilityClass, getStepUtilityClass, getSvgIconUtilityClass, getSwitchUtilityClass,
+   getTableBodyUtilityClass, getTableCellUtilityClass, getTableContainerUtilityClass,
+   getTableFooterUtilityClass, getTableHeadUtilityClass, getTablePaginationUtilityClass,
+   getTableRowUtilityClass, getTableSortLabelUtilityClass, getTableUtilityClass, getTabScrollButtonUtilityClass,
+   getTabsUtilityClass, getTabUtilityClass, getTextFieldUtilityClass, getToggleButtonGroupUtilityClass,
+   getToggleButtonUtilityClass, getToolbarUtilityClass, getTooltipUtilityClass, getTouchRippleUtilityClass,
+   getTypographyUtilityClass, GlobalStateSlot, GlobalStyles, Grid, GridBaseProps, gridClasses, GridClasses,
+   GridClassKey, GridDirection, GridOffset, GridProps, GridSize, GridSpacing, GridTypeMap, GridWrap, Grow,
+   hexToRgb, hslToRgb, Icon, IconButton, iconButtonClasses, IconButtonClasses, IconButtonClassKey, iconClasses,
+   IconClasses, IconClassKey, ImageList, imageListClasses, ImageListClasses, ImageListClassKey, ImageListItem,
+   ImageListItemBar, imageListItemBarClasses, ImageListItemBarClasses, ImageListItemBarClassKey,
+   imageListItemClasses, ImageListItemClasses, ImageListItemClassKey, InitColorSchemeScript, Input,
+   InputAdornment, inputAdornmentClasses, InputAdornmentClasses, InputAdornmentClassKey, InputBase,
+   inputBaseClasses, InputBaseClasses, InputBaseClassKey, inputClasses, InputClasses, InputClassKey, InputLabel,
+   inputLabelClasses, InputLabelClasses, InputLabelClassKey, isEmpty, isMuiElement, keyframes, lighten,
+   LinearProgress, linearProgressClasses, LinearProgressClasses, LinearProgressClassKey, Link, linkClasses,
+   LinkClasses, LinkClassKey, List, listClasses, ListClasses, ListClassKey, ListItem, ListItemAvatar,
+   listItemAvatarClasses, ListItemAvatarClasses, ListItemAvatarClassKey, ListItemButton, listItemButtonClasses,
+   ListItemButtonClasses, ListItemButtonClassKey, listItemClasses, ListItemClasses, ListItemClassKey,
+   ListItemIcon, listItemIconClasses, ListItemIconClasses, ListItemIconClassKey, ListItemSecondaryAction,
+   listItemSecondaryActionClasses, ListItemSecondaryActionClasses, ListItemSecondaryActionClassKey,
+   ListItemText, listItemTextClasses, ListItemTextClasses, ListItemTextClassKey, ListSubheader,
+   listSubheaderClasses, ListSubheaderClasses, ListSubheaderClassKey, major, makeStyles, Menu, menuClasses,
+   MenuClasses, MenuClassKey, MenuItem, menuItemClasses, MenuItemClasses, MenuItemClassKey, MenuList,
+   mergeSlotProps, minor, MobileStepper, mobileStepperClasses, MobileStepperClasses, MobileStepperClassKey,
+   Modal, modalClasses, ModalClasses, ModalClassKey, NativeSelect, nativeSelectClasses, NativeSelectClasses,
+   NativeSelectClassKey, NoSsr, OutlinedInput, outlinedInputClasses, OutlinedInputClasses,
+   OutlinedInputClassKey, ownerDocument, ownerWindow, Pagination, paginationClasses, PaginationClasses,
+   PaginationClassKey, PaginationItem, paginationItemClasses, PaginationItemClasses, PaginationItemClassKey,
+   Paper, paperClasses, PaperClasses, PaperClassKey, patch, Popover, popoverClasses, PopoverClasses,
+   PopoverClassKey, PopoverPaper, PopoverRoot, Popper, popperClasses, PopperClasses, PopperClassKey, Portal,
+   prerelease, private_createMixins, private_createTypography, private_excludeVariablesFromRoot, Radio,
+   radioClasses, RadioClasses, RadioClassKey, RadioGroup, radioGroupClasses, RadioGroupClasses,
+   RadioGroupClassKey, Rating, ratingClasses, RatingClasses, RatingClassKey, recomposeColor, requirePropFactory,
+   responsiveFontSizes, rgbToHex, ScopedCssBaseline, scopedCssBaselineClasses, ScopedCssBaselineClasses,
+   ScopedCssBaselineClassKey, Select, selectClasses, SelectClasses, SelectClassKey, SelectFocusSourceProvider,
+   setRef, shouldSkipGeneratingVar, Skeleton, skeletonClasses, SkeletonClasses, SkeletonClassKey, Slide, Slider,
+   sliderClasses, SliderClasses, SliderClassKey, SliderMark, SliderMarkLabel, SliderRail, SliderRoot,
+   SliderThumb, SliderTrack, SliderValueLabel, Snackbar, snackbarClasses, SnackbarClasses, SnackbarClassKey,
+   SnackbarContent, snackbarContentClasses, SnackbarContentClasses, SnackbarContentClassKey, SpeedDial,
+   SpeedDialAction, speedDialActionClasses, SpeedDialActionClasses, SpeedDialActionClassKey, speedDialClasses,
+   SpeedDialClasses, SpeedDialClassKey, SpeedDialIcon, speedDialIconClasses, SpeedDialIconClasses,
+   SpeedDialIconClassKey, stackClasses, Step, StepButton, stepButtonClasses, StepButtonClasses,
+   StepButtonClassKey, stepClasses, StepClasses, StepClassKey, StepConnector, stepConnectorClasses,
+   StepConnectorClasses, StepConnectorClassKey, StepContent, stepContentClasses, StepContentClasses,
+   StepContentClassKey, StepContext, StepContextType, StepIcon, stepIconClasses, StepIconClasses,
+   StepIconClassKey, StepLabel, stepLabelClasses, StepLabelClasses, StepLabelClassKey, Stepper, stepperClasses,
+   StepperClasses, StepperClassKey, StepperContext, StepperContextType, StyledEngineProvider, SvgIcon,
+   svgIconClasses, SvgIconClasses, SvgIconClassKey, SwipeableDrawer, Switch, switchClasses, SwitchClasses,
+   SwitchClassKey, Tab, tabClasses, TabClasses, TabClassKey, Table, TableBody, tableBodyClasses,
+   TableBodyClasses, TableBodyClassKey, TableCell, tableCellClasses, TableCellClasses, TableCellClassKey,
+   tableClasses, TableClasses, TableClassKey, TableContainer, tableContainerClasses, TableContainerClasses,
+   TableContainerClassKey, TableFooter, tableFooterClasses, TableFooterClasses, TableFooterClassKey, TableHead,
+   tableHeadClasses, TableHeadClasses, TableHeadClassKey, TablePagination, TablePaginationActions,
+   tablePaginationActionsClasses, tablePaginationClasses, TablePaginationClasses, TablePaginationClassKey,
+   TableRow, tableRowClasses, TableRowClasses, TableRowClassKey, TableSortLabel, tableSortLabelClasses,
+   TableSortLabelClasses, TableSortLabelClassKey, Tabs, tabsClasses, TabsClasses, TabsClassKey, TabScrollButton,
+   tabScrollButtonClasses, TabScrollButtonClasses, TabScrollButtonClassKey, TextareaAutosize, TextField,
+   textFieldClasses, TextFieldClasses, TextFieldClassKey, THEME_ID, ThemeProvider, ToggleButton,
+   toggleButtonClasses, ToggleButtonClasses, ToggleButtonClassKey, ToggleButtonGroup, toggleButtonGroupClasses,
+   ToggleButtonGroupClasses, ToggleButtonGroupClassKey, Toolbar, toolbarClasses, ToolbarClasses,
+   ToolbarClassKey, Tooltip, tooltipClasses, TooltipClasses, TooltipClassKey, touchRippleClasses,
+   TouchRippleClasses, TouchRippleClassKey, Typography, typographyClasses, TypographyClasses,
+   TypographyClassKey, unstable_ClassNameGenerator, unstable_composeClasses, unstable_createBreakpoints,
+   unstable_createMuiStrictModeTheme, unstable_getUnit, unstable_memoTheme, unstable_toUnitless,
+   Unstable_TrapFocus, unstable_useEnhancedEffect, unstable_useId, unsupportedProp, useAutocomplete,
+   useColorScheme, useControlled, useEventCallback, useForkRef, useFormControl, useMediaQuery, usePagination,
+   useRadioGroup, useScrollTrigger, useSelectFocusSource, useTheme, useThemeProps, version, withStyles,
+   withTheme, Zoom
+   Fix: Document or un-export undocumented public exports.
+
+5. [warning] api.prop-type-soundness
+   1/6 exported component props use any/unknown
+   Offenders: ClickAwayListener.children (any)
+   Fix: Replace any/unknown props with precise public prop types.
+
+Showing 5 of 16 failing findings. Run with --verbose to see all evidence.
+
+Full Detail
+  Run with --verbose for all evidence: ds-bench audit mui/packages/mui-material --verbose
+  Run with --json for machine-readable output.
+
+--------------------------------------------
+Result: 45.9/100 - Not agent-ready
+Findings: 2 criticals - 10 warnings - 4 info
+Checks: 17 / 22 (5 N/A)
+Next: run `ds-bench audit mui/packages/mui-material --verbose` for full evidence
+--------------------------------------------

@@ -1,132 +1,72 @@
-ds-bench audit: cedar
-target: cedar-ui
-rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
+ds-bench audit cedar
 
-composite score: 96/100
-applicable checks: 19/22 (medium confidence)
-detected carriers: CSS files, Storybook stories/MDX, TypeScript exports, agent metadata files, canonical-examples files, llms.txt, manifests, token files/CSS custom properties
+DS Bench Audit: cedar
+Score: 96 / 100 - Agent-ready with gaps
+Applicable Checks: 19 / 19
+Target: cedar-ui
+Carriers: CSS files, Storybook stories/MDX, TypeScript exports, agent metadata files, canonical-examples files,
+  llms.txt, manifests, token files/CSS custom properties
 
-categories:
-  Docs & examples         [##########]  96.4 (4/4)
-  API clarity             [##########]  96.3 (4/4)
-  Usage guidance          [#########.]  92.2 (3/3)
-  Token hygiene           [##########]    96 (3/3)
-  Deprecation signalling  [N/A       ]   N/A (0/3) weight redistributed
-  Agent metadata          [##########]   100 (5/5)
+Category Scores
+Category                Score  Checks           
+----------------------  -----  -----------------
+Docs & examples          96.4  4/4
+API clarity              96.3  4/4
+Usage guidance           92.2  3/3
+Token hygiene              96  3/3
+Deprecation signalling    N/A  0/3 redistributed
+Agent metadata            100  5/5
 
-findings:
-  [critical] docs.usage-examples - fail
-    measure: 28/30 exported components have importable usage examples; missing: MetricCard, StatusPill
-    evidence: MetricCard, StatusPill
-    fix: Add one canonical story/example per component.
-    receipt: Agents recreate components they can't see used (Atlassian DESIGN.md experiment).
-  [critical] docs.example-imports-real - pass
-    measure: 68/68 example component imports resolve against exported components; unresolved: none
-    evidence: none
-    fix: Correct or delete examples with dead imports.
-    receipt: Wrong import paths are a documented agent failure mode (Astryx self-checks).
-  [critical] api.types-resolve - pass
-    measure: 30/30 exports typecheck from a synthetic package import; unresolved: none
-    evidence: none
-    fix: Repair the package types/exports mapping so every public export is importable.
-    receipt: Wrong import paths are a documented agent failure mode.
-  [critical] deprecation.marked - na
-    measure: 0 known-deprecated exports found; deprecation marks are not applicable.
-    evidence: none
-    fix: Add @deprecated to legacy exports.
-    receipt: Deprecated patterns dominate training data unless current source clearly marks them as deprecated.
-  [critical] agent.instruction-manual - pass
-    measure: 3/3 metadata code examples import system components; rebuild examples: none
-    evidence: none
-    fix: Rewrite metadata examples to import the design-system components instead of re-implementing them.
-    receipt: Re-implementation specs cause agents to recreate components instead of using the system.
-  [warning] docs.prop-descriptions - fail
-    measure: 29/30 exported components have documented public props; missing: TextField
-    evidence: TextField: validation
-    fix: Add TSDoc descriptions to public props, starting with the most-used components.
-    receipt: Agents invent props when public prop contracts lack descriptions.
-  [warning] docs.undocumented-exports - fail
-    measure: 5 exported symbols have no docs presence anywhere: compositionTemplates, RecipeConfig, RecipeResult, VariantMap, VariantProps
-    evidence: compositionTemplates, RecipeConfig, RecipeResult, VariantMap, VariantProps
-    fix: Document or un-export undocumented public exports.
-    receipt: Undocumented public exports are trap surface for agents choosing from the design system.
-  [warning] api.prop-type-soundness - pass
-    measure: 0/28 exported component props use any/unknown; offenders: none
-    evidence: none
-    fix: Replace any/unknown props with precise public prop types.
-    receipt: Hallucinated-prop detection depends on sound public prop types.
-  [warning] api.name-coherence - fail
-    measure: 9 component name carrier mismatches: CardBody source file packages/react/src/Card.tsx, CardFooter source file packages/react/src/Card.tsx, CardHeader source file packages/react/src/Card.tsx, MetricCard source file packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file packages/react/src/Badge.tsx, TableCell source file packages/react/src/Table.tsx, TableHeaderCell source file packages/react/src/Table.tsx, TableRow source file packages/react/src/T... (truncated)
-    evidence: CardBody source file packages/react/src/Card.tsx, CardFooter source file packages/react/src/Card.tsx, CardHeader source file packages/react/src/Card.tsx, MetricCard source file packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file packages/react/src/Badge.tsx, TableCell source file packages/react/src/Table.tsx, TableHeaderCell source file packages/react/src/Table.tsx, TableRow source file packages/react/src/Table.tsx
-    fix: Align component names across source files, stories, and manifest entries.
-    receipt: Name mismatch drives discovery-driven component recreation.
-  [warning] guidance.when-to-use - pass
-    measure: 30/30 exported components include when-to-use guidance; missing: none
-    evidence: none
-    fix: Add when-to-use/when-not sections to component docs.
-    receipt: Agents must choose components, not just call them (Atlassian recreation finding).
-  [warning] guidance.alternatives-resolve - fail
-    measure: 56/73 alternatives/instead component references resolve to exported components; unresolved: Link, ToggleButton, Menu, Select, Disclosure, TextArea, SearchField, Accordion
-    evidence: Link, ToggleButton, Menu, Select, Disclosure, TextArea, SearchField, Accordion
-    fix: Reference real components in alternatives guidance.
-    receipt: Resolvable cross-references can't be faked by boilerplate.
-  [warning] guidance.confusable-pairs - pass
-    measure: 2/2 detected confusable pairs reference each other; missing: none
-    evidence: none
-    fix: Add mutual "use X instead when..." notes.
-    receipt: Wrong-component selection is a recurring design-system agent failure mode.
-  [warning] tokens.hardcoded-values - fail
-    measure: 11 magic values across 1174 style LOC (0.937 per 100 LOC); token references: 406; offenders (showing 8 of 11): 100 in packages/react/src/Dialog.module.css:10, rgb(0 0 0 / 35%) in packages/react/src/Dialog.module.css:44, 1rem in packages/react/src/IconButton.module.css:41, 1rem in packages/react/src/IconButton.module.css:42, 1.25rem in packages/react/src/IconButton.module.css:49, 1.25rem in packages/react/src/IconButton.module.css:50, 1.5rem in packages/react/src/IconButton.module.css:57, 1.5rem in packages/react/src/IconButton.module.css:58
-    evidence: 100 in packages/react/src/Dialog.module.css:10, rgb(0 0 0 / 35%) in packages/react/src/Dialog.module.css:44, 1rem in packages/react/src/IconButton.module.css:41, 1rem in packages/react/src/IconButton.module.css:42, 1.25rem in packages/react/src/IconButton.module.css:49, 1.25rem in packages/react/src/IconButton.module.css:50, 1.5rem in packages/react/src/IconButton.module.css:57, 1.5rem in packages/react/src/IconButton.module.css:58, 110 in packages/react/src/Toast.module.css:5, rgb(0 0 0 / 35%) in packages/react/src/Toast.module.css:33, 100 in packages/react/src/Tooltip.module.css:8
-    fix: Replace named hardcoded colors, spacing, and z-index values with token references.
-    receipt: Agents imitate the system's own styling habits; hardcoded source values become copied output.
-  [warning] tokens.machine-readable - fail
-    measure: 28/30 token sources are present and parseable; invalid: packages/tokens/src/base/motion.json (DTCG token base.motion.easing.out is missing $type; DTCG token base.motion.easing.snap is missing $type; DTCG token base.motion.easing.decelerate is missing $type; DTCG token base.motion.easing.overshoot is missing $type; DTCG token base.motion.spring.gentle.stiffness is missing $type; DTCG token base.motion.spring.gentle.damping is missing $type; DTCG token base.motion.spring.gentle.mass is missing $ty... (truncated)
-    evidence: packages/tokens/src/base/motion.json (DTCG token base.motion.easing.out is missing $type; DTCG token base.motion.easing.snap is missing $type; DTCG token base.motion.easing.decelerate is missing $type; DTCG token base.motion.easing.overshoot is missing $type; DTCG token base.motion.spring.gentle.stiffness is missing $type; DTCG token base.motion.spring.gentle.damping is missing $type; DTCG token base.motion.spring.gentle.mass is missing $type; DTCG token base.motion.spring.snappy.stiffness is missing $type; DTCG token base.motion.spring.snappy.damping is missing $type; DTCG token base.motion.spring.snappy.mass is missing $type), packages/tokens/src/semantic/motion.json (DTCG token semantic.motion.easing.settle is missing $type; DTCG token semantic.motion.easing.enter is missing $type; DTCG token semantic.motion.easing.emphasized is missing $type; DTCG token semantic.motion.easing.playful is missing $type; DTCG token semantic.motion.spring.overlay.stiffness is missing $type; DTCG token semantic.motion.spring.overlay.damping is missing $type; DTCG token semantic.motion.spring.overlay.mass is missing $type; DTCG token semantic.motion.spring.live-update.stiffness is missing $type; DTCG token semantic.motion.spring.live-update.damping is missing $type; DTCG token semantic.motion.spring.live-update.mass is missing $type)
-    fix: Publish tokens in a machine-readable format.
-    receipt: Machine-readable tokens are the theming signal agents can consume.
-  [warning] deprecation.migration-notes - na
-    measure: 0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).
-    evidence: none
-    fix: Append replacement guidance to every @deprecated mark.
-    receipt: A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.
-  [warning] deprecation.manifest-exclusion - na
-    measure: 0 deprecated components found; manifest deprecation signalling is not applicable.
-    evidence: none
-    fix: Tag deprecated entries in the manifest or exclude them from generated agent metadata.
-    receipt: Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.
-  [warning] agent.context-file-quality - pass
-    measure: 2/2 agent context component references resolve against exported components; dead references: none
-    evidence: none
-    fix: Regenerate or correct stale component references in agent context files.
-    receipt: Stale context misleads agents worse than no context.
-  [warning] agent.manifest-coverage - pass
-    measure: 30/30 exported components are covered by a manifest; missing: none
-    evidence: none
-    fix: Generate or complete the component manifest.
-    receipt: Partial manifests force agents to guess the gaps.
-  [info] api.barrel-completeness - fail
-    measure: 4 components are deep-import-only and missing from the root barrel: AsyncStatePanelTemplateExample, FilterableTableTemplateExample, FormDialogTemplateExample, SettingsPageTemplateExample
-    evidence: AsyncStatePanelTemplateExample, FilterableTableTemplateExample, FormDialogTemplateExample, SettingsPageTemplateExample
-    fix: Re-export deep-only components from the root barrel or document deep paths in agent metadata.
-    receipt: Agents guess deep paths when components are not reachable from the root package import.
-  [info] tokens.naming-consistency - fail
-    measure: 6/375 token names violate carrier-local dominant patterns (DTCG JSON: 6/369 dot-kebab; CSS custom properties: 0/6 kebab); offenders: base.font.size.2xl, base.font.lineHeight.tight, base.font.lineHeight.normal, component.heading.font.size.2xl, component.text.font.size.2xl, semantic.font.size.2xl
-    evidence: base.font.size.2xl, base.font.lineHeight.tight, base.font.lineHeight.normal, component.heading.font.size.2xl, component.text.font.size.2xl, semantic.font.size.2xl
-    fix: Rename token outliers to the dominant pattern.
-    receipt: Inconsistent names invite fabricated tokens.
-  [info] deprecation.zombie-exports - fail
-    measure: 2 barrel exports are absent from docs/stories: compositionTemplates, MetricCard
-    evidence: compositionTemplates, MetricCard
-    fix: Document, deprecate, or remove zombie exports.
-    receipt: Zombie exports are trap surface for training-data gravity.
-  [info] agent.llms-txt - pass
-    measure: 6/6 llms.txt references are valid; invalid references: none
-    evidence: none
-    fix: Add or repair llms.txt references.
-    receipt: llms.txt is a contested convention, so it is weighted low but still captures discovery intent.
-  [info] agent.mcp-present - pass
-    measure: 1 MCP package/config carriers detected: packages/mcp/package.json dependency @modelcontextprotocol/sdk
-    evidence: packages/mcp/package.json dependency @modelcontextprotocol/sdk
-    fix: Consider shipping an MCP server or checked-in MCP configuration for agent context.
-    receipt: On-demand context delivery can outperform portable files for agent workflows.
+Legend: redistributed = N/A category weight moved to applicable categories.
+
+Top Findings
+1. [critical] docs.usage-examples
+   28/30 exported components have importable usage examples
+   Missing: 2 total; showing 2.
+     MetricCard
+     StatusPill
+   Fix: Add one canonical story/example per component.
+
+2. [warning] docs.prop-descriptions
+   29/30 exported components have documented public props
+   Missing: TextField
+   Fix: Add TSDoc descriptions to public props, starting with the most-used components.
+
+3. [warning] docs.undocumented-exports
+   5 exported symbols have no docs presence anywhere: compositionTemplates, RecipeConfig, RecipeResult,
+   VariantMap, VariantProps
+   Fix: Document or un-export undocumented public exports.
+
+4. [warning] api.name-coherence
+   9 component name carrier mismatches: CardBody source file packages/react/src/Card.tsx, CardFooter source file
+   packages/react/src/Card.tsx, CardHeader source file packages/react/src/Card.tsx, MetricCard source file
+   packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file
+   packages/react/src/Badge.tsx, TableCell source file packages/react/src/Table.tsx, TableHeaderCell source file
+   packages/react/src/Table.tsx, TableRow source file packages/react/src/Table.tsx
+   Fix: Align component names across source files, stories, and manifest entries.
+
+5. [warning] guidance.alternatives-resolve
+   56/73 alternatives/instead component references resolve to exported components
+   Unresolved: 8 total; showing 8.
+     Link
+     ToggleButton
+     Menu
+     Select
+     Disclosure
+     TextArea
+     SearchField
+     Accordion
+   Fix: Reference real components in alternatives guidance.
+
+Showing 5 of 10 failing findings. Run with --verbose to see all evidence.
+
+Full Detail
+  Run with --verbose for all evidence: ds-bench audit cedar-ui --verbose
+  Run with --json for machine-readable output.
+
+--------------------------------------------
+Result: 96/100 - Agent-ready with gaps
+Findings: 1 critical - 6 warnings - 3 info
+Checks: 19 / 19
+Next: run `ds-bench audit cedar-ui --verbose` for full evidence
+--------------------------------------------

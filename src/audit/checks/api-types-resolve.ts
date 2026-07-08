@@ -15,7 +15,8 @@ export const apiTypesResolveCheck: AuditCheck = {
   measure: "synthetic import of every export typechecks",
   fix: "Repair the package types/exports mapping so every public export is importable.",
   naBehavior:
-    "N/A when the checkout is unbuilt: the package's declared type/entry targets (types/typings/main/module/exports) point at build output (e.g. dist/) that is absent from this checkout. Fails when those targets are present but the mapping is still broken, or when no exports are found.",
+    "N/A when the checkout is unbuilt: the package's declared type/entry targets (types/typings/main/module/exports) point at build output (e.g. dist/) that is absent from this checkout (uncovered). Fails when those targets are present but the mapping is still broken, or when no exports are found.",
+  naReason: "uncovered",
   receipt: "Wrong import paths are a documented agent failure mode.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

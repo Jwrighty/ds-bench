@@ -16,7 +16,8 @@ export const tokensNamingConsistencyCheck: AuditCheck = {
   measure: "naming-pattern violation rate against the system's own dominant pattern",
   fix: "Rename token outliers to the dominant pattern.",
   naBehavior:
-    "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap), or when token names use an unmodeled convention the classifier cannot score.",
+    "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap), or when token names use an unmodeled convention the classifier cannot score (uncovered).",
+  naReason: "uncovered",
   receipt: "Inconsistent names invite fabricated tokens.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

@@ -109,8 +109,7 @@ function renderHeader(report: AuditReport, style: Style): string[] {
     "",
     `DS Bench Audit: ${report.target.name}`,
     `Score: ${style.score(`${formatScore(report.composite)} / 100`, report)} - ${verdictFor(report)}`,
-    `Applicable Checks: ${report.applicability.applicable} / ${report.applicability.total}`,
-    `Confidence: ${report.applicability.confidence}`,
+    `Applicable Checks: ${formatApplicability(report.applicability)}`,
     `Target: ${report.target.path}`,
     ...wrapText(
       `Carriers: ${report.target.detectedCarriers.length === 0 ? "none" : report.target.detectedCarriers.join(", ")}`,
@@ -118,6 +117,13 @@ function renderHeader(report: AuditReport, style: Style): string[] {
       "  ",
     ),
   ];
+}
+
+function formatApplicability(applicability: AuditReport["applicability"]): string {
+  const na = applicability.total - applicability.applicable;
+  const suffix = na > 0 ? ` (${na} N/A)` : "";
+
+  return `${applicability.applicable} / ${applicability.total}${suffix}`;
 }
 
 function renderCategoryTable(report: AuditReport): string[] {
@@ -250,7 +256,7 @@ function renderFooter(report: AuditReport, mode: RenderMode, style: Style): stri
     "-".repeat(44),
     `Result: ${style.score(`${formatScore(report.composite)}/100`, report)} - ${verdictFor(report)}`,
     `Findings: ${formatSeverityCounts(counts)}`,
-    `Checks: ${report.applicability.applicable}/${report.applicability.total} applicable - confidence: ${report.applicability.confidence}`,
+    `Checks: ${formatApplicability(report.applicability)}`,
     next,
     "-".repeat(44),
   ];

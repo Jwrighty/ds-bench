@@ -4,10 +4,10 @@ import { scoreFindings } from "../src/audit/scoring.ts";
 import type { AuditCheck, AuditFinding, CategoryId, Severity } from "../src/audit/types.ts";
 
 describe("scoring machinery", () => {
-  it("excludes N/A checks from denominators and flags redistributed category weight", () => {
+  it("excludes clean N/A checks from applicability denominators and flags redistributed category weight", () => {
     const checks = [
       check("docs.complete", "docs", "critical"),
-      check("deprecation.empty", "deprecation", "warning"),
+      check("deprecation.empty", "deprecation", "warning", "clean"),
     ];
     const findings = [
       finding("docs.complete", "docs", "critical", "pass", 0.8),
@@ -22,6 +22,32 @@ describe("scoring machinery", () => {
     assert.equal(scored.categories.find((category) => category.id === "deprecation")?.total, 1);
     assert.equal(scored.categories.find((category) => category.id === "deprecation")?.weightRedistributed, true);
     assert.equal(scored.composite, 80);
+    assert.deepEqual(scored.applicability, {
+      applicable: 1,
+      total: 1,
+      confidence: "high",
+    });
+  });
+
+  it("keeps uncovered N/A checks in the applicability denominator", () => {
+    const checks = [
+      check("docs.complete", "docs", "critical"),
+      check("tokens.naming-consistency", "tokens", "info", "uncovered"),
+      check("deprecation.empty", "deprecation", "warning", "clean"),
+    ];
+    const findings = [
+      finding("docs.complete", "docs", "critical", "pass", 1),
+      finding("tokens.naming-consistency", "tokens", "info", "na", null),
+      finding("deprecation.empty", "deprecation", "warning", "na", null),
+    ];
+
+    const scored = scoreFindings(checks, findings);
+
+    assert.deepEqual(scored.applicability, {
+      applicable: 1,
+      total: 2,
+      confidence: "low",
+    });
   });
 
   it("uses high, medium, and low confidence thresholds at 0.9 and 0.7", () => {
@@ -150,11 +176,12 @@ function category(scored: ReturnType<typeof scoreFindings>, id: CategoryId) {
   return found;
 }
 
-function check(id: string, category: CategoryId, severity: Severity): AuditCheck {
+function check(id: string, category: CategoryId, severity: Severity, naReason?: AuditCheck["naReason"]): AuditCheck {
   return {
     id,
     category,
     severity,
+    ...(naReason ? { naReason } : {}),
     signal: "fixture signal",
     carriers: ["fixture carrier"],
     measure: "fixture measure",

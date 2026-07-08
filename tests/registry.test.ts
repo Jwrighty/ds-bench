@@ -88,6 +88,17 @@ describe("check registry", () => {
     }
   });
 
+  it("classifies every explicit N/A behavior as clean or uncovered", () => {
+    for (const check of CHECK_REGISTRY) {
+      if (check.naBehavior.startsWith("Never N/A") || check.naBehavior.startsWith("Reported but not scored")) {
+        assert.equal(check.naReason, undefined, `${check.id}.naReason is only for checks that can return N/A`);
+        continue;
+      }
+
+      assert.ok(check.naReason === "clean" || check.naReason === "uncovered", `${check.id}.naReason must classify its N/A behavior`);
+    }
+  });
+
   it("does not register duplicate check ids", () => {
     const ids = CHECK_REGISTRY.map((check) => check.id);
     assert.deepEqual(ids, Array.from(new Set(ids)));

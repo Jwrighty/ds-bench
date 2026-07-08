@@ -37,8 +37,8 @@ describe("audit seam", () => {
     assert.equal(report.composite, 40.7);
     assert.deepEqual(report.applicability, {
       applicable: 14,
-      total: 22,
-      confidence: "low",
+      total: 17,
+      confidence: "medium",
     });
     assert.equal(report.categories.length, 6);
     assert.deepEqual(report.categories[0], {
@@ -111,6 +111,7 @@ describe("audit seam", () => {
       category: "deprecation",
       severity: "critical",
       outcome: "na",
+      naReason: "clean",
       measure: {
         kind: "ratio",
         value: 0,
@@ -125,6 +126,7 @@ describe("audit seam", () => {
       category: "deprecation",
       severity: "warning",
       outcome: "na",
+      naReason: "clean",
       measure: {
         kind: "ratio",
         value: 0,
@@ -134,6 +136,8 @@ describe("audit seam", () => {
       fix: "Append replacement guidance to every @deprecated mark.",
       receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
     });
+    assert.equal(finding(report, "tokens.naming-consistency").naReason, "uncovered");
+    assert.equal(finding(report, "guidance.confusable-pairs").naReason, "clean");
   });
 
   it("treats adopted carriers without the signal as failures", async () => {
@@ -148,12 +152,14 @@ describe("audit seam", () => {
 
     assert.equal(finding(report, "docs.usage-examples").outcome, "fail");
     assert.equal(finding(report, "docs.example-imports-real").outcome, "na");
+    assert.equal(finding(report, "docs.example-imports-real").naReason, "uncovered");
   });
 
   it("reports structurally inapplicable deprecation migration notes as N/A", async () => {
     const report = await audit(join(repoRoot, "fixtures/missing-vs-na/structurally-inapplicable"));
 
     assert.equal(finding(report, "deprecation.migration-notes").outcome, "na");
+    assert.equal(finding(report, "deprecation.migration-notes").naReason, "clean");
     assert.equal(report.categories.find((category) => category.id === "deprecation")?.weightRedistributed, true);
   });
 
@@ -1040,8 +1046,8 @@ describe("audit seam", () => {
     const report = await audit(m1FixturePath("combined-six-pack"));
 
     assert.equal(report.applicability.applicable, 19);
-    assert.equal(report.applicability.total, 22);
-    assert.equal(report.applicability.confidence, "medium");
+    assert.equal(report.applicability.total, 21);
+    assert.equal(report.applicability.confidence, "high");
     assert.ok(report.composite > 0);
     assert.equal(finding(report, "deprecation.marked").outcome, "pass");
     assert.equal(finding(report, "deprecation.marked").measure.detail, "1/1 known-deprecated exports carry @deprecated; missing: none");

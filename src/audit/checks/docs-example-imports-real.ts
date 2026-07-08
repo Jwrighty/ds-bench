@@ -12,7 +12,8 @@ export const docsExampleImportsRealCheck: AuditCheck = {
   carriers: EXAMPLE_CARRIER_LABELS,
   measure: "% example component imports that resolve against exported components",
   fix: "Correct or delete examples with dead imports.",
-  naBehavior: "N/A when no examples exist at all; docs.usage-examples carries the absence.",
+  naBehavior: "N/A when no examples exist at all; docs.usage-examples carries the absence (uncovered).",
+  naReason: "uncovered",
   receipt: "Wrong import paths are a documented agent failure mode (Astryx self-checks).",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

@@ -1,7 +1,7 @@
 import { getExportedSymbols } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { hasDeprecatedTag } from "./deprecation-marked.ts";
+import { hasDeprecatedTag, isKnownDeprecated } from "./deprecation-marked.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const deprecationMigrationNotesCheck: AuditCheck = {
@@ -12,14 +12,22 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
   carriers: ["JSDoc @deprecated"],
   measure: "% @deprecated marks naming a replacement or migration path",
   fix: "Append replacement guidance to every @deprecated mark.",
-  naBehavior: "N/A when zero @deprecated marks exist (unmarked deprecations stay deprecation.marked's gap).",
+  naBehavior:
+    "N/A when zero @deprecated marks exist; clean when no deprecated surface exists, uncovered when unmarked deprecations stay deprecation.marked's gap.",
+  naReason: "clean",
   receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
-    const markedExports = getExportedSymbols(files).filter((symbol) => hasDeprecatedTag(symbol.leadingComment));
+    const exports = getExportedSymbols(files);
+    const markedExports = exports.filter((symbol) => hasDeprecatedTag(symbol.leadingComment));
 
     if (markedExports.length === 0) {
-      return naResult("ratio", "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).");
+      const knownDeprecated = exports.filter((symbol) => isKnownDeprecated(symbol, files));
+      return naResult(
+        "ratio",
+        "0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).",
+        knownDeprecated.length === 0 ? "clean" : "uncovered",
+      );
     }
 
     const withoutMigration = markedExports.filter((markedExport) => !hasMigrationNote(markedExport.leadingComment));

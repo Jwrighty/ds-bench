@@ -14,11 +14,17 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
 
   for (const check of CHECK_REGISTRY) {
     const result = await check.run({ targetPath: resolvedTarget, files });
+    const naReason = result.outcome === "na" ? result.naReason ?? check.naReason : undefined;
+    if (result.outcome === "na" && !naReason) {
+      throw new Error(`${check.id} returned N/A without an N/A reason`);
+    }
+
     findingsForScoring.push({
       checkId: check.id,
       category: check.category,
       severity: check.severity,
       outcome: result.outcome,
+      ...(naReason ? { naReason } : {}),
       score: result.score,
       measure: result.measure,
       evidence: result.evidence,

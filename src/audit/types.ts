@@ -11,6 +11,7 @@ export type CategoryId =
 export type Severity = "critical" | "warning" | "info";
 export type Outcome = "pass" | "fail" | "na";
 export type Confidence = "high" | "medium" | "low";
+export type NaReason = "clean" | "uncovered";
 
 export type Measure = {
   kind: "ratio" | "count";
@@ -23,6 +24,7 @@ export type AuditFinding = {
   category: CategoryId;
   severity: Severity;
   outcome: Outcome;
+  naReason?: NaReason;
   measure: Measure;
   evidence: string[];
   fix: string;
@@ -74,11 +76,13 @@ export type CheckMetadata = {
   measure: string;
   fix: string;
   naBehavior: string;
+  naReason?: NaReason;
   receipt: string;
 };
 
 export type CheckResult = {
   outcome: Outcome;
+  naReason?: NaReason;
   score: number | null;
   measure: Measure;
   evidence: string[];

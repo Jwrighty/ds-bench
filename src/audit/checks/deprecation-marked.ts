@@ -13,7 +13,8 @@ export const deprecationMarkedCheck: AuditCheck = {
   measure:
     "% known-deprecated exports carrying the mark (known-deprecated = docs/changelog/manifest cross-reference where available, plus name-pattern inference: Legacy*/Deprecated*/Old* prefixes and suffixes)",
   fix: "Add @deprecated to legacy exports.",
-  naBehavior: "N/A when zero known-deprecated exports detected.",
+  naBehavior: "N/A when zero known-deprecated exports detected (clean).",
+  naReason: "clean",
   receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

@@ -19,7 +19,8 @@ export const agentInstructionManualCheck: AuditCheck = {
   carriers: ["DESIGN.md", "AGENTS.md", "example blocks in metadata"],
   measure: "metadata code examples import system components instead of rebuilding them",
   fix: "Rewrite metadata examples to import the design-system components instead of re-implementing them.",
-  naBehavior: "N/A when no agent metadata files exist; agent.context-file-quality carries the absence.",
+  naBehavior: "N/A when no agent metadata files exist; agent.context-file-quality carries the absence (uncovered).",
+  naReason: "uncovered",
   receipt: "Re-implementation specs cause agents to recreate components instead of using the system.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

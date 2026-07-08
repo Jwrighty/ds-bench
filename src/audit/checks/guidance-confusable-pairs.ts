@@ -19,7 +19,8 @@ export const guidanceConfusablePairsCheck: AuditCheck = {
   carriers: ["meta files", "manifest fields", "docs sections"],
   measure: "For detected confusable pairs present in the inventory, % pairs that reference each other",
   fix: 'Add mutual "use X instead when..." notes.',
-  naBehavior: "N/A when fewer than 2 confusable-pair members, or no complete seed pair, are in inventory.",
+  naBehavior: "N/A when fewer than 2 confusable-pair members, or no complete seed pair, are in inventory (clean).",
+  naReason: "clean",
   receipt: "Wrong-component selection is a recurring design-system agent failure mode.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);

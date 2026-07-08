@@ -14,20 +14,26 @@ export const deprecationManifestExclusionCheck: AuditCheck = {
   carriers: ["Storybook !manifest tag", "manifest deprecated fields"],
   measure: "% deprecated components excluded from or tagged in manifest",
   fix: "Tag deprecated entries in the manifest or exclude them from generated agent metadata.",
-  naBehavior: "N/A when zero deprecated exports exist, or no manifest exists.",
+  naBehavior:
+    "N/A when zero deprecated exports exist (clean), or no manifest exists and agent.manifest-coverage carries the manifest gap (uncovered).",
+  naReason: "clean",
   receipt: "Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
     const deprecatedComponents = getExportedComponentSymbols(files).filter((symbol) => isKnownDeprecated(symbol, files));
 
     if (deprecatedComponents.length === 0) {
-      return naResult("ratio", "0 deprecated components found; manifest deprecation signalling is not applicable.");
+      return naResult("ratio", "0 deprecated components found; manifest deprecation signalling is not applicable.", "clean");
     }
 
     const manifestFiles = files.filter((file) => isManifestCarrier(file.relativePath));
     const hasStorybookExclusion = deprecatedComponents.some((component) => hasStorybookManifestExclusion(files, component.name));
     if (manifestFiles.length === 0 && !hasStorybookExclusion) {
-      return naResult("ratio", "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.");
+      return naResult(
+        "ratio",
+        "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.",
+        "uncovered",
+      );
     }
 
     const missing = deprecatedComponents.filter((component) => !isExcludedOrTagged(files, manifestFiles, component.name));
