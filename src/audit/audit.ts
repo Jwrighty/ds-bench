@@ -1,4 +1,4 @@
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { CHECK_REGISTRY } from "./checks/registry.ts";
@@ -35,12 +35,29 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
     ...getCheckRegistryMetadata(CHECK_REGISTRY),
     target: {
       name: getPackageName(resolvedTarget),
-      path: resolvedTarget,
+      path: toPortableTargetPath(resolvedTarget),
       detectedCarriers: detectCarriers(resolvedTarget, files),
     },
     ...scoreFindings(CHECK_REGISTRY, findingsForScoring, config),
     findings,
   };
+}
+
+/**
+ * Reports are versioned artifacts: embed the target as <repo-dir>/<path-within-repo>
+ * (or just the directory name outside a git checkout), never an absolute machine path.
+ */
+function toPortableTargetPath(resolvedTarget: string): string {
+  let currentPath = resolvedTarget;
+  while (currentPath !== dirname(currentPath)) {
+    if (existsSync(join(currentPath, ".git"))) {
+      return currentPath === resolvedTarget
+        ? basename(currentPath)
+        : join(basename(currentPath), relative(currentPath, resolvedTarget));
+    }
+    currentPath = dirname(currentPath);
+  }
+  return basename(resolvedTarget);
 }
 
 const SEVERITY_RANK: Record<AuditFinding["severity"], number> = {

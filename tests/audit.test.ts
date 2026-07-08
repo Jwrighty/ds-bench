@@ -20,6 +20,9 @@ describe("audit seam", () => {
     assert.equal(report.scoredCheckCount, 22);
     assert.equal(report.registryFingerprint, "176a3461");
     assert.equal(report.target.name, "missing-usage-examples");
+    // Reports are versioned artifacts — the target must never leak an absolute machine path.
+    assert.ok(!report.target.path.startsWith("/"), `target.path leaks absolute path: ${report.target.path}`);
+    assert.match(report.target.path, /fixtures\/missing-usage-examples$/);
     assert.deepEqual(report.weights, {
       source: "default",
       values: {

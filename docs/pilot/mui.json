@@ -5,7 +5,7 @@
   "registryFingerprint": "176a3461",
   "target": {
     "name": "@mui/material",
-    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/a1f3b0e3-099d-4168-a529-60c423e7cb30/scratchpad/pilot/mui/packages/mui-material",
+    "path": "mui/packages/mui-material",
     "detectedCarriers": [
       "TypeScript exports",
       "package.json exports/types",

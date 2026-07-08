@@ -1,5 +1,5 @@
 ds-bench audit: cedar
-target: /Users/jasonwright/Development/cedar-ui
+target: cedar-ui
 rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
 
 composite score: 96/100
