@@ -570,6 +570,12 @@ describe("audit seam", () => {
       "12px in src/button.css:3",
       "999 in src/button.css:4",
     ]);
+    // Auxiliary surfaces are not the styling habits agents imitate: test/story
+    // files, Storybook config, and changelog markdown must never contribute
+    // offenders (a changelog PR ref like #4424 must not read as a hex color).
+    const failingDetail = finding(failing, "tokens.hardcoded-values").measure.detail;
+    assert.doesNotMatch(failingDetail, /\.test\.|\.stories\.|\.storybook|CHANGELOG/);
+    assert.doesNotMatch(failingDetail, /#4424|#2392/);
     assert.equal(finding(clean, "tokens.hardcoded-values").outcome, "pass");
     assert.equal(finding(clean, "tokens.hardcoded-values").measure.value, 0);
   });

@@ -1,6 +1,6 @@
 import { extname } from "node:path";
 import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
-import { listTextFiles } from "../file-system.ts";
+import { listTextFiles, SOURCE_EXTENSIONS, STYLE_EXTENSIONS } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
@@ -11,6 +11,14 @@ type HardcodedValue = {
 };
 
 const STYLE_FILE_EXTENSIONS = [".css", ".scss", ".sass", ".less"];
+
+// Non-shipping source that agents don't imitate for styling: unit tests, story
+// files, Storybook config, mocks/fixtures. Their hardcoded values are demo noise,
+// not the system's styling habits — excluding them keeps the signal about the
+// surface agents actually copy. (Markdown/changelogs fall out via the extension
+// gate below, so a changelog PR ref like `#4424` is never read as a hex color.)
+const AUXILIARY_STYLE_PATH =
+  /(?:^|\/)(?:__tests__|__stories__|__mocks__|__fixtures__|\.storybook)(?:\/)|\.(?:test|spec|stories)\.[cm]?[jt]sx?$/;
 
 // Matches the opening line of a CSS-in-JS tagged template: styled.x`, styled(X)`, css`, keyframes`
 const STYLE_TEMPLATE_OPEN = /\b(?:styled(?:\.[A-Za-z0-9_]+|\([^)]*\))|css|keyframes)\s*`/;
@@ -29,7 +37,7 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
   receipt: "Agents imitate the system's own styling habits; hardcoded source values become copied output.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
-    const scopedFiles = scopeFilesToLibraryPackages(files);
+    const scopedFiles = scopeFilesToLibraryPackages(files).filter((file) => isStyleAuditableSource(file.relativePath));
     const styleContents = scopedFiles
       .map((file) => ({ relativePath: file.relativePath, styleContent: extractStyleContent(file.relativePath, file.content) }))
       .filter((file) => file.styleContent.length > 0);
@@ -66,6 +74,19 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
  * templates like styled.x`...`/css`...`/keyframes`...`, or style={{...}}
  * inline-style objects) — never the whole file.
  */
+/**
+ * True for files that carry the shipping styling surface agents imitate: style-family
+ * files (.css/.scss/...) and code source (.ts/.tsx/.js/.jsx) that may hold CSS-in-JS.
+ * Excludes non-style extensions (markdown/JSON/txt) and auxiliary test/story/config paths.
+ */
+function isStyleAuditableSource(relativePath: string): boolean {
+  const extension = extname(relativePath);
+  if (!STYLE_EXTENSIONS.has(extension) && !SOURCE_EXTENSIONS.has(extension)) {
+    return false;
+  }
+  return !AUXILIARY_STYLE_PATH.test(relativePath);
+}
+
 function extractStyleContent(relativePath: string, content: string): string {
   const extension = extname(relativePath);
   if (STYLE_FILE_EXTENSIONS.includes(extension)) {

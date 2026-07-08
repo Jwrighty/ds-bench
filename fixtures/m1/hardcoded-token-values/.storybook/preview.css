@@ -1,0 +1,5 @@
+/* Storybook config CSS must NOT count against token discipline. */
+.sb-preview {
+  padding: 17px;
+  color: #fedcba;
+}
