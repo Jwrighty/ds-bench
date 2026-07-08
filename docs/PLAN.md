@@ -6,7 +6,7 @@
 
 **`ds-bench audit <path>`** — deterministic static analysis of any design-system repo. Composite score (0–100, `applicable checks: X/Y` + confidence label) + category breakdown + severity-ranked findings, each with a fix suggestion (Advisor) and a receipt. No AI, no auth, seconds to run. TypeScript, single package, npm `ds-bench`, standalone public repo once the first real report exists.
 
-**Weights (draft rubric ARS v0.1):** Category weights: Docs & examples 25 · API clarity 20 · Usage guidance 15 (provisional) · Token hygiene 15 · Deprecation signalling 15 · Agent metadata 10. Severity weights within each category: critical 4 · warning 2 · info 1, because advisory checks carry signal but should not move composites as much as critical failures. Category weights are user-overridable; severity weights are rubric-owned; publications always use defaults. Frozen after pilot, versioned as "Agent-Readiness Score (ARS)".
+**Weights (draft rubric ARS v0.2):** Category weights: Docs & examples 25 · API clarity 20 · Usage guidance 15 (provisional) · Token hygiene 15 · Deprecation signalling 15 · Agent metadata 10. Severity weights within each category: critical 4 · warning 2 · info 1, because advisory checks carry signal but should not move composites as much as critical failures. Category weights are user-overridable; severity weights are rubric-owned; publications always use defaults. Composite comparisons require the same rubric version and registry fingerprint. Frozen after pilot, versioned as "Agent-Readiness Score (ARS)".
 
 ## Story arcs (essay #1 material)
 

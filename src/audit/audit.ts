@@ -3,10 +3,9 @@ import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { CHECK_REGISTRY } from "./checks/registry.ts";
 import { detectCarriers, getPackageName, isRecord, listTextFiles } from "./file-system.ts";
+import { getCheckRegistryMetadata, RUBRIC_VERSION } from "./rubric.ts";
 import { scoreFindings, toReportFinding, type FindingScoreInput } from "./scoring.ts";
 import type { AuditConfig, AuditFinding, AuditReport } from "./types.ts";
-
-const RUBRIC_VERSION = "ARS v0.1";
 
 export async function audit(targetPath: string, config: AuditConfig = {}): Promise<AuditReport> {
   const resolvedTarget = resolve(targetPath);
@@ -33,6 +32,7 @@ export async function audit(targetPath: string, config: AuditConfig = {}): Promi
   return {
     rubricVersion: RUBRIC_VERSION,
     toolVersion: getToolVersion(),
+    ...getCheckRegistryMetadata(CHECK_REGISTRY),
     target: {
       name: getPackageName(resolvedTarget),
       path: resolvedTarget,

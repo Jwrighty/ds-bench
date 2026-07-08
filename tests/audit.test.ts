@@ -12,11 +12,13 @@ const m1FixturePath = (name: string) => join(repoRoot, "fixtures/m1", name);
 const agentMetadataFixturePath = (name: string) => join(repoRoot, "fixtures/agent-metadata", name);
 
 describe("audit seam", () => {
-  it("returns the ARS v0.1 report contract for a missing usage examples fixture", async () => {
+  it("returns the ARS v0.2 report contract for a missing usage examples fixture", async () => {
     const report = await audit(fixturePath);
 
-    assert.equal(report.rubricVersion, "ARS v0.1");
+    assert.equal(report.rubricVersion, "ARS v0.2");
     assert.equal(report.toolVersion, "0.0.0");
+    assert.equal(report.scoredCheckCount, 22);
+    assert.equal(report.registryFingerprint, "176a3461");
     assert.equal(report.target.name, "missing-usage-examples");
     assert.deepEqual(report.weights, {
       source: "default",
@@ -152,7 +154,7 @@ describe("audit seam", () => {
     assert.equal(report.categories.find((category) => category.id === "deprecation")?.weightRedistributed, true);
   });
 
-  it("applies custom weights from config without mutating default ARS v0.1 weights", async () => {
+  it("applies custom weights from config without mutating default ARS v0.2 weights", async () => {
     const targetPath = join(repoRoot, "fixtures/scoring/deprecation-without-migration");
 
     const defaultReport = await audit(targetPath);

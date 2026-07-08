@@ -1,6 +1,6 @@
-# Audit check catalogue — static tier (`ds-bench audit`) — DRAFT v0.1
+# Audit check catalogue — static tier (`ds-bench audit`) — DRAFT v0.2
 
-**Governing rules** (ADR 0003): intrinsics dominate; checks target *signals* and enumerate *carriers*; quality checks over presence checks; every check carries a **receipt**. Missing ≠ N/A: adopted-carrier-without-signal or no-carrier-at-all = fail; structurally-inapplicable = N/A (excluded from denominator). Composite ships with `applicable checks: X/Y` + confidence label.
+**Governing rules** (ADR 0003): intrinsics dominate; checks target *signals* and enumerate *carriers*; quality checks over presence checks; every check carries a **receipt**. Missing ≠ N/A: adopted-carrier-without-signal or no-carrier-at-all = fail; structurally-inapplicable = N/A (excluded from denominator). Composite ships with `applicable checks: X/Y` + confidence label, plus the scored-check count and registry fingerprint.
 
 Input: local repo checkout (`npx ds-bench audit <path>`). All checks deterministic — no AI, no network (external links: syntax validation only).
 
@@ -9,6 +9,8 @@ Input: local repo checkout (`npx ds-bench audit <path>`). All checks determinist
 Category weights: Docs & examples 25 · API clarity 20 · Usage guidance 15 (provisional) · Token hygiene 15 · Deprecation signalling 15 · Agent metadata 10.
 
 Severity weights within each category: critical 4 · warning 2 · info 1. Rationale: advisory checks carry real signal, but a failing info check should only move its category by its documented share rather than as much as a critical failure.
+
+Composite scores are comparable only when both the rubric version and registry fingerprint match. The rubric version records intentional scoring-rule changes; the registry fingerprint is derived from the sorted scored-check ids, so it changes when checks are added, removed, or moved in/out of scoring. If either value differs, compare category/finding narratives instead of treating the composite delta as apples-to-apples.
 
 Each entry below maps 1:1 to a registry entry: **id** · severity · signal · carriers · measure · fix suggestion · N/A behavior · receipt. **Default N/A behavior: never N/A** — the signal is universal; absence anywhere is a fail. Only checks with an explicit "N/A when" deviate.
 
@@ -45,7 +47,7 @@ Most important, least mechanically checkable. If the pilot shows noise, this cat
 - **`deprecation.marked`** · critical · signal: deprecation marks · carriers: JSDoc `@deprecated` · measure: % known-deprecated exports carrying the mark (known-deprecated = docs/changelog/manifest cross-reference where available, plus name-pattern inference: `Legacy*`/`Deprecated*`/`Old*` prefixes and suffixes) · fix: add `@deprecated` to legacy exports · N/A when: zero known-deprecated exports detected (young/well-tended system — reported as such, not penalised; mirrors `deprecation.migration-notes`) · receipt: deprecated patterns dominate training data (DesignSystemDev).
 - **`deprecation.migration-notes`** · warning · signal: redirection · carriers: `@deprecated` text · measure: % `@deprecated` marks naming the replacement · fix: append "use X instead" to every mark · N/A when: zero `@deprecated` marks exist (young/well-tended system — reported as such, not penalised; unmarked deprecations stay `deprecation.marked`'s gap) · receipt: a bare mark doesn't redirect an agent.
 - **`deprecation.manifest-exclusion`** · warning · signal: metadata-level deprecation · carriers: Storybook `!manifest` tag, manifest deprecated fields · measure: % deprecated components excluded/tagged in manifest · fix: tag deprecated entries in the manifest · N/A when: zero deprecated exports, or no manifest (then `agent.manifest-coverage` carries the manifest gap) · receipt: Storybook first-party convention.
-- **`deprecation.zombie-exports`** · info (reported, not scored in v0.1) · signal: trap surface · carriers: all · measure: exports absent from docs/stories but present in barrel, listed · fix: document, deprecate, or remove · receipt: zombie exports are trap surface for training-data gravity.
+- **`deprecation.zombie-exports`** · info (reported, not scored in v0.2) · signal: trap surface · carriers: all · measure: exports absent from docs/stories but present in barrel, listed · fix: document, deprecate, or remove · receipt: zombie exports are trap surface for training-data gravity.
 
 ## 6. Agent metadata (delivery layer) — weight 10
 

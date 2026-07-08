@@ -8,7 +8,7 @@ export function renderAuditReport(report: AuditReport): string {
   const lines = [
     `ds-bench audit: ${report.target.name}`,
     `target: ${report.target.path}`,
-    `rubric: ${report.rubricVersion} | tool: ${report.toolVersion}`,
+    `rubric: ${report.rubricVersion} (${report.scoredCheckCount} scored checks, registry ${report.registryFingerprint}) | tool: ${report.toolVersion}`,
     "",
     `composite score: ${formatScore(report.composite)}/100`,
     `applicable checks: ${report.applicability.applicable}/${report.applicability.total} (${report.applicability.confidence} confidence)`,

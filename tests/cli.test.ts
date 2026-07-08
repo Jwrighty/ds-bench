@@ -15,6 +15,7 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
+    assert.match(result.stdout, /rubric: ARS v0\.2 \(22 scored checks, registry 176a3461\) \| tool: 0\.0\.0/);
     assert.match(result.stdout, /composite score: 40\.7\/100/);
     assert.match(result.stdout, /applicable checks: 14\/22 \(low confidence\)/);
     assert.match(result.stdout, /Docs & examples\s+\[######\.\.\.\.\]\s+58\.3 \(4\/4\)/);
@@ -30,8 +31,10 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    const report = JSON.parse(result.stdout) as { rubricVersion: string; findings: Array<{ checkId: string }> };
-    assert.equal(report.rubricVersion, "ARS v0.1");
+    const report = JSON.parse(result.stdout) as { rubricVersion: string; scoredCheckCount: number; registryFingerprint: string; findings: Array<{ checkId: string }> };
+    assert.equal(report.rubricVersion, "ARS v0.2");
+    assert.equal(report.scoredCheckCount, 22);
+    assert.equal(report.registryFingerprint, "176a3461");
     assert.equal(report.findings[0].checkId, "docs.usage-examples");
   });
 

@@ -32,6 +32,8 @@ export type AuditFinding = {
 export type AuditReport = {
   rubricVersion: string;
   toolVersion: string;
+  scoredCheckCount: number;
+  registryFingerprint: string;
   target: {
     name: string;
     path: string;

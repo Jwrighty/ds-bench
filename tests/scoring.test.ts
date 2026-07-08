@@ -30,7 +30,7 @@ describe("scoring machinery", () => {
     assert.equal(confidenceForApplicableCount(6), "low");
   });
 
-  it("uses default ARS v0.1 weights and marks custom weight overrides", () => {
+  it("uses default ARS v0.2 weights and marks custom weight overrides", () => {
     const checks = [check("docs.complete", "docs", "critical"), check("api.empty", "api", "warning")];
     const findings = [
       finding("docs.complete", "docs", "critical", "pass", 1),

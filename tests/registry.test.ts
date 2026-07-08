@@ -1,6 +1,35 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { CHECK_REGISTRY } from "../src/audit/checks/registry.ts";
+import { getCheckRegistryMetadata, getScoredCheckIds, RUBRIC_VERSION } from "../src/audit/rubric.ts";
+import type { AuditCheck } from "../src/audit/types.ts";
+
+const SCORED_CHECK_IDS_BY_RUBRIC_VERSION: Record<string, string[]> = {
+  "ARS v0.2": [
+    "agent.context-file-quality",
+    "agent.instruction-manual",
+    "agent.llms-txt",
+    "agent.manifest-coverage",
+    "agent.mcp-present",
+    "api.barrel-completeness",
+    "api.name-coherence",
+    "api.prop-type-soundness",
+    "api.types-resolve",
+    "deprecation.manifest-exclusion",
+    "deprecation.marked",
+    "deprecation.migration-notes",
+    "docs.example-imports-real",
+    "docs.prop-descriptions",
+    "docs.undocumented-exports",
+    "docs.usage-examples",
+    "guidance.alternatives-resolve",
+    "guidance.confusable-pairs",
+    "guidance.when-to-use",
+    "tokens.hardcoded-values",
+    "tokens.machine-readable",
+    "tokens.naming-consistency",
+  ],
+};
 
 describe("check registry", () => {
   it("registers every known check", () => {
@@ -63,9 +92,55 @@ describe("check registry", () => {
     const ids = CHECK_REGISTRY.map((check) => check.id);
     assert.deepEqual(ids, Array.from(new Set(ids)));
   });
+
+  it("snapshots the scored check surface against the declared rubric version", () => {
+    assert.ok(Object.hasOwn(SCORED_CHECK_IDS_BY_RUBRIC_VERSION, RUBRIC_VERSION), `${RUBRIC_VERSION} needs a scored-check snapshot`);
+    assert.deepEqual(getScoredCheckIds(CHECK_REGISTRY), SCORED_CHECK_IDS_BY_RUBRIC_VERSION[RUBRIC_VERSION]);
+    assert.deepEqual(getCheckRegistryMetadata(CHECK_REGISTRY), {
+      scoredCheckCount: 22,
+      registryFingerprint: "176a3461",
+    });
+  });
+
+  it("fingerprints scored check ids stably and changes when the scored surface changes", () => {
+    const one = fakeCheck("tokens.one");
+    const two = fakeCheck("docs.two");
+    const unscored = fakeCheck("agent.unscored", false);
+    const baseline = getCheckRegistryMetadata([one, two, unscored]);
+
+    assert.deepEqual(getCheckRegistryMetadata([two, unscored, one]), baseline);
+    assert.notEqual(getCheckRegistryMetadata([one, two, fakeCheck("api.three"), unscored]).registryFingerprint, baseline.registryFingerprint);
+    assert.notEqual(getCheckRegistryMetadata([one, unscored]).registryFingerprint, baseline.registryFingerprint);
+    assert.deepEqual(getCheckRegistryMetadata([one, two, fakeCheck("api.reported-only", false), unscored]), baseline);
+  });
 });
 
 function assertNonEmptyString(value: string, label: string): void {
   assert.equal(typeof value, "string", `${label} must be a string`);
   assert.ok(value.trim().length > 0, `${label} must not be blank`);
+}
+
+function fakeCheck(id: string, scored: boolean | undefined = true): AuditCheck {
+  return {
+    id,
+    category: "docs",
+    severity: "warning",
+    scored,
+    signal: "test signal",
+    carriers: ["test carrier"],
+    measure: "test measure",
+    fix: "test fix",
+    naBehavior: "test N/A behavior",
+    receipt: "test receipt",
+    run: () => ({
+      outcome: "pass",
+      score: scored === false ? null : 1,
+      measure: {
+        kind: "ratio",
+        value: 1,
+        detail: "test detail",
+      },
+      evidence: [],
+    }),
+  };
 }

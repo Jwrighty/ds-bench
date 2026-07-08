@@ -6,8 +6,10 @@ import type { AuditReport } from "../src/audit/types.ts";
 describe("terminal renderer", () => {
   it("renders a stable report snapshot", () => {
     const report: AuditReport = {
-      rubricVersion: "ARS v0.1",
+      rubricVersion: "ARS v0.2",
       toolVersion: "0.0.0",
+      scoredCheckCount: 22,
+      registryFingerprint: "176a3461",
       target: {
         name: "missing-usage-examples",
         path: "/fixtures/missing-usage-examples",
@@ -60,7 +62,7 @@ describe("terminal renderer", () => {
       renderAuditReport(report),
       `ds-bench audit: missing-usage-examples
 target: /fixtures/missing-usage-examples
-rubric: ARS v0.1 | tool: 0.0.0
+rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
 
 composite score: 50/100
 applicable checks: 1/1 (high confidence)
@@ -86,8 +88,10 @@ findings:
 
   it("caps long measure detail lists in terminal output", () => {
     const report: AuditReport = {
-      rubricVersion: "ARS v0.1",
+      rubricVersion: "ARS v0.2",
       toolVersion: "0.0.0",
+      scoredCheckCount: 22,
+      registryFingerprint: "176a3461",
       target: {
         name: "long-report",
         path: "/fixtures/long-report",
