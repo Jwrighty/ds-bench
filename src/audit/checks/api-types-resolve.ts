@@ -1,9 +1,10 @@
 import * as ts from "typescript";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getExportedComponents, getPublicPackage, type PublicPackage } from "../component-inventory.ts";
 import { escapeRegExp, getPackageName, listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { formatNames, roundRatio } from "./support.ts";
+import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const apiTypesResolveCheck: AuditCheck = {
   id: "api.types-resolve",
@@ -13,7 +14,8 @@ export const apiTypesResolveCheck: AuditCheck = {
   carriers: ["package.json types/exports fields"],
   measure: "synthetic import of every export typechecks",
   fix: "Repair the package types/exports mapping so every public export is importable.",
-  naBehavior: "Never N/A; packages without resolvable public types fail this API clarity signal.",
+  naBehavior:
+    "N/A when the checkout is unbuilt: the package's declared type/entry targets (types/typings/main/module/exports) point at build output (e.g. dist/) that is absent from this checkout. Fails when those targets are present but the mapping is still broken, or when no exports are found.",
   receipt: "Wrong import paths are a documented agent failure mode.",
   run(context: CheckContext): CheckResult {
     const files = context.files ?? listTextFiles(context.targetPath);
@@ -39,6 +41,13 @@ export const apiTypesResolveCheck: AuditCheck = {
 
     const result = getUnresolvedSyntheticImports(context.targetPath, publicPackage, exportedNames);
     if (result.kind === "entrypoint-unresolvable") {
+      const missingEntries = findMissingBuildOutputEntries(context.targetPath, publicPackage);
+      if (missingEntries.length > 0) {
+        return naResult(
+          "ratio",
+          `entrypoints point at build output absent from this checkout (unbuilt source clone); types resolution not assessed: ${formatNames(missingEntries)}`,
+        );
+      }
       return entrypointUnresolvableResult(result.detail, publicPackage.name);
     }
 
@@ -97,6 +106,21 @@ function getUnresolvedSyntheticImports(targetPath: string, publicPackage: Public
   const text = diagnostics.map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")).join("\n");
   return { kind: "checked", unresolved: exportNames.filter((name) => new RegExp(`\\b${escapeRegExp(name)}\\b`).test(text)) };
 }
+
+/**
+ * Declared type/entry targets (types/typings/main/module/exports) that name a conventional
+ * build-output directory (dist/build/lib/out/esm/cjs/umd) but are absent on disk. A non-empty
+ * result means the checkout is an unbuilt source clone — the package was never compiled here —
+ * rather than a genuinely broken entrypoint mapping (which points at a path that was never
+ * going to exist, built or not).
+ */
+function findMissingBuildOutputEntries(targetPath: string, publicPackage: PublicPackage): string[] {
+  return publicPackage.declaredEntryRelativePaths.filter(
+    (entry) => BUILD_OUTPUT_PATH_PATTERN.test(entry) && !existsSync(join(targetPath, entry)),
+  );
+}
+
+const BUILD_OUTPUT_PATH_PATTERN = /(?:^|\/)(?:dist|build|lib|out|esm|cjs|umd)(?:\/|$)/;
 
 function entrypointUnresolvableResult(detail: string, packageName: string): CheckResult {
   return {

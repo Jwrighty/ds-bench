@@ -185,6 +185,18 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "api.types-resolve").measure.value, 1);
   });
 
+  it("reports api.types-resolve as N/A for an unbuilt source checkout whose entrypoints point at missing dist output", async () => {
+    const report = await audit(m1FixturePath("types-unbuilt-checkout"));
+
+    assert.equal(finding(report, "api.types-resolve").outcome, "na");
+    assert.deepEqual(finding(report, "api.types-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail:
+        "entrypoints point at build output absent from this checkout (unbuilt source clone); types resolution not assessed: dist/index.d.ts, dist/index.js",
+    });
+  });
+
   it("checks api.prop-type-soundness against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("unsound-prop-types"));
     const clean = await audit(m1FixturePath("prop-types-sound"));
