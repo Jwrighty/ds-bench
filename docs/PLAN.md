@@ -4,7 +4,7 @@
 
 ## What ships
 
-**`ds-bench audit <path>`** — deterministic static analysis of any design-system repo. Composite score (0–100, `applicable checks: X/Y` + confidence label) + category breakdown + severity-ranked findings, each with a fix suggestion (Advisor) and a receipt. No AI, no auth, seconds to run. TypeScript, single package, npm `ds-bench`, standalone public repo once the first real report exists.
+**`ds-bench audit <path>`** — deterministic static analysis of any design-system repo. Composite score (0–100, `applicable checks: X/Y` with any N/A broken out) + category breakdown + severity-ranked findings, each with a fix suggestion (Advisor) and a receipt. No AI, no auth, seconds to run. TypeScript, single package, npm `ds-bench`, standalone public repo once the first real report exists.
 
 **Weights (draft rubric ARS v0.2):** Category weights: Docs & examples 25 · API clarity 20 · Usage guidance 15 (provisional) · Token hygiene 15 · Deprecation signalling 15 · Agent metadata 10. Severity weights within each category: critical 4 · warning 2 · info 1, because advisory checks carry signal but should not move composites as much as critical failures. Category weights are user-overridable; severity weights are rubric-owned; publications always use defaults. Composite comparisons require the same rubric version and registry fingerprint. Frozen after pilot, versioned as "Agent-Readiness Score (ARS)".
 
@@ -43,4 +43,4 @@ Release CTA throughout: **run `npx ds-bench audit` on your own system** — the 
 - **Usage-guidance checks too noisy** → pilot gate; weight rolls back into Docs & examples (ADR 0003).
 - **Static tier commoditised by a vendor** → accepted knowingly (ADR 0002); behavioral tier is the moat and stays scheduled. Landscape check 2026-07-07: the niche is still empty — DSAudit (Southleft) shipped quietly but measures codebase health, not agent-readiness, and never reached npm; the only other instruments are manual questionnaires. Nearest behavioral-tier cousin is Southleft's active [ds-contracts-poc](https://github.com/southleft/ds-contracts-poc) (governed-vs-ungoverned agent scoring — watch it, plus agentic-spec and Clementine). Details: [research/ai-ready-design-systems-southleft.md](research/ai-ready-design-systems-southleft.md) §2.
 - **Schedule tightens** → minimum publishable unit: audit tool + Cedar arc + partial field survey; each week ends in a shippable state.
-- **Two identical scores mislead** → applicability count + confidence label always displayed.
+- **Two identical scores mislead** → applicability count (`applicable checks: X/Y`, N/A broken out) always displayed; clean N/A leaves the denominator, uncovered N/A stays in it.

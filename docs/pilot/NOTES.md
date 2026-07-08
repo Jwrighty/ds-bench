@@ -13,11 +13,13 @@ of agent-readiness, so does nearly everyone — that is the point of the survey.
 
 ## Systems and headline results
 
-| System | Package audited | Composite | Confidence | Applicable | Runtime | Carrier corner |
+| System | Package audited | Composite | Confidence* | Applicable* | Runtime | Carrier corner |
 | --- | --- | --- | --- | --- | --- | --- |
 | MUI (Material UI) | `@mui/material` | 45.9 | medium | 17/22 | 2.3s | CSS-in-JS, largest surface (~1,300 files) |
 | Chakra UI | `@chakra-ui/react` | 37.1 | low | 15/22 | 3.5s | no manifest, 766-export surface |
 | Shopify Polaris | `@shopify/polaris` | 68.7 | medium | 18/22 | 3.0s | manifest + token files + CSS Modules |
+
+*Confidence is a derived label on the applicability ratio (JSON only — no longer printed in the terminal report). **The Applicable/Confidence figures for the three public systems above predate the issue-28 clean/uncovered N/A split** (their `.json` artifacts still count every N/A in the denominator, `X/22`, and carry no `naReason`). Regenerating them from their checkouts will drop structurally-clean N/As (e.g. zero-deprecation) out of the denominator, shrinking each `Y` and likely raising confidence — as it did for Cedar (`19/22 medium` → `19/19 high`). **Composites are unaffected** and final: the composite is category-weighted with N/A weight redistribution, independent of the applicability denominator.
 
 Reports regenerated 2026-07-08 after the `api.types-resolve` unbuilt-checkout fix
 (fix 3 below): Chakra 31.2→37.1 and Polaris 59.5→67.3 because a methodology
