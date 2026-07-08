@@ -15,16 +15,23 @@ of agent-readiness, so does nearly everyone — that is the point of the survey.
 
 | System | Package audited | Composite | Confidence | Applicable | Runtime | Carrier corner |
 | --- | --- | --- | --- | --- | --- | --- |
-| MUI (Material UI) | `@mui/material` | 50.7 | medium | 18/22 | 2.4s | CSS-in-JS, largest surface (~1,300 files) |
-| Chakra UI | `@chakra-ui/react` | 31.2 | medium | 16/22 | 3.9s | no manifest, 766-export surface |
-| Shopify Polaris | `@shopify/polaris` | 59.5 | high | 20/22 | 3.4s | manifest + token files + CSS Modules |
+| MUI (Material UI) | `@mui/material` | 50.7 | medium | 18/22 | 2.5s | CSS-in-JS, largest surface (~1,300 files) |
+| Chakra UI | `@chakra-ui/react` | 37.1 | low | 15/22 | 3.9s | no manifest, 766-export surface |
+| Shopify Polaris | `@shopify/polaris` | 67.3 | medium | 19/22 | 3.4s | manifest + token files + CSS Modules |
+
+Reports regenerated 2026-07-08 after the `api.types-resolve` unbuilt-checkout fix
+(fix 3 below): Chakra 31.2→37.1 and Polaris 59.5→67.3 because a methodology
+artifact no longer scores as a failure; MUI is unchanged (its types resolve from
+source). Chakra's confidence tier drops to low because the N/A reduces its
+applicable-check count to 15/22 — an honest reflection of how much of the rubric
+can actually be assessed on that checkout.
 
 All three: same binary, no crashes, no hangs, seconds not minutes on the largest
 system (AC 1 and AC 5 met).
 
 ## Generalization fixes (carrier logic, not per-system)
 
-Two breaks surfaced; both fixed generally in the checks/carrier layer.
+Three breaks surfaced; all fixed generally in the checks/carrier layer.
 
 1. **Stack overflow on deep barrel re-export graphs (crash — all three systems).**
    Export-symbol resolution restarted its cycle-guard on every hop, so a re-export
@@ -45,6 +52,16 @@ Two breaks surfaced; both fixed generally in the checks/carrier layer.
    CSS-in-JS literal), Chakra 1→0 (its only offender was a story file, now passes),
    Polaris 363→188 (survivors are all real shipping CSS — `postcss-mixins/`,
    `*.module.css`, `global.css`).
+
+3. **`api.types-resolve` scored unbuilt checkouts as failures (methodology artifact).**
+   Chakra and Polaris point their package `exports` at compiled `dist/`/`build/`
+   output that doesn't exist in a fresh source clone, so the synthetic import failed
+   wholesale and scored 0 — a fact about the checkout, not the package's API clarity.
+   The check now returns N/A when declared entry targets name a conventional
+   build-output directory that is absent on disk; present-but-broken mappings still
+   fail. `src/audit/checks/api-types-resolve.ts`. Regression locked in the
+   `types-unbuilt-checkout` fixture (and the `types-do-not-resolve` fixture — a
+   genuinely typo'd mapping — still fails).
 
 ## Findings-quality notes (spot-checked factual)
 
@@ -75,18 +92,36 @@ Consistent across all three well-maintained systems:
 
 ## Disclosed limitations (not bugs — v0 boundaries)
 
-- **`api.types-resolve` on an unbuilt checkout:** Chakra and Polaris point their
-  package `exports` at compiled `dist/` that doesn't exist in a fresh source clone,
-  so the synthetic import fails wholesale. Factually true of the checkout; would
-  resolve post-build. v0 audits source without building — disclose, don't special-case.
+- **`api.types-resolve` is not assessed on unbuilt checkouts:** the check now
+  reports N/A (fix 3 above) rather than fail, but the underlying coverage gap
+  remains — v0 audits source without building, so whether Chakra/Polaris types
+  actually resolve from the published package is unverified here. A post-build or
+  npm-tarball audit mode would close this.
 - **Examples outside the package dir:** MUI's usage examples live in a separate
   `docs/` app, not in `packages/mui-material`, so `docs.usage-examples` reads 0/148.
   True within the audited package; v0 does no docs-site crawling (out of scope per PRD).
 - **CSS-in-JS offender line numbers** are relative to the extracted style block, not
   the source file. Cosmetic; offender value and file are correct.
 
+## Cedar — the M1 reference input (not a pilot system)
+
+Cedar is the maintained reference system from the M1 acceptance gate (issue 04),
+audited from its local checkout, not a public clone — it is the fourth calibration
+input for the weight freeze, not part of the generalization pilot. Artifacts:
+`cedar.{json,txt}`, same binary and rubric, run 2026-07-08.
+
+**Composite 96.0 · medium confidence · 19/22 applicable · 1.5s.** Cedar is the
+only system of the four that ships the full agent-metadata surface (manifest,
+llms.txt, agent metadata files, canonical examples) — which is expected, since it
+was built against this rubric. That makes it the calibration anchor for the top of
+the scale, and the gap to the public three (37–67) is the discriminating range the
+weight freeze has to reason about. Remaining Cedar findings are real: 2/30
+components lack importable usage examples (`MetricCard`, `StatusPill`).
+
 ## Gate readiness
 
-Inputs for the weight-freeze gate (issue 11) are captured: three public composites
-plus Cedar, with all invalid findings resolved and fixes general. No per-system
-special-casing was introduced.
+Inputs for the weight-freeze gate (issue 11) are captured in this directory: three
+public composites (MUI 50.7, Chakra 37.1, Polaris 67.3) plus Cedar (96.0), with all
+invalid findings resolved and fixes general. No per-system special-casing was
+introduced. Sanity ordering for the gate: Cedar > Polaris > MUI > Chakra, which
+matches informed intuition about their agent-readiness surfaces.

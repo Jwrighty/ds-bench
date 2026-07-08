@@ -1,14 +1,14 @@
 ds-bench audit: @chakra-ui/react
-target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/chakra/packages/react
+target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/a1f3b0e3-099d-4168-a529-60c423e7cb30/scratchpad/pilot/chakra/packages/react
 rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
 
-composite score: 31.2/100
-applicable checks: 16/22 (medium confidence)
+composite score: 37.1/100
+applicable checks: 15/22 (low confidence)
 detected carriers: Storybook stories/MDX, TypeScript exports, package.json exports/types, token files/CSS custom properties
 
 categories:
   Docs & examples         [#####.....]  50.6 (4/4)
-  API clarity             [###.......]  31.7 (4/4)
+  API clarity             [######....]  57.1 (3/4)
   Usage guidance          [..........]     0 (2/3)
   Token hygiene           [#####.....]    50 (2/3)
   Deprecation signalling  [N/A       ]   N/A (0/3) weight redistributed
@@ -25,9 +25,9 @@ findings:
     evidence: Frame
     fix: Correct or delete examples with dead imports.
     receipt: Wrong import paths are a documented agent failure mode (Astryx self-checks).
-  [critical] api.types-resolve - fail
-    measure: package entrypoint for @chakra-ui/react is unresolvable; synthetic package import could not be checked.
-    evidence: @chakra-ui/react
+  [critical] api.types-resolve - na
+    measure: entrypoints point at build output absent from this checkout (unbuilt source clone); types resolution not assessed: dist/cjs/index.cjs, dist/esm/index.js, dist/types/index.d.ts
+    evidence: none
     fix: Repair the package types/exports mapping so every public export is importable.
     receipt: Wrong import paths are a documented agent failure mode.
   [critical] deprecation.marked - na

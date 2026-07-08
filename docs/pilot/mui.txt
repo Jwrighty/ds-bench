@@ -1,5 +1,5 @@
 ds-bench audit: @mui/material
-target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/mui/packages/mui-material
+target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/a1f3b0e3-099d-4168-a529-60c423e7cb30/scratchpad/pilot/mui/packages/mui-material
 rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
 
 composite score: 50.7/100

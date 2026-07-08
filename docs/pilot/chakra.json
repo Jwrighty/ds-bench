@@ -5,7 +5,7 @@
   "registryFingerprint": "176a3461",
   "target": {
     "name": "@chakra-ui/react",
-    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/chakra/packages/react",
+    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/a1f3b0e3-099d-4168-a529-60c423e7cb30/scratchpad/pilot/chakra/packages/react",
     "detectedCarriers": [
       "Storybook stories/MDX",
       "TypeScript exports",
@@ -24,11 +24,11 @@
       "agent": 10
     }
   },
-  "composite": 31.2,
+  "composite": 37.1,
   "applicability": {
-    "applicable": 16,
+    "applicable": 15,
     "total": 22,
-    "confidence": "medium"
+    "confidence": "low"
   },
   "categories": [
     {
@@ -40,8 +40,8 @@
     },
     {
       "id": "api",
-      "score": 31.7,
-      "applicable": 4,
+      "score": 57.1,
+      "applicable": 3,
       "total": 4,
       "weightRedistributed": false
     },
@@ -130,15 +130,13 @@
       "checkId": "api.types-resolve",
       "category": "api",
       "severity": "critical",
-      "outcome": "fail",
+      "outcome": "na",
       "measure": {
         "kind": "ratio",
         "value": 0,
-        "detail": "package entrypoint for @chakra-ui/react is unresolvable; synthetic package import could not be checked."
+        "detail": "entrypoints point at build output absent from this checkout (unbuilt source clone); types resolution not assessed: dist/cjs/index.cjs, dist/esm/index.js, dist/types/index.d.ts"
       },
-      "evidence": [
-        "@chakra-ui/react"
-      ],
+      "evidence": [],
       "fix": "Repair the package types/exports mapping so every public export is importable.",
       "receipt": "Wrong import paths are a documented agent failure mode."
     },

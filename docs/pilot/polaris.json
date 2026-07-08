@@ -5,7 +5,7 @@
   "registryFingerprint": "176a3461",
   "target": {
     "name": "@shopify/polaris",
-    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/polaris/polaris-react",
+    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/a1f3b0e3-099d-4168-a529-60c423e7cb30/scratchpad/pilot/polaris/polaris-react",
     "detectedCarriers": [
       "CSS files",
       "Storybook stories/MDX",
@@ -25,11 +25,11 @@
       "agent": 10
     }
   },
-  "composite": 59.5,
+  "composite": 67.3,
   "applicability": {
-    "applicable": 20,
+    "applicable": 19,
     "total": 22,
-    "confidence": "high"
+    "confidence": "medium"
   },
   "categories": [
     {
@@ -41,8 +41,8 @@
     },
     {
       "id": "api",
-      "score": 48.9,
-      "applicable": 4,
+      "score": 88,
+      "applicable": 3,
       "total": 4,
       "weightRedistributed": false
     },
@@ -135,15 +135,13 @@
       "checkId": "api.types-resolve",
       "category": "api",
       "severity": "critical",
-      "outcome": "fail",
+      "outcome": "na",
       "measure": {
         "kind": "ratio",
         "value": 0,
-        "detail": "package entrypoint for @shopify/polaris is unresolvable; synthetic package import could not be checked."
+        "detail": "entrypoints point at build output absent from this checkout (unbuilt source clone); types resolution not assessed: build/cjs/index.js, build/esm/index.js, build/ts/src/index.d.ts"
       },
-      "evidence": [
-        "@shopify/polaris"
-      ],
+      "evidence": [],
       "fix": "Repair the package types/exports mapping so every public export is importable.",
       "receipt": "Wrong import paths are a documented agent failure mode."
     },
