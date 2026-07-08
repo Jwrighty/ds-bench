@@ -2,14 +2,14 @@ ds-bench audit: @shopify/polaris
 target: polaris/polaris-react
 rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
 
-composite score: 67.3/100
-applicable checks: 19/22 (medium confidence)
+composite score: 68.7/100
+applicable checks: 18/22 (medium confidence)
 detected carriers: CSS files, Storybook stories/MDX, TypeScript exports, package.json exports/types, token files/CSS custom properties
 
 categories:
   Docs & examples         [########..]  78.6 (4/4)
   API clarity             [#########.]    88 (3/4)
-  Usage guidance          [####......]  38.6 (3/3)
+  Usage guidance          [#####.....]  47.9 (2/3)
   Token hygiene           [#########.]  94.9 (3/3)
   Deprecation signalling  [#######...]  67.1 (2/3)
   Agent metadata          [..........]     0 (4/5)
@@ -65,9 +65,9 @@ findings:
     evidence: BadgeProgressValue, BadgeStatusValue, IndexTableSelectionType, InlineGrid, UnstableBulkActions
     fix: Add when-to-use/when-not sections to component docs.
     receipt: Agents must choose components, not just call them (Atlassian recreation finding).
-  [warning] guidance.alternatives-resolve - fail
-    measure: 2/10 alternatives/instead component references resolve to exported components; unresolved: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField
-    evidence: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField
+  [warning] guidance.alternatives-resolve - na
+    measure: No alternatives/instead component references found; alternatives resolution is not applicable.
+    evidence: none
     fix: Reference real components in alternatives guidance.
     receipt: Resolvable cross-references can't be faked by boilerplate.
   [warning] guidance.confusable-pairs - fail

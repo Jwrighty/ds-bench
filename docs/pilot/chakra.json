@@ -330,7 +330,7 @@
       "measure": {
         "kind": "ratio",
         "value": 0,
-        "detail": "No alternatives/instead component references found; alternatives resolution is not applicable."
+        "detail": "No alternatives/instead guidance content found; alternatives resolution is not applicable."
       },
       "evidence": [],
       "fix": "Reference real components in alternatives guidance.",

@@ -66,7 +66,7 @@ findings:
     fix: Add when-to-use/when-not sections to component docs.
     receipt: Agents must choose components, not just call them (Atlassian recreation finding).
   [warning] guidance.alternatives-resolve - na
-    measure: No alternatives/instead component references found; alternatives resolution is not applicable.
+    measure: No alternatives/instead guidance content found; alternatives resolution is not applicable.
     evidence: none
     fix: Reference real components in alternatives guidance.
     receipt: Resolvable cross-references can't be faked by boilerplate.

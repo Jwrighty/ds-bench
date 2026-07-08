@@ -15,9 +15,9 @@ of agent-readiness, so does nearly everyone — that is the point of the survey.
 
 | System | Package audited | Composite | Confidence | Applicable | Runtime | Carrier corner |
 | --- | --- | --- | --- | --- | --- | --- |
-| MUI (Material UI) | `@mui/material` | 50.7 | medium | 18/22 | 2.5s | CSS-in-JS, largest surface (~1,300 files) |
-| Chakra UI | `@chakra-ui/react` | 37.1 | low | 15/22 | 3.9s | no manifest, 766-export surface |
-| Shopify Polaris | `@shopify/polaris` | 67.3 | medium | 19/22 | 3.4s | manifest + token files + CSS Modules |
+| MUI (Material UI) | `@mui/material` | 45.9 | medium | 17/22 | 2.3s | CSS-in-JS, largest surface (~1,300 files) |
+| Chakra UI | `@chakra-ui/react` | 37.1 | low | 15/22 | 3.5s | no manifest, 766-export surface |
+| Shopify Polaris | `@shopify/polaris` | 68.7 | medium | 18/22 | 3.0s | manifest + token files + CSS Modules |
 
 Reports regenerated 2026-07-08 after the `api.types-resolve` unbuilt-checkout fix
 (fix 3 below): Chakra 31.2→37.1 and Polaris 59.5→67.3 because a methodology
@@ -26,12 +26,17 @@ source). Chakra's confidence tier drops to low because the N/A reduces its
 applicable-check count to 15/22 — an honest reflection of how much of the rubric
 can actually be assessed on that checkout.
 
+Reports regenerated again 2026-07-08 after the `guidance.alternatives-resolve`
+surface fix (fix 4 below): Polaris 67.3→68.7 because changelog/example/source-code
+noise no longer under-credits alternatives guidance; MUI 50.7→45.9 because ordinary
+source comments no longer count as alternatives guidance signal. Chakra is unchanged.
+
 All three: same binary, no crashes, no hangs, seconds not minutes on the largest
 system (AC 1 and AC 5 met).
 
 ## Generalization fixes (carrier logic, not per-system)
 
-Three breaks surfaced; all fixed generally in the checks/carrier layer.
+Four breaks surfaced; all fixed generally in the checks/carrier layer.
 
 1. **Stack overflow on deep barrel re-export graphs (crash — all three systems).**
    Export-symbol resolution restarted its cycle-guard on every hop, so a re-export
@@ -62,6 +67,15 @@ Three breaks surfaced; all fixed generally in the checks/carrier layer.
    fail. `src/audit/checks/api-types-resolve.ts`. Regression locked in the
    `types-unbuilt-checkout` fixture (and the `types-do-not-resolve` fixture — a
    genuinely typo'd mapping — still fails).
+
+4. **`guidance.alternatives-resolve` counted auxiliary prose and implementation code
+   as guidance (invalid findings).** Changelog migration entries, placeholder example
+   identifiers, and ordinary component source near `@deprecated Use ... instead`
+   comments were treated as alternatives guidance. The shared guidance layer now
+   excludes auxiliary surfaces, drops conventional placeholder names, and scans
+   structured `.meta.ts(x)` files without treating every implementation file as
+   freeform guidance. `src/audit/checks/guidance-support.ts`. Regression locked in
+   the alternatives changelog, placeholder, and source-noise fixtures.
 
 ## Findings-quality notes (spot-checked factual)
 
@@ -110,18 +124,18 @@ audited from its local checkout, not a public clone — it is the fourth calibra
 input for the weight freeze, not part of the generalization pilot. Artifacts:
 `cedar.{json,txt}`, same binary and rubric, run 2026-07-08.
 
-**Composite 96.0 · medium confidence · 19/22 applicable · 1.5s.** Cedar is the
+**Composite 96.0 · medium confidence · 19/22 applicable · 1.0s.** Cedar is the
 only system of the four that ships the full agent-metadata surface (manifest,
 llms.txt, agent metadata files, canonical examples) — which is expected, since it
 was built against this rubric. That makes it the calibration anchor for the top of
-the scale, and the gap to the public three (37–67) is the discriminating range the
+the scale, and the gap to the public three (37–69) is the discriminating range the
 weight freeze has to reason about. Remaining Cedar findings are real: 2/30
 components lack importable usage examples (`MetricCard`, `StatusPill`).
 
 ## Gate readiness
 
 Inputs for the weight-freeze gate (issue 11) are captured in this directory: three
-public composites (MUI 50.7, Chakra 37.1, Polaris 67.3) plus Cedar (96.0), with all
+public composites (MUI 45.9, Chakra 37.1, Polaris 68.7) plus Cedar (96.0), with all
 invalid findings resolved and fixes general. No per-system special-casing was
 introduced. Sanity ordering for the gate: Cedar > Polaris > MUI > Chakra, which
 matches informed intuition about their agent-readiness surfaces.

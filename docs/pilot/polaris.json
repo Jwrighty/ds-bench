@@ -25,9 +25,9 @@
       "agent": 10
     }
   },
-  "composite": 67.3,
+  "composite": 68.7,
   "applicability": {
-    "applicable": 19,
+    "applicable": 18,
     "total": 22,
     "confidence": "medium"
   },
@@ -48,8 +48,8 @@
     },
     {
       "id": "guidance",
-      "score": 38.6,
-      "applicable": 3,
+      "score": 47.9,
+      "applicable": 2,
       "total": 3,
       "weightRedistributed": false
     },
@@ -311,22 +311,13 @@
       "checkId": "guidance.alternatives-resolve",
       "category": "guidance",
       "severity": "warning",
-      "outcome": "fail",
+      "outcome": "na",
       "measure": {
         "kind": "ratio",
-        "value": 0.2,
-        "detail": "2/10 alternatives/instead component references resolve to exported components; unresolved: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField"
+        "value": 0,
+        "detail": "No alternatives/instead component references found; alternatives resolution is not applicable."
       },
-      "evidence": [
-        "Foo",
-        "Bar",
-        "Baz",
-        "LegacyCardProps",
-        "ArrowLeft",
-        "ArrowRight",
-        "BulkActions",
-        "MyTextField"
-      ],
+      "evidence": [],
       "fix": "Reference real components in alternatives guidance.",
       "receipt": "Resolvable cross-references can't be faked by boilerplate."
     },

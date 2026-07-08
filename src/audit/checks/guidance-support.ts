@@ -12,7 +12,7 @@ export type GuidanceSection = {
   structuredReferences?: string[];
 };
 
-const GUIDANCE_EXTENSIONS = new Set([".md", ".mdx", ".json", ".ts", ".tsx"]);
+const GUIDANCE_EXTENSIONS = new Set([".md", ".mdx", ".json"]);
 const COMPOUND_SUFFIXES = [".meta", ".stories", ".test", ".spec"] as const;
 const STRUCTURED_GUIDANCE_FIELDS = new Set(["useInstead", "alternatives", "relatedComponents", "whenToUse"]);
 const STRUCTURED_REFERENCE_FIELDS = new Set(["useInstead", "alternatives", "relatedComponents"]);
@@ -29,7 +29,7 @@ export function getGuidanceFiles(files: TextFile[]): TextFile[] {
   return files.filter(
     (file) =>
       !isAuxiliarySurfacePath(file.relativePath) &&
-      (GUIDANCE_EXTENSIONS.has(extname(file.relativePath)) || isManifestCarrier(file.relativePath)),
+      (GUIDANCE_EXTENSIONS.has(extname(file.relativePath)) || isManifestCarrier(file.relativePath) || isMetaCarrier(file.relativePath)),
   );
 }
 
@@ -153,11 +153,15 @@ function splitStructuredSections(file: TextFile, components: string[]): Guidance
     return splitManifestSections(file, components);
   }
 
-  if (/\.meta\.[cm]?[jt]sx?$/.test(file.relativePath)) {
+  if (isMetaCarrier(file.relativePath)) {
     return splitMetaSections(file, components);
   }
 
   return [];
+}
+
+function isMetaCarrier(relativePath: string): boolean {
+  return /\.meta\.[cm]?[jt]sx?$/.test(relativePath);
 }
 
 function splitManifestSections(file: TextFile, components: string[]): GuidanceSection[] {
