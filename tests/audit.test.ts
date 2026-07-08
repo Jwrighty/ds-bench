@@ -614,6 +614,22 @@ describe("audit seam", () => {
     assert.doesNotMatch(namingFinding.measure.detail, /observe|sidebar/);
   });
 
+  it("ignores token package build scripts when data token sources exist", async () => {
+    const report = await audit(join(repoRoot, "fixtures/token-scope/token-sources-build-script-noise"));
+    const machineReadableFinding = finding(report, "tokens.machine-readable");
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(machineReadableFinding.outcome, "pass");
+    assert.deepEqual(machineReadableFinding.measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 token sources are present and parseable; invalid: none",
+    });
+    assert.equal(namingFinding.outcome, "pass");
+    assert.doesNotMatch(namingFinding.measure.detail, /truth|transforms|format|outputReferences/);
+    assert.deepEqual(namingFinding.evidence, []);
+  });
+
   it("reports tokens.hardcoded-values as N/A when zero style-LOC is detected", async () => {
     const report = await audit(m1FixturePath("types-resolve-clean"));
 
@@ -678,6 +694,42 @@ describe("audit seam", () => {
       detail: "1/3 token names violate the dominant dot-kebab pattern; offenders: colorAccent",
     });
     assert.deepEqual(finding(report, "tokens.naming-consistency").evidence, ["colorAccent"]);
+  });
+
+  it("compares token naming conventions within each carrier", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-cross-carrier"));
+    const machineReadableFinding = finding(report, "tokens.machine-readable");
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(machineReadableFinding.outcome, "pass");
+    assert.deepEqual(machineReadableFinding.measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "2/2 token sources are present and parseable; invalid: none",
+    });
+    assert.equal(namingFinding.outcome, "pass");
+    assert.equal(namingFinding.measure.value, 0);
+    assert.match(namingFinding.measure.detail, /carrier-local dominant patterns/);
+    assert.deepEqual(namingFinding.evidence, []);
+  });
+
+  it("still harvests token names from TS object token packages without data sources", async () => {
+    const report = await audit(join(repoRoot, "fixtures/scoring/tokens-naming-ts-object"));
+    const machineReadableFinding = finding(report, "tokens.machine-readable");
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(machineReadableFinding.outcome, "pass");
+    assert.deepEqual(machineReadableFinding.measure, {
+      kind: "ratio",
+      value: 1,
+      detail: "1/1 token sources are present and parseable; invalid: none",
+    });
+    assert.equal(namingFinding.outcome, "pass");
+    assert.deepEqual(namingFinding.measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/2 token names violate the dominant dot-kebab pattern; offenders: none",
+    });
   });
 
   it("reports unmodeled token naming conventions as a classifier-gap N/A", async () => {

@@ -1,0 +1,8 @@
+{
+  "name": "token-sources-build-script-noise",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ]
+}

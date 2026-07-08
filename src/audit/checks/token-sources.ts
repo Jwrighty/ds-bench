@@ -1,9 +1,13 @@
+import ts from "typescript";
 import { basename, dirname, extname } from "node:path";
 import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
 import { isRecord, walkJson, SOURCE_EXTENSIONS, STYLE_EXTENSIONS, type TextFile } from "../file-system.ts";
 
+export type TokenSourceKind = "json" | "css" | "source";
+
 export type TokenSource = {
   relativePath: string;
+  kind: TokenSourceKind;
   tokenNames: string[];
   valid: boolean;
   invalidReason: string | null;
@@ -29,6 +33,7 @@ const DTCG_TYPES = new Set([
 export function getTokenSources(files: TextFile[]): TokenSource[] {
   const scopedFiles = scopeFilesToLibraryPackages(files, { includeRootFiles: true });
   const tokenPackageRoots = getTokenPackageRoots(files);
+  const tokenPackagesWithDataSources = getTokenPackageRootsWithDataSources(scopedFiles, tokenPackageRoots);
   const sources: TokenSource[] = [];
 
   for (const file of scopedFiles) {
@@ -44,6 +49,7 @@ export function getTokenSources(files: TextFile[]): TokenSource[] {
       if (cssTokenNames.length > 0) {
         sources.push({
           relativePath: file.relativePath,
+          kind: "css",
           tokenNames: cssTokenNames,
           valid: true,
           invalidReason: null,
@@ -52,11 +58,16 @@ export function getTokenSources(files: TextFile[]): TokenSource[] {
       continue;
     }
 
-    if (SOURCE_EXTENSIONS.has(extension) && isInsideTokenPackage(file.relativePath, tokenPackageRoots)) {
+    if (
+      SOURCE_EXTENSIONS.has(extension) &&
+      isInsideTokenPackage(file.relativePath, tokenPackageRoots) &&
+      !isInsideTokenPackage(file.relativePath, tokenPackagesWithDataSources)
+    ) {
       const sourceTokenNames = getObjectPropertyTokenNames(file.content);
       if (sourceTokenNames.length > 0) {
         sources.push({
           relativePath: file.relativePath,
+          kind: "source",
           tokenNames: sourceTokenNames,
           valid: true,
           invalidReason: null,
@@ -66,6 +77,27 @@ export function getTokenSources(files: TextFile[]): TokenSource[] {
   }
 
   return sources;
+}
+
+function getTokenPackageRootsWithDataSources(files: TextFile[], tokenPackageRoots: string[]): string[] {
+  const roots = new Set<string>();
+
+  for (const file of files) {
+    const extension = extname(file.relativePath);
+    const root = getContainingTokenPackageRoot(file.relativePath, tokenPackageRoots);
+    if (root === null) {
+      continue;
+    }
+
+    if (
+      (extension === ".json" && file.relativePath.endsWith("package.json") === false && isTokenJsonCandidate(file)) ||
+      (STYLE_EXTENSIONS.has(extension) && getCssCustomPropertyNames(file.content).length > 0)
+    ) {
+      roots.add(root);
+    }
+  }
+
+  return Array.from(roots);
 }
 
 function getTokenPackageRoots(files: TextFile[]): string[] {
@@ -89,6 +121,15 @@ function isInsideTokenPackage(relativePath: string, roots: string[]): boolean {
   return roots.some((root) => root === "" || relativePath.startsWith(`${root}/`));
 }
 
+function getContainingTokenPackageRoot(relativePath: string, roots: string[]): string | null {
+  const matchingRoots = roots.filter((root) => root === "" || relativePath.startsWith(`${root}/`));
+  if (matchingRoots.length === 0) {
+    return null;
+  }
+
+  return matchingRoots.sort((left, right) => right.length - left.length)[0];
+}
+
 function isTokenJsonCandidate(file: TextFile): boolean {
   return TOKEN_FILE_NAME.test(basename(file.relativePath)) || /"\$(?:value|type|schema)"\s*:/.test(file.content);
 }
@@ -100,6 +141,7 @@ function readJsonTokenSource(file: TextFile): TokenSource {
   } catch {
     return {
       relativePath: file.relativePath,
+      kind: "json",
       tokenNames: [],
       valid: false,
       invalidReason: "invalid JSON",
@@ -111,6 +153,7 @@ function readJsonTokenSource(file: TextFile): TokenSource {
 
   return {
     relativePath: file.relativePath,
+    kind: "json",
     tokenNames,
     valid: validationError === null,
     invalidReason: validationError,
@@ -218,9 +261,85 @@ function getCssCustomPropertyNames(content: string): string[] {
 }
 
 function getObjectPropertyTokenNames(content: string): string[] {
-  const names = Array.from(content.matchAll(/["']?([A-Za-z][A-Za-z0-9_.-]*)["']?\s*:/g), (match) => match[1]).filter(
-    (name) => !["value", "type", "description"].includes(name),
-  );
+  const sourceFile = ts.createSourceFile("tokens.ts", content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const names = new Set<string>();
 
-  return Array.from(new Set(names));
+  const collectFromCandidate = (node: ts.ObjectLiteralExpression, forceTokenTree: boolean) => {
+    const tokenNames = collectObjectLiteralTokenNames(node);
+    if (forceTokenTree || tokenNames.length > 1 || hasDtcgValueRecord(node)) {
+      for (const name of tokenNames) {
+        names.add(name);
+      }
+    }
+  };
+
+  const visit = (node: ts.Node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
+      if (isTokenRootName(node.name.text)) {
+        collectFromCandidate(node.initializer, true);
+      }
+    } else if (ts.isPropertyAssignment(node) && ts.isObjectLiteralExpression(node.initializer) && isTokenPropertyName(node.name)) {
+      collectFromCandidate(node.initializer, true);
+    } else if (ts.isExportAssignment(node) && ts.isObjectLiteralExpression(node.expression)) {
+      collectFromCandidate(node.expression, false);
+    }
+
+    ts.forEachChild(node, visit);
+  };
+
+  visit(sourceFile);
+
+  return Array.from(names);
+}
+
+function collectObjectLiteralTokenNames(node: ts.ObjectLiteralExpression, path: string[] = []): string[] {
+  if (hasDtcgValueRecord(node)) {
+    return path.length > 0 ? [path.join(".")] : [];
+  }
+
+  const names: string[] = [];
+  for (const property of node.properties) {
+    if (!ts.isPropertyAssignment(property)) {
+      continue;
+    }
+
+    const propertyName = getPropertyNameText(property.name);
+    if (!propertyName || propertyName.startsWith("$") || ["value", "type", "description"].includes(propertyName)) {
+      continue;
+    }
+
+    const nestedPath = [...path, propertyName];
+    if (ts.isObjectLiteralExpression(property.initializer)) {
+      names.push(...collectObjectLiteralTokenNames(property.initializer, nestedPath));
+    } else if (isPrimitiveTokenLeaf(property.initializer)) {
+      names.push(nestedPath.join("."));
+    }
+  }
+
+  return names;
+}
+
+function hasDtcgValueRecord(node: ts.ObjectLiteralExpression): boolean {
+  return node.properties.some((property) => ts.isPropertyAssignment(property) && getPropertyNameText(property.name) === "$value");
+}
+
+function isPrimitiveTokenLeaf(node: ts.Expression): boolean {
+  return ts.isStringLiteralLike(node) || ts.isNumericLiteral(node) || node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword;
+}
+
+function isTokenPropertyName(name: ts.PropertyName): boolean {
+  const text = getPropertyNameText(name);
+  return text !== null && isTokenRootName(text);
+}
+
+function isTokenRootName(name: string): boolean {
+  return /(?:^|[-_.])(?:tokens?|theme)(?:[-_.]|$)/i.test(name);
+}
+
+function getPropertyNameText(name: ts.PropertyName): string | null {
+  if (ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isNumericLiteral(name)) {
+    return name.text;
+  }
+
+  return null;
 }
