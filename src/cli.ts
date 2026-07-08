@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import { audit } from "./audit/audit.ts";
 import { loadAuditConfig } from "./audit/config.ts";
-import { renderAuditReport } from "./render/terminal.ts";
+import { renderAuditReport, type RenderMode } from "./render/terminal.ts";
 import type { AuditConfig } from "./audit/types.ts";
 
 type CliOptions = {
   exclude: string[];
   json: boolean;
+  renderMode: RenderMode;
   targetPath: string | null;
   configPath: string | null;
 };
@@ -37,7 +38,7 @@ async function main(argv: string[]): Promise<number> {
   if (options.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
-    process.stdout.write(renderAuditReport(report));
+    process.stdout.write(renderAuditReport(report, { mode: options.renderMode }));
   }
 
   return 0;
@@ -46,6 +47,7 @@ async function main(argv: string[]): Promise<number> {
 function parseAuditArgs(args: string[]): CliOptions {
   const exclude: string[] = [];
   let json = false;
+  let renderMode: RenderMode = "normal";
   let targetPath: string | null = null;
   let configPath: string | null = null;
 
@@ -53,6 +55,10 @@ function parseAuditArgs(args: string[]): CliOptions {
     const arg = args[index];
     if (arg === "--json") {
       json = true;
+    } else if (arg === "--compact") {
+      renderMode = "compact";
+    } else if (arg === "--verbose") {
+      renderMode = "verbose";
     } else if (arg === "--config") {
       configPath = args[index + 1] ?? null;
       index += 1;
@@ -71,11 +77,11 @@ function parseAuditArgs(args: string[]): CliOptions {
     }
   }
 
-  return { exclude, json, targetPath, configPath };
+  return { exclude, json, renderMode, targetPath, configPath };
 }
 
 function printUsage(): void {
-  process.stderr.write("Usage: ds-bench audit <path> [--json] [--config <path>] [--exclude <glob>]\n");
+  process.stderr.write("Usage: ds-bench audit <path> [--compact] [--verbose] [--json] [--config <path>] [--exclude <glob>]\n");
 }
 
 const exitCode = await main(process.argv.slice(2));

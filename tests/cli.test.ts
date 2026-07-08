@@ -16,14 +16,18 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /rubric: ARS v0\.2 \(22 scored checks, registry 176a3461\) \| tool: 0\.0\.0/);
-    assert.match(result.stdout, /composite score: 40\.7\/100/);
-    assert.match(result.stdout, /applicable checks: 14\/22 \(low confidence\)/);
-    assert.match(result.stdout, /Docs & examples\s+\[######\.\.\.\.\]\s+58\.3 \(4\/4\)/);
-    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
-    assert.match(result.stdout, /Agent metadata\s+\[\.{10}\]\s+0 \(4\/5\)/);
-    assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
-    assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
+    assert.match(result.stdout, /DS Bench Audit: missing-usage-examples/);
+    assert.match(result.stdout, /Score: 40\.7 \/ 100 - Not agent-ready/);
+    assert.match(result.stdout, /Applicable Checks: 14 \/ 22/);
+    assert.match(result.stdout, /Confidence: low/);
+    assert.match(result.stdout, /Category Scores/);
+    assert.match(result.stdout, /Docs & examples\s+58\.3\s+4\/4/);
+    assert.match(result.stdout, /API clarity\s+100\s+4\/4/);
+    assert.match(result.stdout, /Agent metadata\s+0\s+4\/5/);
+    assert.match(result.stdout, /Top Findings/);
+    assert.match(result.stdout, /Fix: Add one canonical story\/example per component\./);
+    assert.match(result.stdout, /Full Detail/);
+    assert.doesNotMatch(result.stdout, /Receipt:/);
   });
 
   it("--json emits the same report object contract", async () => {
@@ -77,16 +81,41 @@ describe("CLI", () => {
     });
 
     assert.equal(result.status, 0);
-    assert.match(result.stdout, /composite score: 75\.3\/100/);
-    assert.match(result.stdout, /applicable checks: 19\/22 \(medium confidence\)/);
-    assert.match(result.stdout, /Docs & examples\s+\[########\.\.\]\s+83\.3 \(4\/4\)/);
-    assert.match(result.stdout, /API clarity\s+\[##########\]\s+100 \(4\/4\)/);
-    assert.match(result.stdout, /Usage guidance\s+\[#######\.\.\.\]\s+66\.7 \(1\/3\)/);
-    assert.match(result.stdout, /Token hygiene\s+\[#######\.\.\.\]\s+73\.3 \(3\/3\)/);
-    assert.match(result.stdout, /Deprecation signalling\s+\[########\.\.\]\s+75 \(3\/3\)/);
-    assert.match(result.stdout, /Agent metadata\s+\[##\.\.\.\.\.\.\.\.]\s+22\.2 \(4\/5\)/);
-    assert.match(result.stdout, /\[na\] guidance\.alternatives-resolve -/);
-    assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
-    assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
+    assert.match(result.stdout, /Score: 75\.3 \/ 100 - Needs targeted work/);
+    assert.match(result.stdout, /Applicable Checks: 19 \/ 22/);
+    assert.match(result.stdout, /Docs & examples\s+83\.3\s+4\/4/);
+    assert.match(result.stdout, /API clarity\s+100\s+4\/4/);
+    assert.match(result.stdout, /Usage guidance\s+66\.7\s+1\/3/);
+    assert.match(result.stdout, /Token hygiene\s+73\.3\s+3\/3/);
+    assert.match(result.stdout, /Deprecation signalling\s+75\s+3\/3/);
+    assert.match(result.stdout, /Agent metadata\s+22\.2\s+4\/5/);
+    assert.match(result.stdout, /Showing 5 of 10 failing findings/);
+    assert.match(result.stdout, /Result: 75\.3\/100 - Needs targeted work/);
+    assert.doesNotMatch(result.stdout, /guidance\.alternatives-resolve/);
+    assert.doesNotMatch(result.stdout, /Receipt:/);
+  });
+
+  it("--compact prints a short CI-oriented summary", () => {
+    const result = spawnSync(process.execPath, [cliPath, "audit", combinedFixturePath, "--compact"], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /^DS Bench combined-six-pack: 75\.3\/100 - Needs targeted work - 1 critical - 6 warnings - 3 info\n/);
+    assert.match(result.stdout, /Critical: docs\.usage-examples - Missing Card/);
+    assert.equal(result.stdout.split("\n").filter(Boolean).length, 2);
+  });
+
+  it("--verbose prints all findings with evidence and receipts", () => {
+    const result = spawnSync(process.execPath, [cliPath, "audit", combinedFixturePath, "--verbose"], {
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Findings\n\[fail\] critical docs\.usage-examples/);
+    assert.match(result.stdout, /Evidence \(1\):\n    Card/);
+    assert.match(result.stdout, /Receipt: Agents recreate components they can't see used/);
+    assert.match(result.stdout, /\[na\] guidance\.alternatives-resolve/);
+    assert.match(result.stdout, /Next: run `ds-bench audit .* --json`/);
   });
 });
