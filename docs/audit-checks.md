@@ -1,4 +1,4 @@
-# Audit check catalogue — static tier (`ds-bench audit`) — DRAFT v0.2
+# Audit check catalogue — static tier (`ds-bench audit`) — ARS v0.2 (FROZEN 2026-07-08)
 
 **Governing rules** (ADR 0003): intrinsics dominate; checks target *signals* and enumerate *carriers*; quality checks over presence checks; every check carries a **receipt**. Missing ≠ N/A: adopted-carrier-without-signal or no-carrier-at-all = fail; structurally-inapplicable = N/A (excluded from denominator). Composite ships with `applicable checks: X/Y` + confidence label, plus the scored-check count and registry fingerprint.
 
@@ -6,7 +6,18 @@ Input: local repo checkout (`npx ds-bench audit <path>`). All checks determinist
 
 ## Scoring rubric
 
-Category weights: Docs & examples 25 · API clarity 20 · Usage guidance 15 (provisional) · Token hygiene 15 · Deprecation signalling 15 · Agent metadata 10.
+**Frozen at the issue-11 weight-freeze gate (2026-07-08)** against four calibration inputs (Cedar 96.0 · Polaris 68.7 · MUI 45.9 · Chakra 37.1 — see `docs/pilot/`). The ADR 0003 strawman survived calibration unchanged; from this point, any weight change requires a rubric version bump.
+
+| Category | Weight |
+| --- | --- |
+| Docs & examples | 25 |
+| API clarity | 20 |
+| Usage guidance | 15 |
+| Token hygiene | 15 |
+| Deprecation signalling | 15 |
+| Agent metadata | 10 |
+
+Usage guidance's provisional flag is resolved: **kept at 15**. `guidance.when-to-use` produced the widest true spread in the rubric across the pilot (Chakra 0/766 → Polaris 113/118), matching informed intuition about all four systems — discriminating signal, not keyword bingo (issue 11 verdict).
 
 Severity weights within each category: critical 4 · warning 2 · info 1. Rationale: advisory checks carry real signal, but a failing info check should only move its category by its documented share rather than as much as a critical failure.
 
@@ -28,9 +39,9 @@ Each entry below maps 1:1 to a registry entry: **id** · severity · signal · c
 - **`api.name-coherence`** · warning · signal: discoverability · carriers: source layout, stories, manifest entries · measure: component name ↔ file/story/manifest-entry mismatch count · fix: align names across carriers · receipt: component names function as instructions, not labels — inconsistent naming makes agent component selection effectively random (Klinke, via DSC "Architecture, Not Documentation", 2026-06).
 - **`api.barrel-completeness`** · info · signal: import ergonomics · carriers: package barrel · measure: exports reachable from root vs deep-import-only count · fix: re-export from root or document deep paths in agent metadata · receipt: agents guess deep paths (Astryx npm-alias lesson).
 
-## 3. Usage guidance — weight 15 — **PROVISIONAL**
+## 3. Usage guidance — weight 15 — provisional flag resolved: kept (issue 11, 2026-07-08)
 
-Most important, least mechanically checkable. If the pilot shows noise, this category's weight rolls back into Docs & examples (ADR 0003) rather than shipping keyword bingo.
+Most important, least mechanically checkable. ADR 0003 flagged this category provisional: if the pilot showed noise, its weight would roll back into Docs & examples. The pilot showed signal — `guidance.when-to-use` is the rubric's widest true discriminator (0/766 → 113/118), and the noisy surfaces `guidance.alternatives-resolve` initially read (prose overmatch, changelog migration notes, placeholder identifiers) were fixed generally in issues 21/22/27 before the freeze.
 
 - **`guidance.when-to-use`** · warning · signal: selection guidance · carriers: meta files, manifest fields, docs sections (heading heuristics) · measure: % components with when-to-use / when-not content · fix: add when-to-use/when-not sections to component docs · receipt: agents must choose components, not just call them (Atlassian recreation finding).
 - **`guidance.alternatives-resolve`** · warning · signal: alternative signposting · carriers: same · measure: % "alternatives/instead" references that resolve to real exports · fix: reference real components in alternatives guidance · N/A when: no alternatives content exists anywhere (then `guidance.when-to-use` carries the gap) · receipt: resolvable cross-references can't be faked by boilerplate.
