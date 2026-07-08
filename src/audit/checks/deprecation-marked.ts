@@ -1,7 +1,7 @@
-import { getExportedSymbols, type ExportedSymbol } from "../component-inventory.ts";
+import { type ExportedSymbol } from "../component-inventory.ts";
 import { escapeRegExp, isRecord, listTextFiles } from "../file-system.ts";
 import { recordNamesExport } from "../manifest-carriers.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const deprecationMarkedCheck: AuditCheck = {
@@ -16,9 +16,9 @@ export const deprecationMarkedCheck: AuditCheck = {
   naBehavior: "N/A when zero known-deprecated exports detected (clean).",
   naReason: "clean",
   receipt: "Deprecated patterns dominate training data unless current source clearly marks them as deprecated.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const exports = getExportedSymbols(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const exports = context.exportedSymbols;
     const knownDeprecated = exports.filter((symbol) => isKnownDeprecated(symbol, files));
 
     if (knownDeprecated.length === 0) {

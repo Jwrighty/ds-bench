@@ -1,8 +1,8 @@
 import { dirname } from "node:path";
-import { COMPONENT_NAME, getExportedComponents, getPublicPackage } from "../component-inventory.ts";
+import { COMPONENT_NAME } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { listTextFiles, type TextFile } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { type TextFile } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames } from "./support.ts";
 
 export const apiBarrelCompletenessCheck: AuditCheck = {
@@ -15,10 +15,10 @@ export const apiBarrelCompletenessCheck: AuditCheck = {
   fix: "Re-export deep-only components from the root barrel or document deep paths in agent metadata.",
   naBehavior: "Never N/A; deep-import-only components are scored as import ergonomics gaps.",
   receipt: "Agents guess deep paths when components are not reachable from the root package import.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const publicPackage = getPublicPackage(files);
-    const reachable = new Set(getExportedComponents(files).components);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const publicPackage = context.publicPackage;
+    const reachable = new Set(context.components);
     const sourceComponents = collectSourceComponents(files, publicPackage?.rootRelativePath ?? "");
     const deepOnly = sourceComponents.filter((component) => !reachable.has(component));
     const total = new Set([...reachable, ...sourceComponents]).size;

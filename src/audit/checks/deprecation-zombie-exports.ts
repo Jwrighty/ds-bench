@@ -1,8 +1,7 @@
 import { extname } from "node:path";
-import { getExportedSymbols } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { escapeRegExp, listTextFiles, type TextFile } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { escapeRegExp, type TextFile } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames } from "./support.ts";
 
 export const deprecationZombieExportsCheck: AuditCheck = {
@@ -16,10 +15,10 @@ export const deprecationZombieExportsCheck: AuditCheck = {
   fix: "Document, deprecate, or remove zombie exports.",
   naBehavior: "Reported but not scored in v0.",
   receipt: "Zombie exports are trap surface for training-data gravity.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const docsAndStories = files.filter(isDocsOrStoryCarrier);
-    const exported = getExportedSymbols(files).filter((symbol) => symbol.kind === "value");
+    const exported = context.exportedSymbols.filter((symbol) => symbol.kind === "value");
     const zombies = exported.filter((symbol) => !hasDocsOrStoryPresence(symbol.name, docsAndStories));
 
     return {

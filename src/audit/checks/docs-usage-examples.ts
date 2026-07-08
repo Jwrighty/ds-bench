@@ -1,7 +1,6 @@
-import { getExportedComponents, hasImportableUsage } from "../component-inventory.ts";
+import { hasImportableUsage } from "../component-inventory.ts";
 import { EXAMPLE_CARRIER_LABELS, isExampleCarrier } from "../example-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
 export const docsUsageExamplesCheck: AuditCheck = {
@@ -14,9 +13,9 @@ export const docsUsageExamplesCheck: AuditCheck = {
   fix: "Add one canonical story/example per component.",
   naBehavior: "Never N/A; usage examples are a universal design-system signal, so absence fails.",
   receipt: "Agents recreate components they can't see used (Atlassian DESIGN.md experiment).",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const inventory = getExportedComponents(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const inventory = { components: context.components };
     const exampleFiles = files.filter((file) => isExampleCarrier(file.relativePath));
     const covered = new Set<string>();
 

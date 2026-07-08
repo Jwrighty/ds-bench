@@ -6,9 +6,9 @@ import {
   getRenderedComponentNames,
 } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
+import { isRecord, walkJson, type TextFile } from "../file-system.ts";
 import { isManifestCarrier, MANIFEST_NAME_FIELDS } from "../manifest-carriers.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames } from "./support.ts";
 
 export const apiNameCoherenceCheck: AuditCheck = {
@@ -21,9 +21,9 @@ export const apiNameCoherenceCheck: AuditCheck = {
   fix: "Align component names across source files, stories, and manifest entries.",
   naBehavior: "Never N/A; name mismatches are scored when carriers exist.",
   receipt: "Name mismatch drives discovery-driven component recreation.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const symbols = getExportedComponentSymbols(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const symbols = context.exportedComponentSymbols;
     const componentNames = new Set(symbols.map((symbol) => symbol.name));
     const checks = [
       ...sourceNameChecks(symbols),

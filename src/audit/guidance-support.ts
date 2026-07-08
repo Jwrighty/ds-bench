@@ -1,7 +1,7 @@
 import { basename, extname } from "node:path";
-import { COMPONENT_NAME } from "../component-inventory.ts";
-import { isManifestCarrier, MANIFEST_NAME_FIELDS } from "../manifest-carriers.ts";
-import { escapeRegExp, isRecord, walkJson, type TextFile } from "../file-system.ts";
+import { COMPONENT_NAME } from "./component-inventory.ts";
+import { isManifestCarrier, MANIFEST_NAME_FIELDS } from "./manifest-carriers.ts";
+import { escapeRegExp, isRecord, walkJson, type TextFile } from "./file-system.ts";
 
 export type GuidanceSection = {
   relativePath: string;

@@ -1,7 +1,7 @@
 import ts from "typescript";
 import { basename, dirname, extname } from "node:path";
-import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
-import { isRecord, walkJson, SOURCE_EXTENSIONS, STYLE_EXTENSIONS, type TextFile } from "../file-system.ts";
+import { scopeFilesToLibraryPackages } from "./component-inventory.ts";
+import { isRecord, walkJson, SOURCE_EXTENSIONS, STYLE_EXTENSIONS, type TextFile } from "./file-system.ts";
 
 export type TokenSourceKind = "json" | "css" | "source";
 

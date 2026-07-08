@@ -1,9 +1,9 @@
 import * as ts from "typescript";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { getExportedComponents, getPublicPackage, type PublicPackage } from "../component-inventory.ts";
-import { escapeRegExp, getPackageName, listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { type PublicPackage } from "../component-inventory.ts";
+import { escapeRegExp, getPackageName } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const apiTypesResolveCheck: AuditCheck = {
@@ -18,10 +18,10 @@ export const apiTypesResolveCheck: AuditCheck = {
     "N/A when the checkout is unbuilt: the package's declared type/entry targets (types/typings/main/module/exports) point at build output (e.g. dist/) that is absent from this checkout (uncovered). Fails when those targets are present but the mapping is still broken, or when no exports are found.",
   naReason: "uncovered",
   receipt: "Wrong import paths are a documented agent failure mode.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const exportedNames = getExportedComponents(files).components;
-    const publicPackage = getPublicPackage(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const exportedNames = context.components;
+    const publicPackage = context.publicPackage;
 
     if (exportedNames.length === 0) {
       return {

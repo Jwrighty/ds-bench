@@ -1,6 +1,4 @@
-import { getExportedSymbols } from "../component-inventory.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { hasDeprecatedTag, isKnownDeprecated } from "./deprecation-marked.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
@@ -16,9 +14,9 @@ export const deprecationMigrationNotesCheck: AuditCheck = {
     "N/A when zero @deprecated marks exist; clean when no deprecated surface exists, uncovered when unmarked deprecations stay deprecation.marked's gap.",
   naReason: "clean",
   receipt: "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const exports = getExportedSymbols(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const exports = context.exportedSymbols;
     const markedExports = exports.filter((symbol) => hasDeprecatedTag(symbol.leadingComment));
 
     if (markedExports.length === 0) {

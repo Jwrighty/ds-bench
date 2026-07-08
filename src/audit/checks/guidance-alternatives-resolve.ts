@@ -1,8 +1,6 @@
-import { getExportedComponents } from "../component-inventory.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
-import { getGuidanceSections, isCandidateGuidanceReferenceName, type GuidanceSection } from "./guidance-support.ts";
+import { isCandidateGuidanceReferenceName, type GuidanceSection } from "../guidance-support.ts";
 
 type AlternativeReference = {
   name: string;
@@ -27,11 +25,11 @@ export const guidanceAlternativesResolveCheck: AuditCheck = {
   naBehavior: "N/A when no alternatives content exists anywhere; guidance.when-to-use carries the selection gap (uncovered).",
   naReason: "uncovered",
   receipt: "Resolvable cross-references can't be faked by boilerplate.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const components = getExportedComponents(files).components;
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const components = context.components;
     const exported = new Set(components);
-    const sections = getGuidanceSections(files, components);
+    const sections = context.guidanceSections;
     const structured = collectStructuredAlternativeReferences(sections);
     const alternativeSections = sections.filter((section) => ALTERNATIVE_CONTENT.test(section.content));
 

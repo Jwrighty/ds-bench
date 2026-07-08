@@ -1,7 +1,5 @@
-import { getExportedComponents } from "../component-inventory.ts";
 import { getManifestCoverage } from "../manifest-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
 export const agentManifestCoverageCheck: AuditCheck = {
@@ -14,9 +12,9 @@ export const agentManifestCoverageCheck: AuditCheck = {
   fix: "Generate or complete the component manifest.",
   naBehavior: "Never N/A; absent or partial manifests are scored as agent metadata gaps.",
   receipt: "Partial manifests force agents to guess the gaps.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const components = getExportedComponents(files).components;
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const components = context.components;
 
     if (components.length === 0) {
       return {

@@ -1,9 +1,8 @@
 import { extname } from "node:path";
-import { getExportedSymbols } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { escapeRegExp, listTextFiles, type TextFile } from "../file-system.ts";
+import { escapeRegExp, type TextFile } from "../file-system.ts";
 import { isManifestCarrier } from "../manifest-carriers.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, hasCommentDescription, roundRatio } from "./support.ts";
 
 export const docsUndocumentedExportsCheck: AuditCheck = {
@@ -16,9 +15,9 @@ export const docsUndocumentedExportsCheck: AuditCheck = {
   fix: "Document or un-export undocumented public exports.",
   naBehavior: "Never N/A; undocumented exports are a scored docs gap.",
   receipt: "Undocumented public exports are trap surface for agents choosing from the design system.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const symbols = getExportedSymbols(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const symbols = context.exportedSymbols;
     const docsFiles = files.filter(isDocsPresenceCarrier);
     const undocumented = symbols.filter((symbol) => !hasDocsPresence(symbol.name, symbol.leadingComment, docsFiles));
     const score = symbols.length === 0 ? 1 : (symbols.length - undocumented.length) / symbols.length;

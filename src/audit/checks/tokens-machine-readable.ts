@@ -1,7 +1,5 @@
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
-import { getTokenSources } from "./token-sources.ts";
 
 export const tokensMachineReadableCheck: AuditCheck = {
   id: "tokens.machine-readable",
@@ -13,9 +11,9 @@ export const tokensMachineReadableCheck: AuditCheck = {
   fix: "Publish tokens in a machine-readable format.",
   naBehavior: "Never N/A; missing machine-readable token sources are a scored token hygiene gap.",
   receipt: "Machine-readable tokens are the theming signal agents can consume.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const sources = getTokenSources(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const sources = context.tokenSources;
 
     if (sources.length === 0) {
       return {

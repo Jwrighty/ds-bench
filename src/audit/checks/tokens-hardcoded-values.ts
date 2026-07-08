@@ -1,8 +1,8 @@
 import { extname } from "node:path";
 import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
-import { listTextFiles, SOURCE_EXTENSIONS, STYLE_EXTENSIONS } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
-import { isAuxiliarySurfacePath } from "./guidance-support.ts";
+import { SOURCE_EXTENSIONS, STYLE_EXTENSIONS } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
+import { isAuxiliarySurfacePath } from "../guidance-support.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 type HardcodedValue = {
@@ -29,8 +29,8 @@ export const tokensHardcodedValuesCheck: AuditCheck = {
   naBehavior: "N/A when zero style-LOC detected across all style carriers (clean).",
   naReason: "clean",
   receipt: "Agents imitate the system's own styling habits; hardcoded source values become copied output.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const scopedFiles = scopeFilesToLibraryPackages(files).filter((file) => isStyleAuditableSource(file.relativePath));
     const styleContents = scopedFiles
       .map((file) => ({ relativePath: file.relativePath, styleContent: extractStyleContent(file.relativePath, file.content) }))

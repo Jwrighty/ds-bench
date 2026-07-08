@@ -1,7 +1,6 @@
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
-import { getTokenSources, type TokenSourceKind } from "./token-sources.ts";
+import { getTokenSources, type TokenSourceKind } from "../token-sources.ts";
 
 type NamingPattern = "kebab" | "dot-kebab" | "dot-snake" | "snake" | "camel" | "unknown";
 
@@ -19,9 +18,9 @@ export const tokensNamingConsistencyCheck: AuditCheck = {
     "N/A when no token names are available from machine-readable token sources (then tokens.machine-readable carries the gap), or when token names use an unmodeled convention the classifier cannot score (uncovered).",
   naReason: "uncovered",
   receipt: "Inconsistent names invite fabricated tokens.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const tokenSources = getTokenSources(files);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const tokenSources = context.tokenSources;
     const tokenNames = tokenSources.flatMap((source) => source.tokenNames);
 
     if (tokenNames.length === 0) {

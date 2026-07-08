@@ -1,8 +1,7 @@
-import { getExportedComponentSymbols } from "../component-inventory.ts";
 import { isExampleCarrier } from "../example-carriers.ts";
-import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
+import { isRecord, walkJson, type TextFile } from "../file-system.ts";
 import { isManifestCarrier, recordNamesExport } from "../manifest-carriers.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { isKnownDeprecated } from "./deprecation-marked.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
@@ -18,9 +17,9 @@ export const deprecationManifestExclusionCheck: AuditCheck = {
     "N/A when zero deprecated exports exist (clean), or no manifest exists and agent.manifest-coverage carries the manifest gap (uncovered).",
   naReason: "clean",
   receipt: "Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const deprecatedComponents = getExportedComponentSymbols(files).filter((symbol) => isKnownDeprecated(symbol, files));
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const deprecatedComponents = context.exportedComponentSymbols.filter((symbol) => isKnownDeprecated(symbol, files));
 
     if (deprecatedComponents.length === 0) {
       return naResult("ratio", "0 deprecated components found; manifest deprecation signalling is not applicable.", "clean");

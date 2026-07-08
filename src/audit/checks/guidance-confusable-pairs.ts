@@ -1,11 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getExportedComponents } from "../component-inventory.ts";
-import { isRecord, listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { isRecord } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
-import { getGuidanceSections, hasWord, type GuidanceSection } from "./guidance-support.ts";
+import { hasWord, type GuidanceSection } from "../guidance-support.ts";
 
 type ConfusablePair = readonly [string, string];
 
@@ -22,9 +21,9 @@ export const guidanceConfusablePairsCheck: AuditCheck = {
   naBehavior: "N/A when fewer than 2 confusable-pair members, or no complete seed pair, are in inventory (clean).",
   naReason: "clean",
   receipt: "Wrong-component selection is a recurring design-system agent failure mode.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const components = getExportedComponents(files).components;
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const components = context.components;
     const inventory = new Set(components);
     const pairs = readConfusablePairs();
     const pairMembers = new Set(pairs.flatMap((pair) => [...pair]));
@@ -39,7 +38,7 @@ export const guidanceConfusablePairsCheck: AuditCheck = {
       return naResult("ratio", `No complete seed pair among ${formatNames(presentPairMembers)}; disambiguation is not applicable.`);
     }
 
-    const sections = getGuidanceSections(files, components);
+    const sections = context.guidanceSections;
     const covered = inventoryPairs.filter(([left, right]) => referencesPair(sections, left, right));
     const missing = inventoryPairs
       .filter((pair) => !covered.includes(pair))

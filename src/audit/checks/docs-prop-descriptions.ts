@@ -1,8 +1,8 @@
 import { getPropsForComponent } from "../component-props.ts";
-import { getExportedSymbols, COMPONENT_NAME } from "../component-inventory.ts";
-import { isRecord, listTextFiles, walkJson, type TextFile } from "../file-system.ts";
+import { COMPONENT_NAME } from "../component-inventory.ts";
+import { isRecord, walkJson, type TextFile } from "../file-system.ts";
 import { MANIFEST_NAME_FIELDS } from "../manifest-carriers.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, hasCommentDescription, roundRatio } from "./support.ts";
 
 export const docsPropDescriptionsCheck: AuditCheck = {
@@ -15,10 +15,10 @@ export const docsPropDescriptionsCheck: AuditCheck = {
   fix: "Add TSDoc descriptions to public props, starting with the most-used components.",
   naBehavior: "Never N/A; undocumented public props are a scored docs gap.",
   receipt: "Agents invent props when public prop contracts lack descriptions.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const filesByPath = new Map(files.map((file) => [file.relativePath, file]));
-    const componentSymbols = getExportedSymbols(files).filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name));
+    const componentSymbols = context.exportedSymbols.filter((symbol) => symbol.kind === "value" && COMPONENT_NAME.test(symbol.name));
 
     if (componentSymbols.length === 0) {
       return {

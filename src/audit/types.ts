@@ -1,4 +1,6 @@
-import type { TextFile } from "./file-system.ts";
+import type { AuditContext } from "./audit-context.ts";
+
+export type { AuditContext };
 
 export type CategoryId =
   | "docs"
@@ -88,11 +90,6 @@ export type CheckResult = {
   evidence: string[];
 };
 
-export type CheckContext = {
-  targetPath: string;
-  files?: TextFile[];
-};
-
 export type AuditCheck = CheckMetadata & {
-  run(context: CheckContext): Promise<CheckResult> | CheckResult;
+  run(context: AuditContext): Promise<CheckResult> | CheckResult;
 };

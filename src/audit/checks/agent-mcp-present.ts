@@ -1,6 +1,5 @@
 import { detectMcpCarriers } from "../agent-metadata-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames } from "./support.ts";
 
 export const agentMcpPresentCheck: AuditCheck = {
@@ -13,8 +12,8 @@ export const agentMcpPresentCheck: AuditCheck = {
   fix: "Consider shipping an MCP server or checked-in MCP configuration for agent context.",
   naBehavior: "Never N/A; absence is reported as a delivery-layer gap.",
   receipt: "On-demand context delivery can outperform portable files for agent workflows.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const detections = detectMcpCarriers(files);
 
     return {

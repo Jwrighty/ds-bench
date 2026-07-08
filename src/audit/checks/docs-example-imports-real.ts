@@ -1,7 +1,6 @@
-import { getComponentImports, getExportedComponents, getRenderedComponentNames } from "../component-inventory.ts";
+import { getComponentImports, getRenderedComponentNames } from "../component-inventory.ts";
 import { EXAMPLE_CARRIER_LABELS, isExampleCarrier } from "../example-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const docsExampleImportsRealCheck: AuditCheck = {
@@ -15,9 +14,9 @@ export const docsExampleImportsRealCheck: AuditCheck = {
   naBehavior: "N/A when no examples exist at all; docs.usage-examples carries the absence (uncovered).",
   naReason: "uncovered",
   receipt: "Wrong import paths are a documented agent failure mode (Astryx self-checks).",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const exportedComponents = new Set(getExportedComponents(files).components);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const exportedComponents = new Set(context.components);
     const exampleFiles = files.filter((file) => isExampleCarrier(file.relativePath));
 
     if (exampleFiles.length === 0) {

@@ -2,6 +2,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 import { CHECK_REGISTRY } from "./checks/registry.ts";
+import { createAuditContext } from "./audit-context.ts";
 import { detectCarriers, getPackageName, isRecord, listTextFiles } from "./file-system.ts";
 import { getCheckRegistryMetadata, RUBRIC_VERSION } from "./rubric.ts";
 import { scoreFindings, toReportFinding, type FindingScoreInput } from "./scoring.ts";
@@ -10,10 +11,11 @@ import type { AuditConfig, AuditFinding, AuditReport } from "./types.ts";
 export async function audit(targetPath: string, config: AuditConfig = {}): Promise<AuditReport> {
   const resolvedTarget = resolve(targetPath);
   const files = listTextFiles(resolvedTarget, { exclude: config.exclude });
+  const context = createAuditContext(files, resolvedTarget);
   const findingsForScoring: FindingScoreInput[] = [];
 
   for (const check of CHECK_REGISTRY) {
-    const result = await check.run({ targetPath: resolvedTarget, files });
+    const result = await check.run(context);
     const naReason = result.outcome === "na" ? result.naReason ?? check.naReason : undefined;
     if (result.outcome === "na" && !naReason) {
       throw new Error(`${check.id} returned N/A without an N/A reason`);

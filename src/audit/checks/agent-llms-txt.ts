@@ -1,8 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getLlmsTxtFiles, resolveLlmsLocalReference } from "../agent-metadata-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
 export const agentLlmsTxtCheck: AuditCheck = {
@@ -15,8 +14,8 @@ export const agentLlmsTxtCheck: AuditCheck = {
   fix: "Add or repair llms.txt references.",
   naBehavior: "Never N/A; absence or broken references are scored as agent discovery gaps.",
   receipt: "llms.txt is a contested convention, so it is weighted low but still captures discovery intent.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const llmsFiles = getLlmsTxtFiles(files);
 
     if (llmsFiles.length === 0) {

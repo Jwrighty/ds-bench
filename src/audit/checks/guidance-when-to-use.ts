@@ -1,8 +1,7 @@
 import { extname } from "node:path";
-import { getExportedComponents } from "../component-inventory.ts";
 import { isManifestCarrier } from "../manifest-carriers.ts";
-import { escapeRegExp, listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { escapeRegExp } from "../file-system.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
 export const guidanceWhenToUseCheck: AuditCheck = {
@@ -15,9 +14,9 @@ export const guidanceWhenToUseCheck: AuditCheck = {
   fix: "Add when-to-use/when-not sections to component docs.",
   naBehavior: "Never N/A; missing guidance is a scored selection gap.",
   receipt: "Agents must choose components, not just call them (Atlassian recreation finding).",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
-    const components = getExportedComponents(files).components;
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
+    const components = context.components;
 
     if (components.length === 0) {
       return {

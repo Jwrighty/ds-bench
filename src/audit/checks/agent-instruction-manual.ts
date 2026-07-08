@@ -1,4 +1,3 @@
-import { getExportedComponents } from "../component-inventory.ts";
 import {
   declaresSystemComponent,
   getInstructionMetadataFiles,
@@ -7,8 +6,7 @@ import {
   importsSystemComponent,
   isRebuildStyleExample,
 } from "../agent-metadata-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 export const agentInstructionManualCheck: AuditCheck = {
@@ -22,15 +20,15 @@ export const agentInstructionManualCheck: AuditCheck = {
   naBehavior: "N/A when no agent metadata files exist; agent.context-file-quality carries the absence (uncovered).",
   naReason: "uncovered",
   receipt: "Re-implementation specs cause agents to recreate components instead of using the system.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const metadataFiles = getInstructionMetadataFiles(files);
 
     if (metadataFiles.length === 0) {
       return naResult("ratio", "0 agent metadata files found; instruction-manual orientation is not applicable.");
     }
 
-    const components = new Set(getExportedComponents(files).components);
+    const components = new Set(context.components);
     const packageNames = getPackageImportNames(files);
     const relevantExamples = getMetadataCodeExamples(files)
       .map((example) => ({

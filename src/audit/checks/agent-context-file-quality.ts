@@ -1,7 +1,5 @@
-import { getExportedComponents } from "../component-inventory.ts";
 import { getAgentContextFiles, getReferencedComponentNames } from "../agent-metadata-carriers.ts";
-import { listTextFiles } from "../file-system.ts";
-import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatNames, roundRatio } from "./support.ts";
 
 export const agentContextFileQualityCheck: AuditCheck = {
@@ -14,10 +12,10 @@ export const agentContextFileQualityCheck: AuditCheck = {
   fix: "Regenerate or correct stale component references in agent context files.",
   naBehavior: "Never N/A; absence or stale references are scored as agent metadata gaps.",
   receipt: "Stale context misleads agents worse than no context.",
-  run(context: CheckContext): CheckResult {
-    const files = context.files ?? listTextFiles(context.targetPath);
+  run(context: AuditContext): CheckResult {
+    const files = context.files;
     const contextFiles = getAgentContextFiles(files);
-    const components = new Set(getExportedComponents(files).components);
+    const components = new Set(context.components);
 
     if (contextFiles.length === 0) {
       return {
