@@ -1,0 +1,5 @@
+{
+  "name": "alternatives-placeholders-filtered",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

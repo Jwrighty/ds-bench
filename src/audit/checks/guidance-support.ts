@@ -18,9 +18,47 @@ const STRUCTURED_GUIDANCE_FIELDS = new Set(["useInstead", "alternatives", "relat
 const STRUCTURED_REFERENCE_FIELDS = new Set(["useInstead", "alternatives", "relatedComponents"]);
 const EXACT_COMPONENT_REFERENCE = /^[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)?$/;
 const LIST_SEPARATOR = /\s*(?:,|\/|\bor\b|\band\b|\bwith\b)\s*/i;
+const AUXILIARY_PATH_SEGMENT =
+  /(?:^|\/)(?:__tests__|__stories__|__mocks__|__fixtures__|\.storybook|tests?|stories?|mocks?|fixtures?|release-notes?)(?:\/)/i;
+const AUXILIARY_SOURCE_FILE = /\.(?:test|spec|stories)\.[cm]?[jt]sx?$/i;
+const AUXILIARY_PROSE_FILE = /^(?:changelog|changes|migration|migrations|release-notes?)(?:[._-].*)?$/i;
+const PLACEHOLDER_REFERENCE_PREFIX = /^(?:My|Example|Sample)[A-Z0-9]/;
+const METASYNTACTIC_PARTS = new Set(["Foo", "Bar", "Baz", "Qux"]);
 
 export function getGuidanceFiles(files: TextFile[]): TextFile[] {
-  return files.filter((file) => GUIDANCE_EXTENSIONS.has(extname(file.relativePath)) || isManifestCarrier(file.relativePath));
+  return files.filter(
+    (file) =>
+      !isAuxiliarySurfacePath(file.relativePath) &&
+      (GUIDANCE_EXTENSIONS.has(extname(file.relativePath)) || isManifestCarrier(file.relativePath)),
+  );
+}
+
+export function isAuxiliarySurfacePath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, "/");
+  if (AUXILIARY_PATH_SEGMENT.test(normalized) || AUXILIARY_SOURCE_FILE.test(normalized)) {
+    return true;
+  }
+
+  const fileStem = basename(normalized, extname(normalized));
+  return AUXILIARY_PROSE_FILE.test(fileStem);
+}
+
+export function isCandidateGuidanceReferenceName(name: string | null | undefined): name is string {
+  return Boolean(
+    name &&
+      COMPONENT_NAME.test(name) &&
+      !/^[A-Z0-9]+$/.test(name) &&
+      !isPlaceholderGuidanceReferenceName(name),
+  );
+}
+
+function isPlaceholderGuidanceReferenceName(name: string): boolean {
+  if (PLACEHOLDER_REFERENCE_PREFIX.test(name)) {
+    return true;
+  }
+
+  const parts = name.match(/[A-Z][a-z0-9]*/g) ?? [];
+  return parts.length > 0 && parts.every((part) => METASYNTACTIC_PARTS.has(part));
 }
 
 export function getGuidanceSections(files: TextFile[], components: string[]): GuidanceSection[] {
@@ -511,5 +549,5 @@ function rootComponentReference(value: string): string | null {
 }
 
 function isCandidateComponentName(name: string | null | undefined): name is string {
-  return Boolean(name && COMPONENT_NAME.test(name) && !/^[A-Z0-9]+$/.test(name));
+  return isCandidateGuidanceReferenceName(name);
 }

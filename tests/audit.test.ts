@@ -374,6 +374,29 @@ describe("audit seam", () => {
     });
   });
 
+  it("ignores changelog migration prose in alternatives guidance", async () => {
+    const report = await audit(m1FixturePath("alternatives-changelog-only"));
+
+    assert.equal(finding(report, "guidance.alternatives-resolve").outcome, "na");
+    assert.deepEqual(finding(report, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "No alternatives/instead guidance content found; alternatives resolution is not applicable.",
+    });
+  });
+
+  it("ignores placeholder names but still fails real unresolved alternatives guidance", async () => {
+    const report = await audit(m1FixturePath("alternatives-placeholders-filtered"));
+
+    assert.equal(finding(report, "guidance.alternatives-resolve").outcome, "fail");
+    assert.deepEqual(finding(report, "guidance.alternatives-resolve").measure, {
+      kind: "ratio",
+      value: 0,
+      detail: "0/1 alternatives/instead component references resolve to exported components; unresolved: GhostButton",
+    });
+    assert.deepEqual(finding(report, "guidance.alternatives-resolve").evidence, ["GhostButton"]);
+  });
+
   it("counts structured alternatives fields and fails unresolved structured references", async () => {
     const clean = await audit(m1FixturePath("structured-alternatives-resolve-clean"));
     const failing = await audit(m1FixturePath("structured-alternatives-do-not-resolve"));

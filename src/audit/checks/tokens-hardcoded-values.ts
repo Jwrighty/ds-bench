@@ -2,6 +2,7 @@ import { extname } from "node:path";
 import { scopeFilesToLibraryPackages } from "../component-inventory.ts";
 import { listTextFiles, SOURCE_EXTENSIONS, STYLE_EXTENSIONS } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
+import { isAuxiliarySurfacePath } from "./guidance-support.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
 
 type HardcodedValue = {
@@ -11,14 +12,6 @@ type HardcodedValue = {
 };
 
 const STYLE_FILE_EXTENSIONS = [".css", ".scss", ".sass", ".less"];
-
-// Non-shipping source that agents don't imitate for styling: unit tests, story
-// files, Storybook config, mocks/fixtures. Their hardcoded values are demo noise,
-// not the system's styling habits — excluding them keeps the signal about the
-// surface agents actually copy. (Markdown/changelogs fall out via the extension
-// gate below, so a changelog PR ref like `#4424` is never read as a hex color.)
-const AUXILIARY_STYLE_PATH =
-  /(?:^|\/)(?:__tests__|__stories__|__mocks__|__fixtures__|\.storybook)(?:\/)|\.(?:test|spec|stories)\.[cm]?[jt]sx?$/;
 
 // Matches the opening line of a CSS-in-JS tagged template: styled.x`, styled(X)`, css`, keyframes`
 const STYLE_TEMPLATE_OPEN = /\b(?:styled(?:\.[A-Za-z0-9_]+|\([^)]*\))|css|keyframes)\s*`/;
@@ -84,7 +77,7 @@ function isStyleAuditableSource(relativePath: string): boolean {
   if (!STYLE_EXTENSIONS.has(extension) && !SOURCE_EXTENSIONS.has(extension)) {
     return false;
   }
-  return !AUXILIARY_STYLE_PATH.test(relativePath);
+  return !isAuxiliarySurfacePath(relativePath);
 }
 
 function extractStyleContent(relativePath: string, content: string): string {

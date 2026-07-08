@@ -1,8 +1,8 @@
-import { getExportedComponents, COMPONENT_NAME } from "../component-inventory.ts";
+import { getExportedComponents } from "../component-inventory.ts";
 import { listTextFiles } from "../file-system.ts";
 import type { AuditCheck, CheckContext, CheckResult } from "../types.ts";
 import { formatNames, naResult, roundRatio } from "./support.ts";
-import { getGuidanceSections, type GuidanceSection } from "./guidance-support.ts";
+import { getGuidanceSections, isCandidateGuidanceReferenceName, type GuidanceSection } from "./guidance-support.ts";
 
 type AlternativeReference = {
   name: string;
@@ -134,5 +134,5 @@ function collectStructuredAlternativeReferences(sections: GuidanceSection[]): St
 }
 
 function isCandidateComponentName(name: string | null | undefined): name is string {
-  return Boolean(name && COMPONENT_NAME.test(name) && !/^[A-Z0-9]+$/.test(name));
+  return isCandidateGuidanceReferenceName(name);
 }
