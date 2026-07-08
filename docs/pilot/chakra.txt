@@ -1,0 +1,132 @@
+ds-bench audit: @chakra-ui/react
+target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/chakra/packages/react
+rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
+
+composite score: 31.2/100
+applicable checks: 16/22 (medium confidence)
+detected carriers: Storybook stories/MDX, TypeScript exports, package.json exports/types, token files/CSS custom properties
+
+categories:
+  Docs & examples         [#####.....]  50.6 (4/4)
+  API clarity             [###.......]  31.7 (4/4)
+  Usage guidance          [..........]     0 (2/3)
+  Token hygiene           [#####.....]    50 (2/3)
+  Deprecation signalling  [N/A       ]   N/A (0/3) weight redistributed
+  Agent metadata          [..........]     0 (4/5)
+
+findings:
+  [critical] docs.usage-examples - fail
+    measure: 12/766 exported components have importable usage examples; missing (showing 8 of 754): AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger
+    evidence: AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger, AccordionPropsProvider, AccordionRoot, AccordionRootProvider, ActionBarCloseTrigger, ActionBarContent, ActionBarContext, ActionBarPositioner, ActionBarPropsProvider, ActionBarRoot, ActionBarRootProvider, ActionBarSelectionTrigger, ActionBarSeparator
+    fix: Add one canonical story/example per component.
+    receipt: Agents recreate components they can't see used (Atlassian DESIGN.md experiment).
+  [critical] docs.example-imports-real - fail
+    measure: 136/137 example component imports resolve against exported components; unresolved: Frame
+    evidence: Frame
+    fix: Correct or delete examples with dead imports.
+    receipt: Wrong import paths are a documented agent failure mode (Astryx self-checks).
+  [critical] api.types-resolve - fail
+    measure: package entrypoint for @chakra-ui/react is unresolvable; synthetic package import could not be checked.
+    evidence: @chakra-ui/react
+    fix: Repair the package types/exports mapping so every public export is importable.
+    receipt: Wrong import paths are a documented agent failure mode.
+  [critical] deprecation.marked - na
+    measure: 0 known-deprecated exports found; deprecation marks are not applicable.
+    evidence: none
+    fix: Add @deprecated to legacy exports.
+    receipt: Deprecated patterns dominate training data unless current source clearly marks them as deprecated.
+  [critical] agent.instruction-manual - na
+    measure: 0 agent metadata files found; instruction-manual orientation is not applicable.
+    evidence: none
+    fix: Rewrite metadata examples to import the design-system components instead of re-implementing them.
+    receipt: Re-implementation specs cause agents to recreate components instead of using the system.
+  [warning] docs.prop-descriptions - fail
+    measure: 727/766 exported components have documented public props; missing (showing 8 of 39): AbsoluteCenter, CarouselAutoplayIndicator, ChakraProvider, CheckboxIndicator, CodeBlockAdapterProvider, CodeBlockContext, CodeBlockRoot, DatePickerDayTable
+    evidence: AbsoluteCenter: axis, CarouselAutoplayIndicator: play, paused, ChakraProvider: value, children, CheckboxIndicator: checked, indeterminate, CodeBlockAdapterProvider: children, value, CodeBlockContext: ctx, CodeBlockRoot: children, DatePickerDayTable: offset, weekNumberLabel, DatePickerMonthTable: columns, format, DatePickerYearTable: columns, DialogRoot: children, DialogRootProvider: children, DrawerRoot: children, DrawerRootProvider: children, FieldRequiredIndicator: fallback, FileUploadFileText: fallback, FloatingPanelRoot: children, FloatingPanelRootProvider: children, GridItem: area, colSpan, colStart, colEnd, rowStart, rowEnd, rowSpan, Highlight: query, children, props, styles, ignoreCase, matchAll
+    fix: Add TSDoc descriptions to public props, starting with the most-used components.
+    receipt: Agents invent props when public prop contracts lack descriptions.
+  [warning] docs.undocumented-exports - fail
+    measure: 1773 exported symbols have no docs presence anywhere: AbsoluteCenterProps, AccordionContext, AccordionFocusChangeDetails, AccordionItem, AccordionItemBody, AccordionItemBodyProps, AccordionItemContent, AccordionItemContentProps, AccordionItemContext, AccordionItemIndicator, AccordionItemIndicatorProps, AccordionItemProps, AccordionItemTrigger, AccordionItemTriggerProps, AccordionPropsProvider, AccordionRoot, AccordionRootProps, AccordionRootProvider, AccordionRootProviderProps, AccordionValueCha... (truncated)
+    evidence: AbsoluteCenterProps, AccordionContext, AccordionFocusChangeDetails, AccordionItem, AccordionItemBody, AccordionItemBodyProps, AccordionItemContent, AccordionItemContentProps, AccordionItemContext, AccordionItemIndicator, AccordionItemIndicatorProps, AccordionItemProps, AccordionItemTrigger, AccordionItemTriggerProps, AccordionPropsProvider, AccordionRoot, AccordionRootProps, AccordionRootProvider, AccordionRootProviderProps, AccordionValueChangeDetails
+    fix: Document or un-export undocumented public exports.
+    receipt: Undocumented public exports are trap surface for agents choosing from the design system.
+  [warning] api.prop-type-soundness - pass
+    measure: 0/89 exported component props use any/unknown; offenders: none
+    evidence: none
+    fix: Replace any/unknown props with precise public prop types.
+    receipt: Hallucinated-prop detection depends on sound public prop types.
+  [warning] api.name-coherence - fail
+    measure: 851 component name carrier mismatches: AbsoluteCenter source file src/components/absolute-center/absolute-center.tsx, AccordionContext source file src/components/accordion/accordion.tsx, AccordionItem source file src/components/accordion/accordion.tsx, AccordionItemBody source file src/components/accordion/accordion.tsx, AccordionItemContent source file src/components/accordion/accordion.tsx, AccordionItemContext source file src/components/accordion/accordion.tsx, AccordionItemIndicator source f... (truncated)
+    evidence: AbsoluteCenter source file src/components/absolute-center/absolute-center.tsx, AccordionContext source file src/components/accordion/accordion.tsx, AccordionItem source file src/components/accordion/accordion.tsx, AccordionItemBody source file src/components/accordion/accordion.tsx, AccordionItemContent source file src/components/accordion/accordion.tsx, AccordionItemContext source file src/components/accordion/accordion.tsx, AccordionItemIndicator source file src/components/accordion/accordion.tsx, AccordionItemTrigger source file src/components/accordion/accordion.tsx, AccordionPropsProvider source file src/components/accordion/accordion.tsx, AccordionRoot source file src/components/accordion/accordion.tsx, AccordionRootProvider source file src/components/accordion/accordion.tsx, ActionBarCloseTrigger source file src/components/action-bar/action-bar.tsx, ActionBarContent source file src/components/action-bar/action-bar.tsx, ActionBarContext source file src/components/action-bar/action-bar.tsx, ActionBarPositioner source file src/components/action-bar/action-bar.tsx, ActionBarPropsProvider source file src/components/action-bar/action-bar.tsx, ActionBarRoot source file src/components/action-bar/action-bar.tsx, ActionBarRootProvider source file src/components/action-bar/action-bar.tsx, ActionBarSelectionTrigger source file src/components/action-bar/action-bar.tsx, ActionBarSeparator source file src/components/action-bar/action-bar.tsx
+    fix: Align component names across source files, stories, and manifest entries.
+    receipt: Name mismatch drives discovery-driven component recreation.
+  [warning] guidance.when-to-use - fail
+    measure: 0/766 exported components include when-to-use guidance; missing (showing 8 of 766): AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger
+    evidence: AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger, AccordionPropsProvider, AccordionRoot, AccordionRootProvider, ActionBarCloseTrigger, ActionBarContent, ActionBarContext, ActionBarPositioner, ActionBarPropsProvider, ActionBarRoot, ActionBarRootProvider, ActionBarSelectionTrigger, ActionBarSeparator
+    fix: Add when-to-use/when-not sections to component docs.
+    receipt: Agents must choose components, not just call them (Atlassian recreation finding).
+  [warning] guidance.alternatives-resolve - na
+    measure: No alternatives/instead component references found; alternatives resolution is not applicable.
+    evidence: none
+    fix: Reference real components in alternatives guidance.
+    receipt: Resolvable cross-references can't be faked by boilerplate.
+  [warning] guidance.confusable-pairs - fail
+    measure: 0/1 detected confusable pairs reference each other; missing: Button/Link
+    evidence: Button/Link
+    fix: Add mutual "use X instead when..." notes.
+    receipt: Wrong-component selection is a recurring design-system agent failure mode.
+  [warning] tokens.hardcoded-values - pass
+    measure: 0 magic values across 7 style LOC (0 per 100 LOC); token references: 0; offenders: none
+    evidence: none
+    fix: Replace named hardcoded colors, spacing, and z-index values with token references.
+    receipt: Agents imitate the system's own styling habits; hardcoded source values become copied output.
+  [warning] tokens.machine-readable - fail
+    measure: 0/0 token sources are present and parseable; invalid: no machine-readable token source found
+    evidence: no machine-readable token source found
+    fix: Publish tokens in a machine-readable format.
+    receipt: Machine-readable tokens are the theming signal agents can consume.
+  [warning] deprecation.migration-notes - na
+    measure: 0 @deprecated marks found; migration notes are not applicable (deprecation.marked carries unmarked deprecations).
+    evidence: none
+    fix: Append replacement guidance to every @deprecated mark.
+    receipt: A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.
+  [warning] deprecation.manifest-exclusion - na
+    measure: 0 deprecated components found; manifest deprecation signalling is not applicable.
+    evidence: none
+    fix: Tag deprecated entries in the manifest or exclude them from generated agent metadata.
+    receipt: Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.
+  [warning] agent.context-file-quality - fail
+    measure: 0 agent context files found; dead references: no context file
+    evidence: none
+    fix: Regenerate or correct stale component references in agent context files.
+    receipt: Stale context misleads agents worse than no context.
+  [warning] agent.manifest-coverage - fail
+    measure: 0/766 exported components are covered by a manifest; missing (showing 8 of 766): AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger
+    evidence: AbsoluteCenter, AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger, AccordionPropsProvider, AccordionRoot, AccordionRootProvider, ActionBarCloseTrigger, ActionBarContent, ActionBarContext, ActionBarPositioner, ActionBarPropsProvider, ActionBarRoot, ActionBarRootProvider, ActionBarSelectionTrigger, ActionBarSeparator
+    fix: Generate or complete the component manifest.
+    receipt: Partial manifests force agents to guess the gaps.
+  [info] api.barrel-completeness - fail
+    measure: 220 components are deep-import-only and missing from the root barrel: ActionTrigger, AdapterProvider, Addon, Anchor, Area, AreaBackground, AreaThumb, Arrow, ArrowDownIcon, ArrowTip, ArrowUpIcon, AutoplayIndicator, AutoplayTrigger, Backdrop, Body, Branch, BranchContent, BranchControl, BranchIndentGuide, BranchIndicator, BranchText, BranchTrigger, CancelTrigger, Caption, Cell, ChannelInput, ChannelSlider, ChannelSliderLabel, ChannelSliderThumb, ChannelSliderTrack, ChannelSliderValueText, ChannelTe... (truncated)
+    evidence: ActionTrigger, AdapterProvider, Addon, Anchor, Area, AreaBackground, AreaThumb, Arrow, ArrowDownIcon, ArrowTip, ArrowUpIcon, AutoplayIndicator, AutoplayTrigger, Backdrop, Body, Branch, BranchContent, BranchControl, BranchIndentGuide, BranchIndicator
+    fix: Re-export deep-only components from the root barrel or document deep paths in agent metadata.
+    receipt: Agents guess deep paths when components are not reachable from the root package import.
+  [info] tokens.naming-consistency - na
+    measure: No token names found; naming consistency is not applicable (tokens.machine-readable carries the missing-token-source gap).
+    evidence: none
+    fix: Rename token outliers to the dominant pattern.
+    receipt: Inconsistent names invite fabricated tokens.
+  [info] deprecation.zombie-exports - fail
+    measure: 882 barrel exports are absent from docs/stories: AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger, AccordionPropsProvider, AccordionRoot, AccordionRootProvider, ActionBarCloseTrigger, ActionBarContent, ActionBarContext, ActionBarPositioner, ActionBarPropsProvider, ActionBarRoot, ActionBarRootProvider, ActionBarSelectionTrigger, ActionBarSeparator, AlertContent, AlertDescription, AlertIndicator, AlertProps... (truncated)
+    evidence: AccordionContext, AccordionItem, AccordionItemBody, AccordionItemContent, AccordionItemContext, AccordionItemIndicator, AccordionItemTrigger, AccordionPropsProvider, AccordionRoot, AccordionRootProvider, ActionBarCloseTrigger, ActionBarContent, ActionBarContext, ActionBarPositioner, ActionBarPropsProvider, ActionBarRoot, ActionBarRootProvider, ActionBarSelectionTrigger, ActionBarSeparator, AlertContent
+    fix: Document, deprecate, or remove zombie exports.
+    receipt: Zombie exports are trap surface for training-data gravity.
+  [info] agent.llms-txt - fail
+    measure: 0 llms.txt files found; invalid references: missing llms.txt
+    evidence: none
+    fix: Add or repair llms.txt references.
+    receipt: llms.txt is a contested convention, so it is weighted low but still captures discovery intent.
+  [info] agent.mcp-present - fail
+    measure: 0 MCP package/config carriers detected: none
+    evidence: none
+    fix: Consider shipping an MCP server or checked-in MCP configuration for agent context.
+    receipt: On-demand context delivery can outperform portable files for agent workflows.

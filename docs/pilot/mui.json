@@ -1,0 +1,558 @@
+{
+  "rubricVersion": "ARS v0.2",
+  "toolVersion": "0.0.0",
+  "scoredCheckCount": 22,
+  "registryFingerprint": "176a3461",
+  "target": {
+    "name": "@mui/material",
+    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/mui/packages/mui-material",
+    "detectedCarriers": [
+      "TypeScript exports",
+      "package.json exports/types",
+      "token files/CSS custom properties"
+    ]
+  },
+  "weights": {
+    "source": "default",
+    "values": {
+      "docs": 25,
+      "api": 20,
+      "guidance": 15,
+      "tokens": 15,
+      "deprecation": 15,
+      "agent": 10
+    }
+  },
+  "composite": 50.7,
+  "applicability": {
+    "applicable": 18,
+    "total": 22,
+    "confidence": "medium"
+  },
+  "categories": [
+    {
+      "id": "docs",
+      "score": 25.1,
+      "applicable": 3,
+      "total": 4,
+      "weightRedistributed": false
+    },
+    {
+      "id": "api",
+      "score": 89.2,
+      "applicable": 4,
+      "total": 4,
+      "weightRedistributed": false
+    },
+    {
+      "id": "guidance",
+      "score": 36.3,
+      "applicable": 3,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "tokens",
+      "score": 40.9,
+      "applicable": 2,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "deprecation",
+      "score": 100,
+      "applicable": 2,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "agent",
+      "score": 0,
+      "applicable": 4,
+      "total": 5,
+      "weightRedistributed": false
+    }
+  ],
+  "findings": [
+    {
+      "checkId": "docs.usage-examples",
+      "category": "docs",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/148 exported components have importable usage examples; missing: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext, ButtonGroupContext, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia, Checkbox, Chip, CircularProgress, ClickAwayListener, Collapse, Container, CssBaseline, CssVarsProvider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, Fade, FilledInput, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, FormLabelRoot, GlobalStyles, Grid, Grow, Icon, IconButton, ImageList, ImageListItem, ImageListItemBar, InitColorSchemeScript, Input, InputAdornment, InputBase, InputLabel, LinearProgress, Link, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, MenuList, MobileStepper, Modal, ModalManager, NativeSelect, NoSsr, OutlinedInput, Pagination, PaginationItem, Paper, Popover, PopoverPaper, PopoverRoot, Popper, Portal, Radio, RadioGroup, Rating, ScopedCssBaseline, Select, SelectFocusSourceProvider, Skeleton, Slide, Slider, SliderMark, SliderMarkLabel, SliderRail, SliderRoot, SliderThumb, SliderTrack, SliderValueLabel, Snackbar, SnackbarContent, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack, Step, StepButton, StepConnector, StepContent, StepContext, StepIcon, StepLabel, Stepper, StepperContext, StyledEngineProvider, SvgIcon, SwipeableDrawer, Switch, Tab, TabScrollButton, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TablePaginationActions, TableRow, TableSortLabel, Tabs, TextField, TextareaAutosize, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar, Tooltip, Typography, Zoom"
+      },
+      "evidence": [
+        "Accordion",
+        "AccordionActions",
+        "AccordionDetails",
+        "AccordionSummary",
+        "Alert",
+        "AlertTitle",
+        "AppBar",
+        "Autocomplete",
+        "Avatar",
+        "AvatarGroup",
+        "Backdrop",
+        "Badge",
+        "BottomNavigation",
+        "BottomNavigationAction",
+        "Box",
+        "Breadcrumbs",
+        "Button",
+        "ButtonBase",
+        "ButtonGroup",
+        "ButtonGroupButtonContext"
+      ],
+      "fix": "Add one canonical story/example per component.",
+      "receipt": "Agents recreate components they can't see used (Atlassian DESIGN.md experiment)."
+    },
+    {
+      "checkId": "docs.example-imports-real",
+      "category": "docs",
+      "severity": "critical",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "No examples exist; docs.usage-examples carries the absence."
+      },
+      "evidence": [],
+      "fix": "Correct or delete examples with dead imports.",
+      "receipt": "Wrong import paths are a documented agent failure mode (Astryx self-checks)."
+    },
+    {
+      "checkId": "api.types-resolve",
+      "category": "api",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.973,
+        "detail": "144/148 exports typecheck from a synthetic package import; unresolved: FormLabel, FormLabelRoot, StepContext, StepperContext"
+      },
+      "evidence": [
+        "FormLabel",
+        "FormLabelRoot",
+        "StepContext",
+        "StepperContext"
+      ],
+      "fix": "Repair the package types/exports mapping so every public export is importable.",
+      "receipt": "Wrong import paths are a documented agent failure mode."
+    },
+    {
+      "checkId": "deprecation.marked",
+      "category": "deprecation",
+      "severity": "critical",
+      "outcome": "pass",
+      "measure": {
+        "kind": "ratio",
+        "value": 1,
+        "detail": "1/1 known-deprecated exports carry @deprecated; missing: none"
+      },
+      "evidence": [],
+      "fix": "Add @deprecated to legacy exports.",
+      "receipt": "Deprecated patterns dominate training data unless current source clearly marks them as deprecated."
+    },
+    {
+      "checkId": "agent.instruction-manual",
+      "category": "agent",
+      "severity": "critical",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 agent metadata files found; instruction-manual orientation is not applicable."
+      },
+      "evidence": [],
+      "fix": "Rewrite metadata examples to import the design-system components instead of re-implementing them.",
+      "receipt": "Re-implementation specs cause agents to recreate components instead of using the system."
+    },
+    {
+      "checkId": "docs.prop-descriptions",
+      "category": "docs",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.993,
+        "detail": "147/148 exported components have documented public props; missing: ClickAwayListener"
+      },
+      "evidence": [
+        "ClickAwayListener: event"
+      ],
+      "fix": "Add TSDoc descriptions to public props, starting with the most-used components.",
+      "receipt": "Agents invent props when public prop contracts lack descriptions."
+    },
+    {
+      "checkId": "docs.undocumented-exports",
+      "category": "docs",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 705,
+        "detail": "705 exported symbols have no docs presence anywhere: Accordion, AccordionActions, accordionActionsClasses, AccordionActionsClasses, AccordionActionsClassKey, accordionClasses, AccordionClasses, AccordionClassKey, AccordionDetails, accordionDetailsClasses, AccordionDetailsClasses, AccordionDetailsClassKey, AccordionSummary, accordionSummaryClasses, AccordionSummaryClasses, AccordionSummaryClassKey, adaptV4Theme, Alert, alertClasses, AlertClasses, AlertClassKey, AlertTitle, alertTitleClasses, AlertTitleClasses, AlertTitleClassKey, alpha, AppBar, appBarClasses, AppBarClasses, AppBarClassKey, areEqualValues, Autocomplete, autocompleteClasses, AutocompleteClasses, AutocompleteClassKey, Avatar, avatarClasses, AvatarClasses, AvatarClassKey, AvatarGroup, avatarGroupClasses, AvatarGroupClasses, AvatarGroupClassKey, Backdrop, backdropClasses, BackdropClasses, BackdropClassKey, Badge, badgeClasses, BadgeClasses, BadgeClassKey, BottomNavigation, BottomNavigationAction, bottomNavigationActionClasses, BottomNavigationActionClasses, BottomNavigationActionClassKey, bottomNavigationClasses, BottomNavigationClasses, BottomNavigationClassKey, Box, boxClasses, BoxClasses, BoxClassKey, Breadcrumbs, breadcrumbsClasses, BreadcrumbsClasses, BreadcrumbsClassKey, Button, ButtonBase, buttonBaseClasses, ButtonBaseClasses, ButtonBaseClassKey, buttonClasses, ButtonClasses, ButtonClassKey, ButtonGroup, ButtonGroupButtonContext, buttonGroupClasses, ButtonGroupClasses, ButtonGroupClassKey, ButtonGroupContext, capitalize, Card, CardActionArea, cardActionAreaClasses, CardActionAreaClasses, CardActionAreaClassKey, CardActions, cardActionsClasses, CardActionsClasses, CardActionsClassKey, cardClasses, CardClasses, CardClassKey, CardContent, cardContentClasses, CardContentClasses, CardContentClassKey, CardHeader, cardHeaderClasses, CardHeaderClasses, CardHeaderClassKey, CardMedia, cardMediaClasses, CardMediaClasses, CardMediaClassKey, Checkbox, checkboxClasses, CheckboxClasses, CheckboxClassKey, Chip, chipClasses, ChipClasses, ChipClassKey, CircularProgress, circularProgressClasses, CircularProgressClasses, CircularProgressClassKey, ClickAwayListenerProps, Collapse, collapseClasses, CollapseClasses, CollapseClassKey, colors, Container, containerClasses, ContainerClasses, ContainerClassKey, createChainedFunction, createColorScheme, createFilterOptions, createStyles, createSvgIcon, createTheme, createTransitions, css, CssBaseline, darken, darkScrollbar, debounce, decomposeColor, default, deprecatedPropType, Dialog, DialogActions, dialogActionsClasses, DialogActionsClasses, DialogActionsClassKey, dialogClasses, DialogClasses, DialogClassKey, DialogContent, dialogContentClasses, DialogContentClasses, DialogContentClassKey, DialogContentText, dialogContentTextClasses, DialogContentTextClasses, DialogContentTextClassKey, DialogTitle, dialogTitleClasses, DialogTitleClasses, DialogTitleClassKey, Divider, dividerClasses, DividerClasses, DividerClassKey, Drawer, drawerClasses, DrawerClasses, DrawerClassKey, duration, easing, emphasize, enhanceHighContrast, Experimental_CssVarsProvider, experimental_extendTheme, experimental_sx, extendTheme, Fab, fabClasses, FabClasses, FabClassKey, Fade, FilledInput, filledInputClasses, FilledInputClasses, FilledInputClassKey, FormControl, formControlClasses, FormControlClasses, FormControlClassKey, FormControlLabel, formControlLabelClasses, FormControlLabelClasses, FormControlLabelClassKey, FormGroup, formGroupClasses, FormGroupClasses, FormGroupClassKey, FormHelperText, formHelperTextClasses, FormHelperTextClasses, FormHelperTextClassKey, FormLabel, formLabelClasses, FormLabelClasses, FormLabelClassKey, FormLabelRoot, generateUtilityClass, generateUtilityClasses, getAccordionActionsUtilityClass, getAccordionDetailsUtilityClass, getAccordionSummaryUtilityClass, getAccordionUtilityClass, getActiveElement, getAlertTitleUtilityClass, getAlertUtilityClass, getAppBarUtilityClass, getAutocompleteUtilityClass, getAvatarGroupUtilityClass, getAvatarUtilityClass, getBackdropUtilityClass, getBadgeUtilityClass, getBottomNavigationActionUtilityClass, getBottomNavigationUtilityClass, getBreadcrumbsUtilityClass, getButtonBaseUtilityClass, getButtonGroupUtilityClass, getButtonUtilityClass, getCardActionAreaUtilityClass, getCardActionsUtilityClass, getCardContentUtilityClass, getCardHeaderUtilityClass, getCardMediaUtilityClass, getCardUtilityClass, getCheckboxUtilityClass, getChipUtilityClass, getCircularProgressUtilityClass, getCollapseUtilityClass, getContainerUtilityClass, getContrastRatio, getDialogActionsUtilityClass, getDialogContentTextUtilityClass, getDialogContentUtilityClass, getDialogTitleUtilityClass, getDialogUtilityClass, getDividerUtilityClass, getDrawerUtilityClass, getFabUtilityClass, getFilledInputUtilityClass, getFormControlLabelUtilityClasses, getFormControlUtilityClasses, getFormGroupUtilityClass, getFormHelperTextUtilityClasses, getFormLabelUtilityClasses, getGridUtilityClass, getIconButtonUtilityClass, getIconUtilityClass, getImageListItemBarUtilityClass, getImageListItemUtilityClass, getImageListUtilityClass, getInitColorSchemeScript, getInputAdornmentUtilityClass, getInputBaseUtilityClass, getInputLabelUtilityClasses, getInputUtilityClass, getLinearProgressUtilityClass, getLinkUtilityClass, getListItemAvatarUtilityClass, getListItemButtonUtilityClass, getListItemIconUtilityClass, getListItemSecondaryActionClassesUtilityClass, getListItemTextUtilityClass, getListItemUtilityClass, getListSubheaderUtilityClass, getListUtilityClass, getLuminance, getMenuItemUtilityClass, getMenuUtilityClass, getMobileStepperUtilityClass, getModalUtilityClass, getNativeSelectUtilityClasses, getOffsetLeft, getOffsetTop, getOpenInteractionType, getOutlinedInputUtilityClass, getOverlayAlpha, getPaginationItemUtilityClass, getPaginationUtilityClass, getPaperUtilityClass, getPopoverUtilityClass, getPopperUtilityClass, getRadioGroupUtilityClass, getRadioUtilityClass, getRatingUtilityClass, getScopedCssBaselineUtilityClass, getSelectUtilityClasses, getSkeletonUtilityClass, getSliderUtilityClass, getSnackbarContentUtilityClass, getSnackbarUtilityClass, getSpeedDialActionUtilityClass, getSpeedDialIconUtilityClass, getSpeedDialUtilityClass, getStepButtonUtilityClass, getStepConnectorUtilityClass, getStepContentUtilityClass, getStepIconUtilityClass, getStepLabelUtilityClass, getStepperUtilityClass, getStepUtilityClass, getSvgIconUtilityClass, getSwitchUtilityClass, getTableBodyUtilityClass, getTableCellUtilityClass, getTableContainerUtilityClass, getTableFooterUtilityClass, getTableHeadUtilityClass, getTablePaginationUtilityClass, getTableRowUtilityClass, getTableSortLabelUtilityClass, getTableUtilityClass, getTabScrollButtonUtilityClass, getTabsUtilityClass, getTabUtilityClass, getTextFieldUtilityClass, getToggleButtonGroupUtilityClass, getToggleButtonUtilityClass, getToolbarUtilityClass, getTooltipUtilityClass, getTouchRippleUtilityClass, getTypographyUtilityClass, GlobalStateSlot, GlobalStyles, Grid, GridBaseProps, gridClasses, GridClasses, GridClassKey, GridDirection, GridOffset, GridProps, GridSize, GridSpacing, GridTypeMap, GridWrap, Grow, hexToRgb, hslToRgb, Icon, IconButton, iconButtonClasses, IconButtonClasses, IconButtonClassKey, iconClasses, IconClasses, IconClassKey, ImageList, imageListClasses, ImageListClasses, ImageListClassKey, ImageListItem, ImageListItemBar, imageListItemBarClasses, ImageListItemBarClasses, ImageListItemBarClassKey, imageListItemClasses, ImageListItemClasses, ImageListItemClassKey, InitColorSchemeScript, Input, InputAdornment, inputAdornmentClasses, InputAdornmentClasses, InputAdornmentClassKey, InputBase, inputBaseClasses, InputBaseClasses, InputBaseClassKey, inputClasses, InputClasses, InputClassKey, InputLabel, inputLabelClasses, InputLabelClasses, InputLabelClassKey, isEmpty, isMuiElement, keyframes, lighten, LinearProgress, linearProgressClasses, LinearProgressClasses, LinearProgressClassKey, Link, linkClasses, LinkClasses, LinkClassKey, List, listClasses, ListClasses, ListClassKey, ListItem, ListItemAvatar, listItemAvatarClasses, ListItemAvatarClasses, ListItemAvatarClassKey, ListItemButton, listItemButtonClasses, ListItemButtonClasses, ListItemButtonClassKey, listItemClasses, ListItemClasses, ListItemClassKey, ListItemIcon, listItemIconClasses, ListItemIconClasses, ListItemIconClassKey, ListItemSecondaryAction, listItemSecondaryActionClasses, ListItemSecondaryActionClasses, ListItemSecondaryActionClassKey, ListItemText, listItemTextClasses, ListItemTextClasses, ListItemTextClassKey, ListSubheader, listSubheaderClasses, ListSubheaderClasses, ListSubheaderClassKey, major, makeStyles, Menu, menuClasses, MenuClasses, MenuClassKey, MenuItem, menuItemClasses, MenuItemClasses, MenuItemClassKey, MenuList, mergeSlotProps, minor, MobileStepper, mobileStepperClasses, MobileStepperClasses, MobileStepperClassKey, Modal, modalClasses, ModalClasses, ModalClassKey, NativeSelect, nativeSelectClasses, NativeSelectClasses, NativeSelectClassKey, NoSsr, OutlinedInput, outlinedInputClasses, OutlinedInputClasses, OutlinedInputClassKey, ownerDocument, ownerWindow, Pagination, paginationClasses, PaginationClasses, PaginationClassKey, PaginationItem, paginationItemClasses, PaginationItemClasses, PaginationItemClassKey, Paper, paperClasses, PaperClasses, PaperClassKey, patch, Popover, popoverClasses, PopoverClasses, PopoverClassKey, PopoverPaper, PopoverRoot, Popper, popperClasses, PopperClasses, PopperClassKey, Portal, prerelease, private_createMixins, private_createTypography, private_excludeVariablesFromRoot, Radio, radioClasses, RadioClasses, RadioClassKey, RadioGroup, radioGroupClasses, RadioGroupClasses, RadioGroupClassKey, Rating, ratingClasses, RatingClasses, RatingClassKey, recomposeColor, requirePropFactory, responsiveFontSizes, rgbToHex, ScopedCssBaseline, scopedCssBaselineClasses, ScopedCssBaselineClasses, ScopedCssBaselineClassKey, Select, selectClasses, SelectClasses, SelectClassKey, SelectFocusSourceProvider, setRef, shouldSkipGeneratingVar, Skeleton, skeletonClasses, SkeletonClasses, SkeletonClassKey, Slide, Slider, sliderClasses, SliderClasses, SliderClassKey, SliderMark, SliderMarkLabel, SliderRail, SliderRoot, SliderThumb, SliderTrack, SliderValueLabel, Snackbar, snackbarClasses, SnackbarClasses, SnackbarClassKey, SnackbarContent, snackbarContentClasses, SnackbarContentClasses, SnackbarContentClassKey, SpeedDial, SpeedDialAction, speedDialActionClasses, SpeedDialActionClasses, SpeedDialActionClassKey, speedDialClasses, SpeedDialClasses, SpeedDialClassKey, SpeedDialIcon, speedDialIconClasses, SpeedDialIconClasses, SpeedDialIconClassKey, stackClasses, Step, StepButton, stepButtonClasses, StepButtonClasses, StepButtonClassKey, stepClasses, StepClasses, StepClassKey, StepConnector, stepConnectorClasses, StepConnectorClasses, StepConnectorClassKey, StepContent, stepContentClasses, StepContentClasses, StepContentClassKey, StepContext, StepContextType, StepIcon, stepIconClasses, StepIconClasses, StepIconClassKey, StepLabel, stepLabelClasses, StepLabelClasses, StepLabelClassKey, Stepper, stepperClasses, StepperClasses, StepperClassKey, StepperContext, StepperContextType, StyledEngineProvider, SvgIcon, svgIconClasses, SvgIconClasses, SvgIconClassKey, SwipeableDrawer, Switch, switchClasses, SwitchClasses, SwitchClassKey, Tab, tabClasses, TabClasses, TabClassKey, Table, TableBody, tableBodyClasses, TableBodyClasses, TableBodyClassKey, TableCell, tableCellClasses, TableCellClasses, TableCellClassKey, tableClasses, TableClasses, TableClassKey, TableContainer, tableContainerClasses, TableContainerClasses, TableContainerClassKey, TableFooter, tableFooterClasses, TableFooterClasses, TableFooterClassKey, TableHead, tableHeadClasses, TableHeadClasses, TableHeadClassKey, TablePagination, TablePaginationActions, tablePaginationActionsClasses, tablePaginationClasses, TablePaginationClasses, TablePaginationClassKey, TableRow, tableRowClasses, TableRowClasses, TableRowClassKey, TableSortLabel, tableSortLabelClasses, TableSortLabelClasses, TableSortLabelClassKey, Tabs, tabsClasses, TabsClasses, TabsClassKey, TabScrollButton, tabScrollButtonClasses, TabScrollButtonClasses, TabScrollButtonClassKey, TextareaAutosize, TextField, textFieldClasses, TextFieldClasses, TextFieldClassKey, THEME_ID, ThemeProvider, ToggleButton, toggleButtonClasses, ToggleButtonClasses, ToggleButtonClassKey, ToggleButtonGroup, toggleButtonGroupClasses, ToggleButtonGroupClasses, ToggleButtonGroupClassKey, Toolbar, toolbarClasses, ToolbarClasses, ToolbarClassKey, Tooltip, tooltipClasses, TooltipClasses, TooltipClassKey, touchRippleClasses, TouchRippleClasses, TouchRippleClassKey, Typography, typographyClasses, TypographyClasses, TypographyClassKey, unstable_ClassNameGenerator, unstable_composeClasses, unstable_createBreakpoints, unstable_createMuiStrictModeTheme, unstable_getUnit, unstable_memoTheme, unstable_toUnitless, Unstable_TrapFocus, unstable_useEnhancedEffect, unstable_useId, unsupportedProp, useAutocomplete, useColorScheme, useControlled, useEventCallback, useForkRef, useFormControl, useMediaQuery, usePagination, useRadioGroup, useScrollTrigger, useSelectFocusSource, useTheme, useThemeProps, version, withStyles, withTheme, Zoom"
+      },
+      "evidence": [
+        "Accordion",
+        "AccordionActions",
+        "accordionActionsClasses",
+        "AccordionActionsClasses",
+        "AccordionActionsClassKey",
+        "accordionClasses",
+        "AccordionClasses",
+        "AccordionClassKey",
+        "AccordionDetails",
+        "accordionDetailsClasses",
+        "AccordionDetailsClasses",
+        "AccordionDetailsClassKey",
+        "AccordionSummary",
+        "accordionSummaryClasses",
+        "AccordionSummaryClasses",
+        "AccordionSummaryClassKey",
+        "adaptV4Theme",
+        "Alert",
+        "alertClasses",
+        "AlertClasses"
+      ],
+      "fix": "Document or un-export undocumented public exports.",
+      "receipt": "Undocumented public exports are trap surface for agents choosing from the design system."
+    },
+    {
+      "checkId": "api.prop-type-soundness",
+      "category": "api",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.167,
+        "detail": "1/6 exported component props use any/unknown; offenders: ClickAwayListener.children (any)"
+      },
+      "evidence": [
+        "ClickAwayListener.children (any)"
+      ],
+      "fix": "Replace any/unknown props with precise public prop types.",
+      "receipt": "Hallucinated-prop detection depends on sound public prop types."
+    },
+    {
+      "checkId": "api.name-coherence",
+      "category": "api",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 12,
+        "detail": "12 component name carrier mismatches: CssVarsProvider source file src/styles/ThemeProviderWithVars.tsx, FormLabelRoot source file src/FormLabel/FormLabel.js, PopoverPaper source file src/Popover/Popover.js, PopoverRoot source file src/Popover/Popover.js, SelectFocusSourceProvider source file src/Select/utils/SelectFocusSourceContext.ts, SliderMark source file src/Slider/Slider.js, SliderMarkLabel source file src/Slider/Slider.js, SliderRail source file src/Slider/Slider.js, SliderRoot source file src/Slider/Slider.js, SliderThumb source file src/Slider/Slider.js, SliderTrack source file src/Slider/Slider.js, SliderValueLabel source file src/Slider/Slider.js"
+      },
+      "evidence": [
+        "CssVarsProvider source file src/styles/ThemeProviderWithVars.tsx",
+        "FormLabelRoot source file src/FormLabel/FormLabel.js",
+        "PopoverPaper source file src/Popover/Popover.js",
+        "PopoverRoot source file src/Popover/Popover.js",
+        "SelectFocusSourceProvider source file src/Select/utils/SelectFocusSourceContext.ts",
+        "SliderMark source file src/Slider/Slider.js",
+        "SliderMarkLabel source file src/Slider/Slider.js",
+        "SliderRail source file src/Slider/Slider.js",
+        "SliderRoot source file src/Slider/Slider.js",
+        "SliderThumb source file src/Slider/Slider.js",
+        "SliderTrack source file src/Slider/Slider.js",
+        "SliderValueLabel source file src/Slider/Slider.js"
+      ],
+      "fix": "Align component names across source files, stories, and manifest entries.",
+      "receipt": "Name mismatch drives discovery-driven component recreation."
+    },
+    {
+      "checkId": "guidance.when-to-use",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.088,
+        "detail": "13/148 exported components include when-to-use guidance; missing: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext, ButtonGroupContext, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia, Checkbox, CircularProgress, ClickAwayListener, Collapse, Container, CssBaseline, CssVarsProvider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, Fade, FilledInput, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, FormLabelRoot, GlobalStyles, Grid, Grow, Icon, ImageList, ImageListItem, ImageListItemBar, InitColorSchemeScript, Input, InputAdornment, InputBase, InputLabel, LinearProgress, Link, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, MenuList, MobileStepper, NativeSelect, NoSsr, OutlinedInput, Pagination, PaginationItem, Popover, PopoverPaper, PopoverRoot, Portal, Radio, RadioGroup, Rating, ScopedCssBaseline, SelectFocusSourceProvider, Skeleton, Slide, Slider, SliderMark, SliderMarkLabel, SliderRail, SliderRoot, SliderThumb, SliderTrack, SliderValueLabel, Snackbar, SnackbarContent, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack, Step, StepButton, StepConnector, StepContent, StepContext, StepIcon, StepLabel, Stepper, StepperContext, StyledEngineProvider, SwipeableDrawer, Switch, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TablePaginationActions, TableRow, TableSortLabel, TextareaAutosize, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar, Tooltip, Typography, Zoom"
+      },
+      "evidence": [
+        "Accordion",
+        "AccordionActions",
+        "AccordionDetails",
+        "AccordionSummary",
+        "Alert",
+        "AlertTitle",
+        "AppBar",
+        "Avatar",
+        "AvatarGroup",
+        "Backdrop",
+        "Badge",
+        "BottomNavigation",
+        "BottomNavigationAction",
+        "Box",
+        "Breadcrumbs",
+        "Button",
+        "ButtonBase",
+        "ButtonGroup",
+        "ButtonGroupButtonContext",
+        "ButtonGroupContext"
+      ],
+      "fix": "Add when-to-use/when-not sections to component docs.",
+      "receipt": "Agents must choose components, not just call them (Atlassian recreation finding)."
+    },
+    {
+      "checkId": "guidance.alternatives-resolve",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "pass",
+      "measure": {
+        "kind": "ratio",
+        "value": 1,
+        "detail": "2/2 alternatives/instead component references resolve to exported components; unresolved: none"
+      },
+      "evidence": [],
+      "fix": "Reference real components in alternatives guidance.",
+      "receipt": "Resolvable cross-references can't be faked by boilerplate."
+    },
+    {
+      "checkId": "guidance.confusable-pairs",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/4 detected confusable pairs reference each other; missing: Button/Link, Checkbox/Switch, Dialog/Popover, RadioGroup/Select"
+      },
+      "evidence": [
+        "Button/Link",
+        "Checkbox/Switch",
+        "Dialog/Popover",
+        "RadioGroup/Select"
+      ],
+      "fix": "Add mutual \"use X instead when...\" notes.",
+      "receipt": "Wrong-component selection is a recurring design-system agent failure mode."
+    },
+    {
+      "checkId": "tokens.hardcoded-values",
+      "category": "tokens",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 0.885,
+        "detail": "2 magic values across 226 style LOC (0.885 per 100 LOC); token references: 9; offenders: #fff in src/Paper/Paper.js:10, #fff in src/Paper/Paper.js:12"
+      },
+      "evidence": [
+        "#fff in src/Paper/Paper.js:10",
+        "#fff in src/Paper/Paper.js:12"
+      ],
+      "fix": "Replace named hardcoded colors, spacing, and z-index values with token references.",
+      "receipt": "Agents imitate the system's own styling habits; hardcoded source values become copied output."
+    },
+    {
+      "checkId": "tokens.machine-readable",
+      "category": "tokens",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/0 token sources are present and parseable; invalid: no machine-readable token source found"
+      },
+      "evidence": [
+        "no machine-readable token source found"
+      ],
+      "fix": "Publish tokens in a machine-readable format.",
+      "receipt": "Machine-readable tokens are the theming signal agents can consume."
+    },
+    {
+      "checkId": "deprecation.migration-notes",
+      "category": "deprecation",
+      "severity": "warning",
+      "outcome": "pass",
+      "measure": {
+        "kind": "ratio",
+        "value": 1,
+        "detail": "1/1 @deprecated marks name a replacement or migration path; missing: none"
+      },
+      "evidence": [],
+      "fix": "Append replacement guidance to every @deprecated mark.",
+      "receipt": "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity."
+    },
+    {
+      "checkId": "deprecation.manifest-exclusion",
+      "category": "deprecation",
+      "severity": "warning",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap."
+      },
+      "evidence": [],
+      "fix": "Tag deprecated entries in the manifest or exclude them from generated agent metadata.",
+      "receipt": "Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths."
+    },
+    {
+      "checkId": "agent.context-file-quality",
+      "category": "agent",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 agent context files found; dead references: no context file"
+      },
+      "evidence": [],
+      "fix": "Regenerate or correct stale component references in agent context files.",
+      "receipt": "Stale context misleads agents worse than no context."
+    },
+    {
+      "checkId": "agent.manifest-coverage",
+      "category": "agent",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/148 exported components are covered by a manifest; missing: Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, AlertTitle, AppBar, Autocomplete, Avatar, AvatarGroup, Backdrop, Badge, BottomNavigation, BottomNavigationAction, Box, Breadcrumbs, Button, ButtonBase, ButtonGroup, ButtonGroupButtonContext, ButtonGroupContext, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia, Checkbox, Chip, CircularProgress, ClickAwayListener, Collapse, Container, CssBaseline, CssVarsProvider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, Fade, FilledInput, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, FormLabelRoot, GlobalStyles, Grid, Grow, Icon, IconButton, ImageList, ImageListItem, ImageListItemBar, InitColorSchemeScript, Input, InputAdornment, InputBase, InputLabel, LinearProgress, Link, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, MenuList, MobileStepper, Modal, ModalManager, NativeSelect, NoSsr, OutlinedInput, Pagination, PaginationItem, Paper, Popover, PopoverPaper, PopoverRoot, Popper, Portal, Radio, RadioGroup, Rating, ScopedCssBaseline, Select, SelectFocusSourceProvider, Skeleton, Slide, Slider, SliderMark, SliderMarkLabel, SliderRail, SliderRoot, SliderThumb, SliderTrack, SliderValueLabel, Snackbar, SnackbarContent, SpeedDial, SpeedDialAction, SpeedDialIcon, Stack, Step, StepButton, StepConnector, StepContent, StepContext, StepIcon, StepLabel, Stepper, StepperContext, StyledEngineProvider, SvgIcon, SwipeableDrawer, Switch, Tab, TabScrollButton, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TablePaginationActions, TableRow, TableSortLabel, Tabs, TextField, TextareaAutosize, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar, Tooltip, Typography, Zoom"
+      },
+      "evidence": [
+        "Accordion",
+        "AccordionActions",
+        "AccordionDetails",
+        "AccordionSummary",
+        "Alert",
+        "AlertTitle",
+        "AppBar",
+        "Autocomplete",
+        "Avatar",
+        "AvatarGroup",
+        "Backdrop",
+        "Badge",
+        "BottomNavigation",
+        "BottomNavigationAction",
+        "Box",
+        "Breadcrumbs",
+        "Button",
+        "ButtonBase",
+        "ButtonGroup",
+        "ButtonGroupButtonContext"
+      ],
+      "fix": "Generate or complete the component manifest.",
+      "receipt": "Partial manifests force agents to guess the gaps."
+    },
+    {
+      "checkId": "api.barrel-completeness",
+      "category": "api",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 85,
+        "detail": "85 components are deep-import-only and missing from the root barrel: AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteCloseReason, AutocompleteInputChangeReason, AutocompleteValue, BackdropRoot, BadgeMark, BadgeRoot, Breakpoint, BreakpointOverrides, Breakpoints, BreakpointsOptions, ButtonBaseRoot, CSSInterpolation, CSSObject, CSSProperties, Color, ColorFormat, ColorObject, CommonColors, ComponentNameToClassKey, Components, ComponentsOverrides, ComponentsProps, ComponentsPropsList, ComponentsVariants, CreateMUIStyled, CssThemeVariables, CustomTooltip, CustomTooltip2, DeprecatedThemeOptions, Direction, Duration, Easing, FormControlLabelRoot, FormControlState, HighContrastTokens, Identity, InputBaseInput, InputBaseRoot, Interpolation, LazyRipple, ListItemRoot, MenuListContext, MenuPaper, Mixins, MixinsOptions, ModalRoot, Motion, MotionOptions, Palette, PaletteColor, PaletteColorOptions, PaletteMode, PaletteOptions, PopperPlacementType, RadioGroupState, ReducedMotionMode, RovingTabIndexContext, SelectChangeEvent, Shadows, SimplePaletteColorOptions, StyledSelectIcon, StyledSelectSelect, SxProps, Theme, ThemeOptions, ThemeProviderProps, TouchRippleActions, TouchRippleClassKey, TouchRippleProps, TouchRippleRipple, TouchRippleRoot, Transitions, TransitionsOptions, TrapFocusProps, TypeAction, TypeBackground, TypeText, TypographyRoot, TypographyStyle, TypographyVariant, TypographyVariants, TypographyVariantsOptions, ZIndex"
+      },
+      "evidence": [
+        "AutocompleteChangeDetails",
+        "AutocompleteChangeReason",
+        "AutocompleteCloseReason",
+        "AutocompleteInputChangeReason",
+        "AutocompleteValue",
+        "BackdropRoot",
+        "BadgeMark",
+        "BadgeRoot",
+        "Breakpoint",
+        "BreakpointOverrides",
+        "Breakpoints",
+        "BreakpointsOptions",
+        "ButtonBaseRoot",
+        "CSSInterpolation",
+        "CSSObject",
+        "CSSProperties",
+        "Color",
+        "ColorFormat",
+        "ColorObject",
+        "CommonColors"
+      ],
+      "fix": "Re-export deep-only components from the root barrel or document deep paths in agent metadata.",
+      "receipt": "Agents guess deep paths when components are not reachable from the root package import."
+    },
+    {
+      "checkId": "tokens.naming-consistency",
+      "category": "tokens",
+      "severity": "info",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "No token names found; naming consistency is not applicable (tokens.machine-readable carries the missing-token-source gap)."
+      },
+      "evidence": [],
+      "fix": "Rename token outliers to the dominant pattern.",
+      "receipt": "Inconsistent names invite fabricated tokens."
+    },
+    {
+      "checkId": "deprecation.zombie-exports",
+      "category": "deprecation",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 468,
+        "detail": "468 barrel exports are absent from docs/stories: Accordion, AccordionActions, accordionActionsClasses, accordionClasses, AccordionDetails, accordionDetailsClasses, AccordionSummary, accordionSummaryClasses, adaptV4Theme, Alert, alertClasses, AlertTitle, alertTitleClasses, alpha, AppBar, appBarClasses, areEqualValues, Autocomplete, autocompleteClasses, Avatar, avatarClasses, AvatarGroup, avatarGroupClasses, Backdrop, backdropClasses, Badge, badgeClasses, BottomNavigation, BottomNavigationAction, bottomNavigationActionClasses, bottomNavigationClasses, Box, boxClasses, Breadcrumbs, breadcrumbsClasses, Button, ButtonBase, buttonBaseClasses, buttonClasses, ButtonGroup, ButtonGroupButtonContext, buttonGroupClasses, ButtonGroupContext, capitalize, Card, CardActionArea, cardActionAreaClasses, CardActions, cardActionsClasses, cardClasses, CardContent, cardContentClasses, CardHeader, cardHeaderClasses, CardMedia, cardMediaClasses, Checkbox, checkboxClasses, Chip, chipClasses, CircularProgress, circularProgressClasses, ClickAwayListener, Collapse, collapseClasses, colors, Container, containerClasses, createChainedFunction, createColorScheme, createFilterOptions, createStyles, createSvgIcon, createTheme, createTransitions, css, CssBaseline, CssVarsProvider, darken, darkScrollbar, debounce, decomposeColor, default, deprecatedPropType, Dialog, DialogActions, dialogActionsClasses, dialogClasses, DialogContent, dialogContentClasses, DialogContentText, dialogContentTextClasses, DialogTitle, dialogTitleClasses, Divider, dividerClasses, Drawer, drawerClasses, duration, easing, emphasize, enhanceHighContrast, Experimental_CssVarsProvider, experimental_extendTheme, experimental_sx, extendTheme, Fab, fabClasses, Fade, FilledInput, filledInputClasses, FormControl, formControlClasses, FormControlLabel, formControlLabelClasses, FormGroup, formGroupClasses, FormHelperText, formHelperTextClasses, FormLabel, formLabelClasses, FormLabelRoot, generateUtilityClass, generateUtilityClasses, getAccordionActionsUtilityClass, getAccordionDetailsUtilityClass, getAccordionSummaryUtilityClass, getAccordionUtilityClass, getActiveElement, getAlertTitleUtilityClass, getAlertUtilityClass, getAppBarUtilityClass, getAutocompleteUtilityClass, getAvatarGroupUtilityClass, getAvatarUtilityClass, getBackdropUtilityClass, getBadgeUtilityClass, getBottomNavigationActionUtilityClass, getBottomNavigationUtilityClass, getBreadcrumbsUtilityClass, getButtonBaseUtilityClass, getButtonGroupUtilityClass, getButtonUtilityClass, getCardActionAreaUtilityClass, getCardActionsUtilityClass, getCardContentUtilityClass, getCardHeaderUtilityClass, getCardMediaUtilityClass, getCardUtilityClass, getCheckboxUtilityClass, getChipUtilityClass, getCircularProgressUtilityClass, getCollapseUtilityClass, getContainerUtilityClass, getContrastRatio, getDialogActionsUtilityClass, getDialogContentTextUtilityClass, getDialogContentUtilityClass, getDialogTitleUtilityClass, getDialogUtilityClass, getDividerUtilityClass, getDrawerUtilityClass, getFabUtilityClass, getFilledInputUtilityClass, getFormControlLabelUtilityClasses, getFormControlUtilityClasses, getFormGroupUtilityClass, getFormHelperTextUtilityClasses, getFormLabelUtilityClasses, getGridUtilityClass, getIconButtonUtilityClass, getIconUtilityClass, getImageListItemBarUtilityClass, getImageListItemUtilityClass, getImageListUtilityClass, getInitColorSchemeScript, getInputAdornmentUtilityClass, getInputBaseUtilityClass, getInputLabelUtilityClasses, getInputUtilityClass, getLinearProgressUtilityClass, getLinkUtilityClass, getListItemAvatarUtilityClass, getListItemButtonUtilityClass, getListItemIconUtilityClass, getListItemSecondaryActionClassesUtilityClass, getListItemTextUtilityClass, getListItemUtilityClass, getListSubheaderUtilityClass, getListUtilityClass, getLuminance, getMenuItemUtilityClass, getMenuUtilityClass, getMobileStepperUtilityClass, getModalUtilityClass, getNativeSelectUtilityClasses, getOffsetLeft, getOffsetTop, getOpenInteractionType, getOutlinedInputUtilityClass, getOverlayAlpha, getPaginationItemUtilityClass, getPaginationUtilityClass, getPaperUtilityClass, getPopoverUtilityClass, getPopperUtilityClass, getRadioGroupUtilityClass, getRadioUtilityClass, getRatingUtilityClass, getScopedCssBaselineUtilityClass, getSelectUtilityClasses, getSkeletonUtilityClass, getSliderUtilityClass, getSnackbarContentUtilityClass, getSnackbarUtilityClass, getSpeedDialActionUtilityClass, getSpeedDialIconUtilityClass, getSpeedDialUtilityClass, getStepButtonUtilityClass, getStepConnectorUtilityClass, getStepContentUtilityClass, getStepIconUtilityClass, getStepLabelUtilityClass, getStepperUtilityClass, getStepUtilityClass, getSvgIconUtilityClass, getSwitchUtilityClass, getTableBodyUtilityClass, getTableCellUtilityClass, getTableContainerUtilityClass, getTableFooterUtilityClass, getTableHeadUtilityClass, getTablePaginationUtilityClass, getTableRowUtilityClass, getTableSortLabelUtilityClass, getTableUtilityClass, getTabScrollButtonUtilityClass, getTabsUtilityClass, getTabUtilityClass, getTextFieldUtilityClass, getToggleButtonGroupUtilityClass, getToggleButtonUtilityClass, getToolbarUtilityClass, getTooltipUtilityClass, getTouchRippleUtilityClass, getTypographyUtilityClass, GlobalStyles, Grid, gridClasses, Grow, hexToRgb, hslToRgb, Icon, IconButton, iconButtonClasses, iconClasses, ImageList, imageListClasses, ImageListItem, ImageListItemBar, imageListItemBarClasses, imageListItemClasses, InitColorSchemeScript, Input, InputAdornment, inputAdornmentClasses, InputBase, inputBaseClasses, inputClasses, InputLabel, inputLabelClasses, isEmpty, isMuiElement, keyframes, lighten, LinearProgress, linearProgressClasses, Link, linkClasses, List, listClasses, ListItem, ListItemAvatar, listItemAvatarClasses, ListItemButton, listItemButtonClasses, listItemClasses, ListItemIcon, listItemIconClasses, ListItemSecondaryAction, listItemSecondaryActionClasses, ListItemText, listItemTextClasses, ListSubheader, listSubheaderClasses, major, makeStyles, Menu, menuClasses, MenuItem, menuItemClasses, MenuList, mergeSlotProps, minor, MobileStepper, mobileStepperClasses, Modal, modalClasses, ModalManager, NativeSelect, nativeSelectClasses, NoSsr, OutlinedInput, outlinedInputClasses, ownerDocument, ownerWindow, Pagination, paginationClasses, PaginationItem, paginationItemClasses, Paper, paperClasses, patch, Popover, popoverClasses, PopoverPaper, PopoverRoot, Popper, popperClasses, Portal, prerelease, private_createMixins, private_createTypography, private_excludeVariablesFromRoot, Radio, radioClasses, RadioGroup, radioGroupClasses, Rating, ratingClasses, recomposeColor, requirePropFactory, responsiveFontSizes, rgbToHex, ScopedCssBaseline, scopedCssBaselineClasses, Select, selectClasses, SelectFocusSourceProvider, setRef, shouldSkipGeneratingVar, Skeleton, skeletonClasses, Slide, Slider, sliderClasses, SliderMark, SliderMarkLabel, SliderRail, SliderRoot, SliderThumb, SliderTrack, SliderValueLabel, Snackbar, snackbarClasses, SnackbarContent, snackbarContentClasses, SpeedDial, SpeedDialAction, speedDialActionClasses, speedDialClasses, SpeedDialIcon, speedDialIconClasses, stackClasses, Step, StepButton, stepButtonClasses, stepClasses, StepConnector, stepConnectorClasses, StepContent, stepContentClasses, StepContext, StepIcon, stepIconClasses, StepLabel, stepLabelClasses, Stepper, stepperClasses, StepperContext, StyledEngineProvider, SvgIcon, svgIconClasses, SwipeableDrawer, Switch, switchClasses, Tab, tabClasses, Table, TableBody, tableBodyClasses, TableCell, tableCellClasses, tableClasses, TableContainer, tableContainerClasses, TableFooter, tableFooterClasses, TableHead, tableHeadClasses, TablePagination, TablePaginationActions, tablePaginationActionsClasses, tablePaginationClasses, TableRow, tableRowClasses, TableSortLabel, tableSortLabelClasses, Tabs, tabsClasses, TabScrollButton, tabScrollButtonClasses, TextareaAutosize, TextField, textFieldClasses, THEME_ID, ThemeProvider, ToggleButton, toggleButtonClasses, ToggleButtonGroup, toggleButtonGroupClasses, Toolbar, toolbarClasses, Tooltip, tooltipClasses, touchRippleClasses, Typography, typographyClasses, unstable_ClassNameGenerator, unstable_composeClasses, unstable_createBreakpoints, unstable_createMuiStrictModeTheme, unstable_getUnit, unstable_memoTheme, unstable_toUnitless, Unstable_TrapFocus, unstable_useEnhancedEffect, unstable_useId, unsupportedProp, useAutocomplete, useColorScheme, useControlled, useEventCallback, useForkRef, useFormControl, useMediaQuery, usePagination, useRadioGroup, useScrollTrigger, useSelectFocusSource, useStepContext, useStepperContext, useTheme, useThemeProps, version, withStyles, withTheme, Zoom"
+      },
+      "evidence": [
+        "Accordion",
+        "AccordionActions",
+        "accordionActionsClasses",
+        "accordionClasses",
+        "AccordionDetails",
+        "accordionDetailsClasses",
+        "AccordionSummary",
+        "accordionSummaryClasses",
+        "adaptV4Theme",
+        "Alert",
+        "alertClasses",
+        "AlertTitle",
+        "alertTitleClasses",
+        "alpha",
+        "AppBar",
+        "appBarClasses",
+        "areEqualValues",
+        "Autocomplete",
+        "autocompleteClasses",
+        "Avatar"
+      ],
+      "fix": "Document, deprecate, or remove zombie exports.",
+      "receipt": "Zombie exports are trap surface for training-data gravity."
+    },
+    {
+      "checkId": "agent.llms-txt",
+      "category": "agent",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 llms.txt files found; invalid references: missing llms.txt"
+      },
+      "evidence": [],
+      "fix": "Add or repair llms.txt references.",
+      "receipt": "llms.txt is a contested convention, so it is weighted low but still captures discovery intent."
+    },
+    {
+      "checkId": "agent.mcp-present",
+      "category": "agent",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 0,
+        "detail": "0 MCP package/config carriers detected: none"
+      },
+      "evidence": [],
+      "fix": "Consider shipping an MCP server or checked-in MCP configuration for agent context.",
+      "receipt": "On-demand context delivery can outperform portable files for agent workflows."
+    }
+  ]
+}

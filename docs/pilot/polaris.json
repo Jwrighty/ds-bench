@@ -1,0 +1,614 @@
+{
+  "rubricVersion": "ARS v0.2",
+  "toolVersion": "0.0.0",
+  "scoredCheckCount": 22,
+  "registryFingerprint": "176a3461",
+  "target": {
+    "name": "@shopify/polaris",
+    "path": "/private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/polaris/polaris-react",
+    "detectedCarriers": [
+      "CSS files",
+      "Storybook stories/MDX",
+      "TypeScript exports",
+      "package.json exports/types",
+      "token files/CSS custom properties"
+    ]
+  },
+  "weights": {
+    "source": "default",
+    "values": {
+      "docs": 25,
+      "api": 20,
+      "guidance": 15,
+      "tokens": 15,
+      "deprecation": 15,
+      "agent": 10
+    }
+  },
+  "composite": 59.5,
+  "applicability": {
+    "applicable": 20,
+    "total": 22,
+    "confidence": "high"
+  },
+  "categories": [
+    {
+      "id": "docs",
+      "score": 78.6,
+      "applicable": 4,
+      "total": 4,
+      "weightRedistributed": false
+    },
+    {
+      "id": "api",
+      "score": 48.9,
+      "applicable": 4,
+      "total": 4,
+      "weightRedistributed": false
+    },
+    {
+      "id": "guidance",
+      "score": 38.6,
+      "applicable": 3,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "tokens",
+      "score": 94.9,
+      "applicable": 3,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "deprecation",
+      "score": 67.1,
+      "applicable": 2,
+      "total": 3,
+      "weightRedistributed": false
+    },
+    {
+      "id": "agent",
+      "score": 0,
+      "applicable": 4,
+      "total": 5,
+      "weightRedistributed": false
+    }
+  ],
+  "findings": [
+    {
+      "checkId": "docs.usage-examples",
+      "category": "docs",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.754,
+        "detail": "89/118 exported components have importable usage examples; missing: ActionMenu, AlphaPicker, AutoSelection, Backdrop, BadgeProgressValue, BadgeStatusValue, Breadcrumbs, Connected, EventListener, Focus, IndexFiltersMode, IndexTableSelectionType, Indicator, Key, KeypressListener, Label, Labelled, PolarisTestProvider, PopoverCloseSource, Portal, PortalsManager, PositionedOverlay, ScrollLock, Sticky, TrapFocus, Truncate, UnstableBulkActions, UnstyledButton, UnstyledLink"
+      },
+      "evidence": [
+        "ActionMenu",
+        "AlphaPicker",
+        "AutoSelection",
+        "Backdrop",
+        "BadgeProgressValue",
+        "BadgeStatusValue",
+        "Breadcrumbs",
+        "Connected",
+        "EventListener",
+        "Focus",
+        "IndexFiltersMode",
+        "IndexTableSelectionType",
+        "Indicator",
+        "Key",
+        "KeypressListener",
+        "Label",
+        "Labelled",
+        "PolarisTestProvider",
+        "PopoverCloseSource",
+        "Portal"
+      ],
+      "fix": "Add one canonical story/example per component.",
+      "receipt": "Agents recreate components they can't see used (Atlassian DESIGN.md experiment)."
+    },
+    {
+      "checkId": "docs.example-imports-real",
+      "category": "docs",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.991,
+        "detail": "526/531 example component imports resolve against exported components; unresolved: BulkActions, IndexFiltersProps, Fragment, ScrollableRef, ShadowBevel"
+      },
+      "evidence": [
+        "BulkActions",
+        "IndexFiltersProps",
+        "Fragment",
+        "ScrollableRef",
+        "ShadowBevel"
+      ],
+      "fix": "Correct or delete examples with dead imports.",
+      "receipt": "Wrong import paths are a documented agent failure mode (Astryx self-checks)."
+    },
+    {
+      "checkId": "api.types-resolve",
+      "category": "api",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "package entrypoint for @shopify/polaris is unresolvable; synthetic package import could not be checked."
+      },
+      "evidence": [
+        "@shopify/polaris"
+      ],
+      "fix": "Repair the package types/exports mapping so every public export is importable.",
+      "receipt": "Wrong import paths are a documented agent failure mode."
+    },
+    {
+      "checkId": "deprecation.marked",
+      "category": "deprecation",
+      "severity": "critical",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.563,
+        "detail": "9/16 known-deprecated exports carry @deprecated; missing: LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps"
+      },
+      "evidence": [
+        "LegacyCardHeaderProps",
+        "LegacyCardProps",
+        "LegacyCardSectionProps",
+        "LegacyCardSubsectionProps",
+        "LegacyFiltersProps",
+        "LegacyStackProps",
+        "LegacyTabsProps"
+      ],
+      "fix": "Add @deprecated to legacy exports.",
+      "receipt": "Deprecated patterns dominate training data unless current source clearly marks them as deprecated."
+    },
+    {
+      "checkId": "agent.instruction-manual",
+      "category": "agent",
+      "severity": "critical",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 agent metadata files found; instruction-manual orientation is not applicable."
+      },
+      "evidence": [],
+      "fix": "Rewrite metadata examples to import the design-system components instead of re-implementing them.",
+      "receipt": "Re-implementation specs cause agents to recreate components instead of using the system."
+    },
+    {
+      "checkId": "docs.prop-descriptions",
+      "category": "docs",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.703,
+        "detail": "83/118 exported components have documented public props; missing: ActionMenu, AppProvider, Autocomplete, Backdrop, Bleed, BlockStack, Box, Card, ColorPicker, DataTable, DatePicker, EmptySearchResult, EventListener, Filters, Focus, Form, Grid, Image, Indicator, InlineGrid, KeyboardKey, LegacyTabs, Listbox, Navigation, Portal, PortalsManager, PositionedOverlay, SelectAllActions, SkeletonTabs, Sticky, Tabs, ThemeProvider, TrapFocus, Truncate, UnstyledButton"
+      },
+      "evidence": [
+        "ActionMenu: hasRolledUp",
+        "AppProvider: theme",
+        "Autocomplete: selected",
+        "Backdrop: belowNavigation, transparent, setClosing",
+        "Bleed: children",
+        "BlockStack: children",
+        "Box: children",
+        "Card: children",
+        "ColorPicker: color",
+        "DataTable: hasFixedFirstColumn",
+        "DatePicker: date, month, year",
+        "EmptySearchResult: title, description, withIllustration",
+        "EventListener: passive",
+        "Filters: queryValue, mountedState, selectedViewName",
+        "Focus: children, disabled, root",
+        "Form: event",
+        "Grid: columns, gap, children",
+        "Image: alt, source, crossOrigin, sourceSet, ref",
+        "Indicator: pulse",
+        "InlineGrid: children"
+      ],
+      "fix": "Add TSDoc descriptions to public props, starting with the most-used components.",
+      "receipt": "Agents invent props when public prop contracts lack descriptions."
+    },
+    {
+      "checkId": "docs.undocumented-exports",
+      "category": "docs",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 149,
+        "detail": "149 exported symbols have no docs presence anywhere: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, ActionListItemDescriptor, ActionListItemProps, ActionListProps, ActionListSection, ActionMenuProps, AlphaPickerProps, BackdropProps, BadgeAction, BadgeProgressValue, BadgeStatusValue, BannerProps, BannerTone, BaseButton, BaseCallbackAction, BleedProps, BlockStackProps, BreadcrumbsProps, ButtonGroupProps, ButtonProps, CalloutCardProps, CardProps, CheckboxHandles, CheckboxProps, ChoiceListProps, CollapsibleProps, ColorPickerProps, ColumnContentType, ComboboxProps, ConnectedProps, DATA_ATTRIBUTE, DataTableProps, DatePickerProps, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, DescriptionListProps, DestructableAction, DividerProps, DropZoneProps, EmptySearchResultProps, EmptyStateProps, errorTextID, EventListenerProps, ExceptionListProps, FocusProps, FooterHelpProps, FormLayoutProps, FormProps, FrameProps, FullscreenBarProps, GridCellProps, GridProps, HeadingTagName, HSBAColor, HSBColor, HSBLAColor, hsbToRgb, HSLAColor, HSLColor, hslToRgb, IconProps, IconSource, ImageProps, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, IndicatorProps, InlineCodeProps, InlineErrorProps, InlineGridProps, InlineStackProps, isNavigationItemActive, KeyboardKeyProps, KeypressListenerProps, labelID, LabelledProps, LabelProps, LayoutProps, LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps, LinkAction, LinkProps, ListboxProps, ListProps, LoadingProps, MenuActionDescriptor, MenuGroupDescriptor, ModalProps, NavigationItemProps, NavigationProps, PageActionsProps, PageProps, PaginationProps, PopoverAutofocusTarget, PopoverProps, PopoverPublicAPI, PortalProps, PortalsManagerProps, PositionedOverlayProps, ProgressBarProps, RadioButtonProps, RangeSliderProps, ResourceItemProps, RGBAColor, rgbaString, RGBColor, rgbString, rgbToHex, rgbToHsl, ScrollableProps, SelectAllActionsProps, SelectGroup, SelectOption, SelectProps, SettingToggleProps, SheetProps, SkeletonBodyTextProps, SkeletonDisplayTextProps, SkeletonPageProps, SkeletonThumbnailProps, SortButtonChoice, SortDirection, SpinnerProps, StickyProps, SubNavigationItem, TableData, TableRow, TabsProps, TagProps, TextContainerProps, TextFieldProps, ThemeProviderProps, ThumbnailProps, TopBarProps, TrapFocusProps, TruncateProps, UnstableBulkActions, UnstableBulkActionsProps, unstyledButtonFrom, UnstyledButtonProps, UnstyledLinkProps, useEphemeralPresenceManager, useFrame"
+      },
+      "evidence": [
+        "_SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT",
+        "_SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT",
+        "AccountConnectionProps",
+        "ActionListItemDescriptor",
+        "ActionListItemProps",
+        "ActionListProps",
+        "ActionListSection",
+        "ActionMenuProps",
+        "AlphaPickerProps",
+        "BackdropProps",
+        "BadgeAction",
+        "BadgeProgressValue",
+        "BadgeStatusValue",
+        "BannerProps",
+        "BannerTone",
+        "BaseButton",
+        "BaseCallbackAction",
+        "BleedProps",
+        "BlockStackProps",
+        "BreadcrumbsProps"
+      ],
+      "fix": "Document or un-export undocumented public exports.",
+      "receipt": "Undocumented public exports are trap surface for agents choosing from the design system."
+    },
+    {
+      "checkId": "api.prop-type-soundness",
+      "category": "api",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.004,
+        "detail": "2/536 exported component props use any/unknown; offenders: Form.event (unknown), UnstyledButton.key (any)"
+      },
+      "evidence": [
+        "Form.event (unknown)",
+        "UnstyledButton.key (any)"
+      ],
+      "fix": "Replace any/unknown props with precise public prop types.",
+      "receipt": "Hallucinated-prop detection depends on sound public prop types."
+    },
+    {
+      "checkId": "api.name-coherence",
+      "category": "api",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 4,
+        "detail": "4 component name carrier mismatches: AlphaPicker source file src/components/Picker/Picker.tsx, FrameContext source file src/utilities/frame/context.ts, PopoverCloseSource source file src/components/Popover/Popover.tsx, UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx"
+      },
+      "evidence": [
+        "AlphaPicker source file src/components/Picker/Picker.tsx",
+        "FrameContext source file src/utilities/frame/context.ts",
+        "PopoverCloseSource source file src/components/Popover/Popover.tsx",
+        "UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx"
+      ],
+      "fix": "Align component names across source files, stories, and manifest entries.",
+      "receipt": "Name mismatch drives discovery-driven component recreation."
+    },
+    {
+      "checkId": "guidance.when-to-use",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.958,
+        "detail": "113/118 exported components include when-to-use guidance; missing: BadgeProgressValue, BadgeStatusValue, IndexTableSelectionType, InlineGrid, UnstableBulkActions"
+      },
+      "evidence": [
+        "BadgeProgressValue",
+        "BadgeStatusValue",
+        "IndexTableSelectionType",
+        "InlineGrid",
+        "UnstableBulkActions"
+      ],
+      "fix": "Add when-to-use/when-not sections to component docs.",
+      "receipt": "Agents must choose components, not just call them (Atlassian recreation finding)."
+    },
+    {
+      "checkId": "guidance.alternatives-resolve",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.2,
+        "detail": "2/10 alternatives/instead component references resolve to exported components; unresolved: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField"
+      },
+      "evidence": [
+        "Foo",
+        "Bar",
+        "Baz",
+        "LegacyCardProps",
+        "ArrowLeft",
+        "ArrowRight",
+        "BulkActions",
+        "MyTextField"
+      ],
+      "fix": "Reference real components in alternatives guidance.",
+      "receipt": "Resolvable cross-references can't be faked by boilerplate."
+    },
+    {
+      "checkId": "guidance.confusable-pairs",
+      "category": "guidance",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/2 detected confusable pairs reference each other; missing: Button/Link, Combobox/Select"
+      },
+      "evidence": [
+        "Button/Link",
+        "Combobox/Select"
+      ],
+      "fix": "Add mutual \"use X instead when...\" notes.",
+      "receipt": "Wrong-component selection is a recurring design-system agent failure mode."
+    },
+    {
+      "checkId": "tokens.hardcoded-values",
+      "category": "tokens",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 1.722,
+        "detail": "188 magic values across 10917 style LOC (1.722 per 100 LOC); token references: 3058; offenders: 28px in postcss-mixins/button-base.css:7, 28px in postcss-mixins/button-base.css:8, 28px in src/components/ActionMenu/components/SecondaryAction/SecondaryAction.module.css:16, 240px in src/components/AppProvider/global.css:11, 56px in src/components/AppProvider/global.css:41, 32px in src/components/AppProvider/global.css:47, 11px in src/components/AppProvider/global.css:84, rgba(241, 242, 244, 1) in src/components/AppProvider/global.css:130, rgba(0, 0, 0, 0.5) in src/components/Backdrop/Backdrop.module.css:10, 1.25px in src/components/Badge/components/Pip/Pip.module.css:5, 0.25rem in src/components/Badge/components/Pip/Pip.module.css:78, 0.5rem in src/components/Badge/components/Pip/Pip.module.css:79, 24px in src/components/BulkActions/BulkActions.module.css:8, 100px in src/components/CalloutCard/CalloutCard.module.css:9, 10 in src/components/ColorPicker/ColorPicker.module.css:5, rgba(0, 0, 0, 0.5) in src/components/ColorPicker/ColorPicker.module.css:8, rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:9, rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:10, 145px in src/components/DataTable/DataTable.module.css:3, 6px in src/components/DataTable/DataTable.module.css:34, 6px in src/components/DataTable/DataTable.module.css:35, 3px in src/components/DataTable/DataTable.module.css:234, 9px in src/components/DataTable/DataTable.module.css:235, 3px in src/components/DataTable/DataTable.module.css:252, 3px in src/components/DataTable/DataTable.module.css:253, -9999px in src/components/DataTable/DataTable.module.css:357, -9999px in src/components/DataTable/DataTable.module.css:358, 3 in src/components/DataTable/DataTable.module.css:397, 1 in src/components/DataTable/DataTable.module.css:404, 230px in src/components/DatePicker/DatePicker.module.css:19, 120px in src/components/DropZone/DropZone.module.css:90, 100px in src/components/DropZone/DropZone.module.css:94, 40px in src/components/DropZone/DropZone.module.css:101, 6px in src/components/ExceptionList/ExceptionList.module.css:44, 6px in src/components/ExceptionList/ExceptionList.module.css:45, 30 in src/components/Filters/Filters.module.css:4, 53px in src/components/Filters/Filters.module.css:24, 0.375rem in src/components/Filters/Filters.module.css:59, 0.375rem in src/components/Filters/Filters.module.css:65, 28px in src/components/Filters/Filters.module.css:74, 24px in src/components/Filters/Filters.module.css:88, -12px in src/components/Filters/Filters.module.css:177, 12px in src/components/Filters/Filters.module.css:178, rgba(255, 255, 255, 0) in src/components/Filters/Filters.module.css:184, 26px in src/components/Filters/components/FilterPill/FilterPill.module.css:77, 22px in src/components/Filters/components/FilterPill/FilterPill.module.css:81, 185px in src/components/Filters/components/FilterPill/FilterPill.module.css:114, 300px in src/components/Filters/components/FilterPill/FilterPill.module.css:115, 1 in src/components/Frame/Frame.module.css:50, rgba(255, 255, 255, 0.5) in src/components/Frame/Frame.module.css:142, rgba(255, 255, 255, 0.5) in src/components/Frame/Frame.module.css:147, 1200px in src/components/Frame/Frame.module.css:243, rgba(0, 0, 0, 0.15) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:13, 1px in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:48, rgba(48, 48, 48, 1) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:93, rgba(255, 255, 255, 1) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:95, rgba(250, 250, 250, 1) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:96, rgba(247, 247, 247, 1) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:97, rgba(247, 247, 247, 1) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:98, rgba(255, 255, 255, 0.2) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:99, rgba(255, 255, 255, 0.48) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:100, rgba(255, 255, 255, 0.2) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:101, rgba(255, 255, 255, 0.2) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:102, rgba(0, 0, 0, 0.25) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:103, rgba(26, 26, 26, 0.2) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:104, rgba(26, 26, 26, 0.12) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:105, rgba(26, 26, 26, 0.12) in src/components/Frame/components/ContextualSaveBar/ContextualSaveBar.module.css:106, 3px in src/components/Frame/components/Loading/Loading.module.css:3, 500px in src/components/Frame/components/Toast/Toast.module.css:3, 20px in src/components/Icon/Icon.module.css:3, 20px in src/components/Icon/Icon.module.css:4, 56px in src/components/IndexFilters/IndexFilters.module.css:16, 44px in src/components/IndexFilters/IndexFilters.module.css:28, 20px in src/components/IndexFilters/IndexFilters.module.css:50, 20px in src/components/IndexFilters/IndexFilters.module.css:51, 55px in src/components/IndexFilters/IndexFilters.module.css:63, 56px in src/components/IndexFilters/IndexFilters.module.css:64, -16px in src/components/IndexFilters/IndexFilters.module.css:74, rgba(255, 255, 255, 0) in src/components/IndexFilters/IndexFilters.module.css:81, 3rem in src/components/IndexFilters/IndexFilters.module.css:98, -17px in src/components/IndexFilters/IndexFilters.module.css:105, rgba(255, 255, 255, 0) in src/components/IndexFilters/IndexFilters.module.css:112, 20px in src/components/IndexFilters/IndexFilters.module.css:125, 30 in src/components/IndexTable/IndexTable.module.css:277, 0rem in src/components/IndexTable/IndexTable.module.css:839, -1000px in src/components/IndexTable/IndexTable.module.css:1296, -1000px in src/components/IndexTable/IndexTable.module.css:1297, 56px in src/components/IndexTable/IndexTable.module.css:1576, 1px in src/components/IndexTable/IndexTable.module.css:1595, 1 in src/components/Indicator/Indicator.module.css:28, 70px in src/components/LegacyFilters/LegacyFilters.module.css:5, 100px in src/components/LegacyFilters/components/ConnectedFilterControl/ConnectedFilterControl.module.css:17, -1000px in src/components/LegacyFilters/components/ConnectedFilterControl/ConnectedFilterControl.module.css:41, -1000px in src/components/LegacyFilters/components/ConnectedFilterControl/ConnectedFilterControl.module.css:42, 50px in src/components/LegacyTabs/LegacyTabs.module.css:122, 16px in src/components/LegacyTabs/LegacyTabs.module.css:155, 1 in src/components/MessageIndicator/MessageIndicator.module.css:12, 620px in src/components/Modal/Modal.module.css:12, 620px in src/components/Modal/components/Dialog/Dialog.module.css:53, 41.25em in src/components/Modal/components/Dialog/Dialog.module.css:61, 600px in src/components/Modal/components/Dialog/Dialog.module.css:62, 380px in src/components/Modal/components/Dialog/Dialog.module.css:69, 980px in src/components/Modal/components/Dialog/Dialog.module.css:79, 40px in src/components/Navigation/Navigation.module.css:3, 28px in src/components/Navigation/Navigation.module.css:4, 40px in src/components/Navigation/Navigation.module.css:6, 360px in src/components/Navigation/Navigation.module.css:16, 11px in src/components/Navigation/Navigation.module.css:73, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:264, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:289, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:320, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:343, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:367, 1px in src/components/Navigation/Navigation.module.css:385, 1px in src/components/Navigation/Navigation.module.css:386, 3px in src/components/Navigation/Navigation.module.css:388, 21px in src/components/Navigation/Navigation.module.css:425, 32px in src/components/Navigation/Navigation.module.css:426, 28px in src/components/Navigation/Navigation.module.css:433, 20px in src/components/Navigation/Navigation.module.css:482, 20px in src/components/Navigation/Navigation.module.css:483, rgba(0, 0, 0, 0) in src/components/Navigation/Navigation.module.css:642, #ffffff in src/components/Navigation/Navigation.module.css:704, 21px in src/components/Navigation/Navigation.module.css:756, 32px in src/components/Navigation/Navigation.module.css:757, 28px in src/components/Navigation/Navigation.module.css:763, #ffffff in src/components/Navigation/Navigation.module.css:1012, 10px in src/components/Navigation/Navigation.module.css:1094, 10px in src/components/Navigation/Navigation.module.css:1095, 20px in src/components/OptionList/components/Option/Option.module.css:149, 20px in src/components/OptionList/components/Option/Option.module.css:150, 28px in src/components/Page/components/Header/Header.module.css:61, 1px in src/components/Pagination/Pagination.module.css:25, 400px in src/components/Popover/Popover.module.css:92, 500px in src/components/Popover/Popover.module.css:93, 4px in src/components/RangeSlider/RangeSlider.module.css:5, 28px in src/components/RangeSlider/components/DualThumb/DualThumb.module.css:13, 1 in src/components/RangeSlider/components/DualThumb/DualThumb.module.css:37, 24px in src/components/RangeSlider/components/DualThumb/DualThumb.module.css:139, 32px in src/components/RangeSlider/components/DualThumb/DualThumb.module.css:160, 32px in src/components/RangeSlider/components/DualThumb/DualThumb.module.css:161, 44px in src/components/RangeSlider/components/SingleThumb/SingleThumb.module.css:25, 32px in src/components/RangeSlider/components/SingleThumb/SingleThumb.module.css:244, 32px in src/components/RangeSlider/components/SingleThumb/SingleThumb.module.css:245, 44px in src/components/ResourceItem/ResourceItem.module.css:3, 48px in src/components/ResourceItem/ResourceItem.module.css:4, rgba(255, 255, 255, 0.5) in src/components/ResourceList/ResourceList.module.css:43, 52px in src/components/ResourceList/ResourceList.module.css:61, 48px in src/components/ResourceList/ResourceList.module.css:67, 37.5em in src/components/ResourceList/ResourceList.module.css:241, 64px in src/components/ResourceList/ResourceList.module.css:286, rgba(255, 255, 255, 0.5) in src/components/ResourceList/ResourceList.module.css:312, rgba(0, 0, 0, 0.15) in src/components/Scrollable/Scrollable.module.css:4, 32 in src/components/Scrollable/Scrollable.module.css:64, 0 in src/components/ShadowBevel/ShadowBevel.module.css:4, 380px in src/components/Sheet/Sheet.module.css:26, 36px in src/components/SkeletonDisplayText/SkeletonDisplayText.module.css:59, 998px in src/components/SkeletonPage/SkeletonPage.module.css:3, 20px in src/components/Spinner/Spinner.module.css:8, 20px in src/components/Spinner/Spinner.module.css:9, 44px in src/components/Spinner/Spinner.module.css:13, 44px in src/components/Spinner/Spinner.module.css:14, 50px in src/components/Tabs/Tabs.module.css:3, rgba(0, 0, 0, 0) in src/components/Tabs/Tabs.module.css:60, 18px in src/components/Tag/Tag.module.css:75, 18px in src/components/Tag/Tag.module.css:76, 24px in src/components/Tag/Tag.module.css:171, 20px in src/components/Tag/Tag.module.css:189, 20px in src/components/Tag/Tag.module.css:190, 20px in src/components/Tag/Tag.module.css:217, 12px in src/components/Tag/Tag.module.css:219, 1em in src/components/TextField/TextField.module.css:222, 28px in src/components/TextField/TextField.module.css:336, #898f94 in src/components/TextField/TextField.module.css:393, 140px in src/components/TextField/TextField.module.css:429, 328px in src/components/TextField/TextField.module.css:440, 22px in src/components/TextField/TextField.module.css:499, 1 in src/components/Tooltip/components/TooltipOverlay/TooltipOverlay.module.css:8, rgba(26, 26, 26, 0.1) in src/components/Tooltip/components/TooltipOverlay/TooltipOverlay.module.css:57, 200px in src/components/Tooltip/components/TooltipOverlay/TooltipOverlay.module.css:102, 275px in src/components/Tooltip/components/TooltipOverlay/TooltipOverlay.module.css:106, 32px in src/components/TopBar/components/Menu/Menu.module.css:19, 325px in src/components/TopBar/components/Menu/components/Message/Message.module.css:2, 580px in src/components/TopBar/components/Search/Search.module.css:16, 32px in src/components/TopBar/components/SearchField/SearchField.module.css:80, 160px in src/components/TopBar/components/UserMenu/UserMenu.module.css:2, rgba(223, 227, 232, 0.3) in src/components/VideoThumbnail/VideoThumbnail.module.css:21, 6px in src/components/VideoThumbnail/VideoThumbnail.module.css:80"
+      },
+      "evidence": [
+        "28px in postcss-mixins/button-base.css:7",
+        "28px in postcss-mixins/button-base.css:8",
+        "28px in src/components/ActionMenu/components/SecondaryAction/SecondaryAction.module.css:16",
+        "240px in src/components/AppProvider/global.css:11",
+        "56px in src/components/AppProvider/global.css:41",
+        "32px in src/components/AppProvider/global.css:47",
+        "11px in src/components/AppProvider/global.css:84",
+        "rgba(241, 242, 244, 1) in src/components/AppProvider/global.css:130",
+        "rgba(0, 0, 0, 0.5) in src/components/Backdrop/Backdrop.module.css:10",
+        "1.25px in src/components/Badge/components/Pip/Pip.module.css:5",
+        "0.25rem in src/components/Badge/components/Pip/Pip.module.css:78",
+        "0.5rem in src/components/Badge/components/Pip/Pip.module.css:79",
+        "24px in src/components/BulkActions/BulkActions.module.css:8",
+        "100px in src/components/CalloutCard/CalloutCard.module.css:9",
+        "10 in src/components/ColorPicker/ColorPicker.module.css:5",
+        "rgba(0, 0, 0, 0.5) in src/components/ColorPicker/ColorPicker.module.css:8",
+        "rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:9",
+        "rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:10",
+        "145px in src/components/DataTable/DataTable.module.css:3",
+        "6px in src/components/DataTable/DataTable.module.css:34"
+      ],
+      "fix": "Replace named hardcoded colors, spacing, and z-index values with token references.",
+      "receipt": "Agents imitate the system's own styling habits; hardcoded source values become copied output."
+    },
+    {
+      "checkId": "tokens.machine-readable",
+      "category": "tokens",
+      "severity": "warning",
+      "outcome": "pass",
+      "measure": {
+        "kind": "ratio",
+        "value": 1,
+        "detail": "60/60 token sources are present and parseable; invalid: none"
+      },
+      "evidence": [],
+      "fix": "Publish tokens in a machine-readable format.",
+      "receipt": "Machine-readable tokens are the theming signal agents can consume."
+    },
+    {
+      "checkId": "deprecation.migration-notes",
+      "category": "deprecation",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.889,
+        "detail": "8/9 @deprecated marks name a replacement or migration path; missing: SettingToggle"
+      },
+      "evidence": [
+        "SettingToggle"
+      ],
+      "fix": "Append replacement guidance to every @deprecated mark.",
+      "receipt": "A bare deprecation mark does not redirect an agent away from deprecated training-data gravity."
+    },
+    {
+      "checkId": "deprecation.manifest-exclusion",
+      "category": "deprecation",
+      "severity": "warning",
+      "outcome": "na",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap."
+      },
+      "evidence": [],
+      "fix": "Tag deprecated entries in the manifest or exclude them from generated agent metadata.",
+      "receipt": "Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths."
+    },
+    {
+      "checkId": "agent.context-file-quality",
+      "category": "agent",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 agent context files found; dead references: no context file"
+      },
+      "evidence": [],
+      "fix": "Regenerate or correct stale component references in agent context files.",
+      "receipt": "Stale context misleads agents worse than no context."
+    },
+    {
+      "checkId": "agent.manifest-coverage",
+      "category": "agent",
+      "severity": "warning",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0/118 exported components are covered by a manifest; missing: AccountConnection, ActionList, ActionMenu, AlphaPicker, AppProvider, AutoSelection, Autocomplete, Avatar, Backdrop, Badge, BadgeProgressValue, BadgeStatusValue, Banner, Bleed, BlockStack, Box, Breadcrumbs, Button, ButtonGroup, CalloutCard, Card, Checkbox, ChoiceList, Collapsible, ColorPicker, Combobox, Connected, ContextualSaveBar, DataTable, DatePicker, DescriptionList, Divider, DropZone, EmptySearchResult, EmptyState, EventListener, ExceptionList, Filters, Focus, FooterHelp, Form, FormLayout, Frame, FrameContext, FullscreenBar, Grid, Icon, Image, IndexFilters, IndexFiltersMode, IndexTable, IndexTableSelectionType, Indicator, InlineCode, InlineError, InlineGrid, InlineStack, Key, KeyboardKey, KeypressListener, Label, Labelled, Layout, LegacyCard, LegacyFilters, LegacyStack, LegacyTabs, Link, List, Listbox, Loading, MediaCard, Modal, Navigation, OptionList, Page, PageActions, Pagination, PolarisTestProvider, Popover, PopoverCloseSource, Portal, PortalsManager, PositionedOverlay, ProgressBar, RadioButton, RangeSlider, ResourceItem, ResourceList, ScrollLock, Scrollable, Select, SelectAllActions, SettingToggle, Sheet, SkeletonBodyText, SkeletonDisplayText, SkeletonPage, SkeletonTabs, SkeletonThumbnail, Spinner, Sticky, Tabs, Tag, Text, TextContainer, TextField, ThemeProvider, Thumbnail, Toast, Tooltip, TopBar, TrapFocus, Truncate, UnstableBulkActions, UnstyledButton, UnstyledLink, VideoThumbnail"
+      },
+      "evidence": [
+        "AccountConnection",
+        "ActionList",
+        "ActionMenu",
+        "AlphaPicker",
+        "AppProvider",
+        "AutoSelection",
+        "Autocomplete",
+        "Avatar",
+        "Backdrop",
+        "Badge",
+        "BadgeProgressValue",
+        "BadgeStatusValue",
+        "Banner",
+        "Bleed",
+        "BlockStack",
+        "Box",
+        "Breadcrumbs",
+        "Button",
+        "ButtonGroup",
+        "CalloutCard"
+      ],
+      "fix": "Generate or complete the component manifest.",
+      "receipt": "Partial manifests force agents to guess the gaps."
+    },
+    {
+      "checkId": "api.barrel-completeness",
+      "category": "api",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 133,
+        "detail": "133 components are deep-import-only and missing from the root barrel: Action, ActionContext, Actions, ActionsMeasurements, ActionsMeasurer, Activator, AfterInitialMount, AnnotatedSection, BannerContext, BannerLayout, BulkActionButton, BulkActionMenu, BulkActions, BulkActionsMeasurer, CSSAnimation, Cell, CheckableButton, CheckboxWrapper, Choice, CloseButton, ComboboxListboxContext, ComboboxListboxOptionContext, ComboboxTextField, ComboboxTextFieldContext, ConditionalRender, ConditionalWrapper, ConnectedFilterControl, Container, CreateViewModal, Day, DefaultBanner, Dialog, DirectionButton, DiscardConfirmationModal, DropZoneContext, DualThumb, DuplicateModal, EditColumnsButton, EphemeralPresenceManager, EphemeralPresenceManagerContext, FeaturesContext, FileUpload, FilterActionsContext, FilterActionsProvider, FilterPill, FiltersBar, FocusManager, FocusManagerContext, Footer, Group, Header, HuePicker, I18n, I18nContext, IndexContext, IndexProvider, IndexRowContext, IndexSelectionChangeContext, InlineIconBanner, Item, ItemSecondaryAction, LinkContext, ListboxContext, MappedAction, MappedActionContext, MappedOption, MediaQueryContext, MediaQueryProvider, Menu, MenuGroup, Message, MessageIndicator, MissingAppProviderError, Month, NavigationContext, Option, Pane, Panel, Picker, Pip, PopoverOverlay, PortalsContainer, PortalsManagerContext, Rect, RenameModal, Resizer, ResourceListContext, RollupActions, Row, RowContext, RowHoveredContext, SEPARATOR, ScrollContainer, ScrollContext, ScrollLockManager, ScrollLockManagerContext, ScrollTo, ScrollableContext, Search, SearchDismissOverlay, SearchField, SearchFilterButton, SecondaryAction, SecondaryNavigation, Section, SectionContext, SettingAction, ShadowBevel, SingleThumb, Slidable, SortButton, StickyManager, StickyManagerContext, Subsection, Tab, TabMeasurer, TagsWrapper, TextOption, ThemeContext, ThemeNameContext, Title, ToastManager, TooltipOverlay, TruncateText, UpdateButtons, UseFeatures, UseTheme, UserMenu, Weekday, WithinContentContainerBanner, WithinContentContext, WithinFilterContext, WithinListboxContext"
+      },
+      "evidence": [
+        "Action",
+        "ActionContext",
+        "Actions",
+        "ActionsMeasurements",
+        "ActionsMeasurer",
+        "Activator",
+        "AfterInitialMount",
+        "AnnotatedSection",
+        "BannerContext",
+        "BannerLayout",
+        "BulkActionButton",
+        "BulkActionMenu",
+        "BulkActions",
+        "BulkActionsMeasurer",
+        "CSSAnimation",
+        "Cell",
+        "CheckableButton",
+        "CheckboxWrapper",
+        "Choice",
+        "CloseButton"
+      ],
+      "fix": "Re-export deep-only components from the root barrel or document deep paths in agent metadata.",
+      "receipt": "Agents guess deep paths when components are not reachable from the root package import."
+    },
+    {
+      "checkId": "tokens.naming-consistency",
+      "category": "tokens",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0.142,
+        "detail": "61/431 token names violate the dominant kebab pattern; offenders: pc-button-bg_hover, pc-button-bg_active, pc-button-bg_pressed, pc-button-bg_disabled, pc-button-color_hover, pc-button-color_active, pc-button-color_pressed, pc-button-color_disabled, pc-button-box-shadow_hover, pc-button-box-shadow_active, pc-button-box-shadow_pressed, pc-button-box-shadow_disabled, pc-button-icon-fill_hover, pc-button-icon-fill_active, pc-button-icon-fill_pressed, pc-button-icon-fill_disabled"
+      },
+      "evidence": [
+        "pc-button-bg_hover",
+        "pc-button-bg_active",
+        "pc-button-bg_pressed",
+        "pc-button-bg_disabled",
+        "pc-button-color_hover",
+        "pc-button-color_active",
+        "pc-button-color_pressed",
+        "pc-button-color_disabled",
+        "pc-button-box-shadow_hover",
+        "pc-button-box-shadow_active",
+        "pc-button-box-shadow_pressed",
+        "pc-button-box-shadow_disabled",
+        "pc-button-icon-fill_hover",
+        "pc-button-icon-fill_active",
+        "pc-button-icon-fill_pressed",
+        "pc-button-icon-fill_disabled",
+        "pc-button-box-shadow_active",
+        "pc-button-bg_hover",
+        "pc-button-bg_active",
+        "pc-button-bg_disabled"
+      ],
+      "fix": "Rename token outliers to the dominant pattern.",
+      "receipt": "Inconsistent names invite fabricated tokens."
+    },
+    {
+      "checkId": "deprecation.zombie-exports",
+      "category": "deprecation",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 22,
+        "detail": "22 barrel exports are absent from docs/stories: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, BadgeProgressValue, BadgeStatusValue, DATA_ATTRIBUTE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, errorTextID, hsbToRgb, hslToRgb, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, isNavigationItemActive, labelID, rgbaString, rgbString, rgbToHex, rgbToHsl, UnstableBulkActions, unstyledButtonFrom, useEphemeralPresenceManager, useFrame"
+      },
+      "evidence": [
+        "_SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT",
+        "_SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT",
+        "BadgeProgressValue",
+        "BadgeStatusValue",
+        "DATA_ATTRIBUTE",
+        "DEFAULT_TOAST_DURATION",
+        "DEFAULT_TOAST_DURATION_WITH_ACTION",
+        "errorTextID",
+        "hsbToRgb",
+        "hslToRgb",
+        "INDEX_TABLE_SELECT_ALL_ITEMS",
+        "IndexTableSelectionType",
+        "isNavigationItemActive",
+        "labelID",
+        "rgbaString",
+        "rgbString",
+        "rgbToHex",
+        "rgbToHsl",
+        "UnstableBulkActions",
+        "unstyledButtonFrom"
+      ],
+      "fix": "Document, deprecate, or remove zombie exports.",
+      "receipt": "Zombie exports are trap surface for training-data gravity."
+    },
+    {
+      "checkId": "agent.llms-txt",
+      "category": "agent",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "ratio",
+        "value": 0,
+        "detail": "0 llms.txt files found; invalid references: missing llms.txt"
+      },
+      "evidence": [],
+      "fix": "Add or repair llms.txt references.",
+      "receipt": "llms.txt is a contested convention, so it is weighted low but still captures discovery intent."
+    },
+    {
+      "checkId": "agent.mcp-present",
+      "category": "agent",
+      "severity": "info",
+      "outcome": "fail",
+      "measure": {
+        "kind": "count",
+        "value": 0,
+        "detail": "0 MCP package/config carriers detected: none"
+      },
+      "evidence": [],
+      "fix": "Consider shipping an MCP server or checked-in MCP configuration for agent context.",
+      "receipt": "On-demand context delivery can outperform portable files for agent workflows."
+    }
+  ]
+}

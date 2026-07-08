@@ -1,0 +1,132 @@
+ds-bench audit: @shopify/polaris
+target: /private/tmp/claude-501/-Users-jasonwright-Development-ds-bench/16754ba9-331c-4835-81f6-79109d51c95f/scratchpad/pilot/polaris/polaris-react
+rubric: ARS v0.2 (22 scored checks, registry 176a3461) | tool: 0.0.0
+
+composite score: 59.5/100
+applicable checks: 20/22 (high confidence)
+detected carriers: CSS files, Storybook stories/MDX, TypeScript exports, package.json exports/types, token files/CSS custom properties
+
+categories:
+  Docs & examples         [########..]  78.6 (4/4)
+  API clarity             [#####.....]  48.9 (4/4)
+  Usage guidance          [####......]  38.6 (3/3)
+  Token hygiene           [#########.]  94.9 (3/3)
+  Deprecation signalling  [#######...]  67.1 (2/3)
+  Agent metadata          [..........]     0 (4/5)
+
+findings:
+  [critical] docs.usage-examples - fail
+    measure: 89/118 exported components have importable usage examples; missing (showing 8 of 29): ActionMenu, AlphaPicker, AutoSelection, Backdrop, BadgeProgressValue, BadgeStatusValue, Breadcrumbs, Connected
+    evidence: ActionMenu, AlphaPicker, AutoSelection, Backdrop, BadgeProgressValue, BadgeStatusValue, Breadcrumbs, Connected, EventListener, Focus, IndexFiltersMode, IndexTableSelectionType, Indicator, Key, KeypressListener, Label, Labelled, PolarisTestProvider, PopoverCloseSource, Portal
+    fix: Add one canonical story/example per component.
+    receipt: Agents recreate components they can't see used (Atlassian DESIGN.md experiment).
+  [critical] docs.example-imports-real - fail
+    measure: 526/531 example component imports resolve against exported components; unresolved: BulkActions, IndexFiltersProps, Fragment, ScrollableRef, ShadowBevel
+    evidence: BulkActions, IndexFiltersProps, Fragment, ScrollableRef, ShadowBevel
+    fix: Correct or delete examples with dead imports.
+    receipt: Wrong import paths are a documented agent failure mode (Astryx self-checks).
+  [critical] api.types-resolve - fail
+    measure: package entrypoint for @shopify/polaris is unresolvable; synthetic package import could not be checked.
+    evidence: @shopify/polaris
+    fix: Repair the package types/exports mapping so every public export is importable.
+    receipt: Wrong import paths are a documented agent failure mode.
+  [critical] deprecation.marked - fail
+    measure: 9/16 known-deprecated exports carry @deprecated; missing: LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps
+    evidence: LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps
+    fix: Add @deprecated to legacy exports.
+    receipt: Deprecated patterns dominate training data unless current source clearly marks them as deprecated.
+  [critical] agent.instruction-manual - na
+    measure: 0 agent metadata files found; instruction-manual orientation is not applicable.
+    evidence: none
+    fix: Rewrite metadata examples to import the design-system components instead of re-implementing them.
+    receipt: Re-implementation specs cause agents to recreate components instead of using the system.
+  [warning] docs.prop-descriptions - fail
+    measure: 83/118 exported components have documented public props; missing (showing 8 of 35): ActionMenu, AppProvider, Autocomplete, Backdrop, Bleed, BlockStack, Box, Card
+    evidence: ActionMenu: hasRolledUp, AppProvider: theme, Autocomplete: selected, Backdrop: belowNavigation, transparent, setClosing, Bleed: children, BlockStack: children, Box: children, Card: children, ColorPicker: color, DataTable: hasFixedFirstColumn, DatePicker: date, month, year, EmptySearchResult: title, description, withIllustration, EventListener: passive, Filters: queryValue, mountedState, selectedViewName, Focus: children, disabled, root, Form: event, Grid: columns, gap, children, Image: alt, source, crossOrigin, sourceSet, ref, Indicator: pulse, InlineGrid: children
+    fix: Add TSDoc descriptions to public props, starting with the most-used components.
+    receipt: Agents invent props when public prop contracts lack descriptions.
+  [warning] docs.undocumented-exports - fail
+    measure: 149 exported symbols have no docs presence anywhere: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, ActionListItemDescriptor, ActionListItemProps, ActionListProps, ActionListSection, ActionMenuProps, AlphaPickerProps, BackdropProps, BadgeAction, BadgeProgressValue, BadgeStatusValue, BannerProps, BannerTone, BaseButton, BaseCallbackAction, BleedProps, BlockStackProps, BreadcrumbsProps, ButtonGroupProps, ButtonProps, CalloutCardProps,... (truncated)
+    evidence: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, ActionListItemDescriptor, ActionListItemProps, ActionListProps, ActionListSection, ActionMenuProps, AlphaPickerProps, BackdropProps, BadgeAction, BadgeProgressValue, BadgeStatusValue, BannerProps, BannerTone, BaseButton, BaseCallbackAction, BleedProps, BlockStackProps, BreadcrumbsProps
+    fix: Document or un-export undocumented public exports.
+    receipt: Undocumented public exports are trap surface for agents choosing from the design system.
+  [warning] api.prop-type-soundness - fail
+    measure: 2/536 exported component props use any/unknown; offenders: Form.event (unknown), UnstyledButton.key (any)
+    evidence: Form.event (unknown), UnstyledButton.key (any)
+    fix: Replace any/unknown props with precise public prop types.
+    receipt: Hallucinated-prop detection depends on sound public prop types.
+  [warning] api.name-coherence - fail
+    measure: 4 component name carrier mismatches: AlphaPicker source file src/components/Picker/Picker.tsx, FrameContext source file src/utilities/frame/context.ts, PopoverCloseSource source file src/components/Popover/Popover.tsx, UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx
+    evidence: AlphaPicker source file src/components/Picker/Picker.tsx, FrameContext source file src/utilities/frame/context.ts, PopoverCloseSource source file src/components/Popover/Popover.tsx, UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx
+    fix: Align component names across source files, stories, and manifest entries.
+    receipt: Name mismatch drives discovery-driven component recreation.
+  [warning] guidance.when-to-use - fail
+    measure: 113/118 exported components include when-to-use guidance; missing: BadgeProgressValue, BadgeStatusValue, IndexTableSelectionType, InlineGrid, UnstableBulkActions
+    evidence: BadgeProgressValue, BadgeStatusValue, IndexTableSelectionType, InlineGrid, UnstableBulkActions
+    fix: Add when-to-use/when-not sections to component docs.
+    receipt: Agents must choose components, not just call them (Atlassian recreation finding).
+  [warning] guidance.alternatives-resolve - fail
+    measure: 2/10 alternatives/instead component references resolve to exported components; unresolved: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField
+    evidence: Foo, Bar, Baz, LegacyCardProps, ArrowLeft, ArrowRight, BulkActions, MyTextField
+    fix: Reference real components in alternatives guidance.
+    receipt: Resolvable cross-references can't be faked by boilerplate.
+  [warning] guidance.confusable-pairs - fail
+    measure: 0/2 detected confusable pairs reference each other; missing: Button/Link, Combobox/Select
+    evidence: Button/Link, Combobox/Select
+    fix: Add mutual "use X instead when..." notes.
+    receipt: Wrong-component selection is a recurring design-system agent failure mode.
+  [warning] tokens.hardcoded-values - fail
+    measure: 188 magic values across 10917 style LOC (1.722 per 100 LOC); token references: 3058; offenders (showing 8 of 188): 28px in postcss-mixins/button-base.css:7, 28px in postcss-mixins/button-base.css:8, 28px in src/components/ActionMenu/components/SecondaryAction/SecondaryAction.module.css:16, 240px in src/components/AppProvider/global.css:11, 56px in src/components/AppProvider/global.css:41, 32px in src/components/AppProvider/global.css:47, 11px in src/components/AppProvider/global.css:84, rgba(241, 242, 244, 1) in src/components/AppProvider/global.css:130, rgba(0, 0, 0
+    evidence: 28px in postcss-mixins/button-base.css:7, 28px in postcss-mixins/button-base.css:8, 28px in src/components/ActionMenu/components/SecondaryAction/SecondaryAction.module.css:16, 240px in src/components/AppProvider/global.css:11, 56px in src/components/AppProvider/global.css:41, 32px in src/components/AppProvider/global.css:47, 11px in src/components/AppProvider/global.css:84, rgba(241, 242, 244, 1) in src/components/AppProvider/global.css:130, rgba(0, 0, 0, 0.5) in src/components/Backdrop/Backdrop.module.css:10, 1.25px in src/components/Badge/components/Pip/Pip.module.css:5, 0.25rem in src/components/Badge/components/Pip/Pip.module.css:78, 0.5rem in src/components/Badge/components/Pip/Pip.module.css:79, 24px in src/components/BulkActions/BulkActions.module.css:8, 100px in src/components/CalloutCard/CalloutCard.module.css:9, 10 in src/components/ColorPicker/ColorPicker.module.css:5, rgba(0, 0, 0, 0.5) in src/components/ColorPicker/ColorPicker.module.css:8, rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:9, rgba(33, 43, 54, 0.32) in src/components/ColorPicker/ColorPicker.module.css:10, 145px in src/components/DataTable/DataTable.module.css:3, 6px in src/components/DataTable/DataTable.module.css:34
+    fix: Replace named hardcoded colors, spacing, and z-index values with token references.
+    receipt: Agents imitate the system's own styling habits; hardcoded source values become copied output.
+  [warning] tokens.machine-readable - pass
+    measure: 60/60 token sources are present and parseable; invalid: none
+    evidence: none
+    fix: Publish tokens in a machine-readable format.
+    receipt: Machine-readable tokens are the theming signal agents can consume.
+  [warning] deprecation.migration-notes - fail
+    measure: 8/9 @deprecated marks name a replacement or migration path; missing: SettingToggle
+    evidence: SettingToggle
+    fix: Append replacement guidance to every @deprecated mark.
+    receipt: A bare deprecation mark does not redirect an agent away from deprecated training-data gravity.
+  [warning] deprecation.manifest-exclusion - na
+    measure: No manifest found; manifest deprecation signalling is not applicable because agent.manifest-coverage carries the gap.
+    evidence: none
+    fix: Tag deprecated entries in the manifest or exclude them from generated agent metadata.
+    receipt: Manifest-level deprecation signalling keeps deprecated components out of agent-first metadata paths.
+  [warning] agent.context-file-quality - fail
+    measure: 0 agent context files found; dead references: no context file
+    evidence: none
+    fix: Regenerate or correct stale component references in agent context files.
+    receipt: Stale context misleads agents worse than no context.
+  [warning] agent.manifest-coverage - fail
+    measure: 0/118 exported components are covered by a manifest; missing (showing 8 of 118): AccountConnection, ActionList, ActionMenu, AlphaPicker, AppProvider, AutoSelection, Autocomplete, Avatar
+    evidence: AccountConnection, ActionList, ActionMenu, AlphaPicker, AppProvider, AutoSelection, Autocomplete, Avatar, Backdrop, Badge, BadgeProgressValue, BadgeStatusValue, Banner, Bleed, BlockStack, Box, Breadcrumbs, Button, ButtonGroup, CalloutCard
+    fix: Generate or complete the component manifest.
+    receipt: Partial manifests force agents to guess the gaps.
+  [info] api.barrel-completeness - fail
+    measure: 133 components are deep-import-only and missing from the root barrel: Action, ActionContext, Actions, ActionsMeasurements, ActionsMeasurer, Activator, AfterInitialMount, AnnotatedSection, BannerContext, BannerLayout, BulkActionButton, BulkActionMenu, BulkActions, BulkActionsMeasurer, CSSAnimation, Cell, CheckableButton, CheckboxWrapper, Choice, CloseButton, ComboboxListboxContext, ComboboxListboxOptionContext, ComboboxTextField, ComboboxTextFieldContext, ConditionalRender, ConditionalWrapper, Co... (truncated)
+    evidence: Action, ActionContext, Actions, ActionsMeasurements, ActionsMeasurer, Activator, AfterInitialMount, AnnotatedSection, BannerContext, BannerLayout, BulkActionButton, BulkActionMenu, BulkActions, BulkActionsMeasurer, CSSAnimation, Cell, CheckableButton, CheckboxWrapper, Choice, CloseButton
+    fix: Re-export deep-only components from the root barrel or document deep paths in agent metadata.
+    receipt: Agents guess deep paths when components are not reachable from the root package import.
+  [info] tokens.naming-consistency - fail
+    measure: 61/431 token names violate the dominant kebab pattern; offenders (showing 8 of 16): pc-button-bg_hover, pc-button-bg_active, pc-button-bg_pressed, pc-button-bg_disabled, pc-button-color_hover, pc-button-color_active, pc-button-color_pressed, pc-button-color_disabled
+    evidence: pc-button-bg_hover, pc-button-bg_active, pc-button-bg_pressed, pc-button-bg_disabled, pc-button-color_hover, pc-button-color_active, pc-button-color_pressed, pc-button-color_disabled, pc-button-box-shadow_hover, pc-button-box-shadow_active, pc-button-box-shadow_pressed, pc-button-box-shadow_disabled, pc-button-icon-fill_hover, pc-button-icon-fill_active, pc-button-icon-fill_pressed, pc-button-icon-fill_disabled, pc-button-box-shadow_active, pc-button-bg_hover, pc-button-bg_active, pc-button-bg_disabled
+    fix: Rename token outliers to the dominant pattern.
+    receipt: Inconsistent names invite fabricated tokens.
+  [info] deprecation.zombie-exports - fail
+    measure: 22 barrel exports are absent from docs/stories: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, BadgeProgressValue, BadgeStatusValue, DATA_ATTRIBUTE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, errorTextID, hsbToRgb, hslToRgb, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, isNavigationItemActive, labelID, rgbaString, rgbString, rgbToHex, rgbToHsl, UnstableBulkActions, unstyledButtonFrom, useEphemeralPresenceManager, useFrame
+    evidence: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, BadgeProgressValue, BadgeStatusValue, DATA_ATTRIBUTE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, errorTextID, hsbToRgb, hslToRgb, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, isNavigationItemActive, labelID, rgbaString, rgbString, rgbToHex, rgbToHsl, UnstableBulkActions, unstyledButtonFrom
+    fix: Document, deprecate, or remove zombie exports.
+    receipt: Zombie exports are trap surface for training-data gravity.
+  [info] agent.llms-txt - fail
+    measure: 0 llms.txt files found; invalid references: missing llms.txt
+    evidence: none
+    fix: Add or repair llms.txt references.
+    receipt: llms.txt is a contested convention, so it is weighted low but still captures discovery intent.
+  [info] agent.mcp-present - fail
+    measure: 0 MCP package/config carriers detected: none
+    evidence: none
+    fix: Consider shipping an MCP server or checked-in MCP configuration for agent context.
+    receipt: On-demand context delivery can outperform portable files for agent workflows.
