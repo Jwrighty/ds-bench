@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
+import { audit } from "../src/audit/audit.ts";
 
 const repoRoot = process.cwd();
 const fixturePath = join(repoRoot, "fixtures/missing-usage-examples");
@@ -25,12 +26,15 @@ describe("CLI", () => {
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
   });
 
-  it("--json emits the same report object contract", () => {
+  it("--json emits the same report object contract", async () => {
     const result = spawnSync(process.execPath, [cliPath, "audit", fixturePath, "--json"], {
       encoding: "utf8",
     });
 
     assert.equal(result.status, 0);
+    const expectedReport = await audit(fixturePath);
+    assert.equal(result.stdout, `${JSON.stringify(expectedReport, null, 2)}\n`);
+
     const report = JSON.parse(result.stdout) as { rubricVersion: string; scoredCheckCount: number; registryFingerprint: string; findings: Array<{ checkId: string }> };
     assert.equal(report.rubricVersion, "ARS v0.2");
     assert.equal(report.scoredCheckCount, 22);
@@ -81,7 +85,7 @@ describe("CLI", () => {
     assert.match(result.stdout, /Token hygiene\s+\[#######\.\.\.\]\s+73\.3 \(3\/3\)/);
     assert.match(result.stdout, /Deprecation signalling\s+\[########\.\.\]\s+75 \(3\/3\)/);
     assert.match(result.stdout, /Agent metadata\s+\[##\.\.\.\.\.\.\.\.]\s+22\.2 \(4\/5\)/);
-    assert.match(result.stdout, /guidance\.alternatives-resolve - na/);
+    assert.match(result.stdout, /\[na\] guidance\.alternatives-resolve -/);
     assert.match(result.stdout, /fix: Add one canonical story\/example per component\./);
     assert.match(result.stdout, /receipt: Agents recreate components they can't see used/);
   });
