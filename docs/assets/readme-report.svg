@@ -15,14 +15,30 @@
     <text x="64" y="204">Carriers: Storybook stories/MDX, TypeScript exports, package.json exports/types</text>
 
     <text x="64" y="260" font-weight="700">Category Scores</text>
-    <text x="64" y="294" fill="#aeb6c2">Category                Score  Checks</text>
-    <text x="64" y="322" fill="#aeb6c2">----------------------  -----  -----------------</text>
-    <text x="64" y="350">Docs &amp; examples          58.3  4/4</text>
-    <text x="64" y="378">API clarity               100  4/4</text>
-    <text x="64" y="406">Usage guidance              0  1/3</text>
-    <text x="64" y="434">Token hygiene               0  1/3</text>
-    <text x="64" y="462">Deprecation signalling    N/A  0/3 redistributed</text>
-    <text x="64" y="490">Agent metadata              0  4/5</text>
+    <text x="64" y="294" fill="#aeb6c2">Category</text>
+    <text x="430" y="294" text-anchor="end" fill="#aeb6c2">Score</text>
+    <text x="470" y="294" fill="#aeb6c2">Checks</text>
+    <text x="64" y="322" fill="#aeb6c2">----------------------</text>
+    <text x="375" y="322" text-anchor="end" fill="#aeb6c2">-----</text>
+    <text x="470" y="322" fill="#aeb6c2">-----------------</text>
+    <text x="64" y="350">Docs &amp; examples</text>
+    <text x="430" y="350" text-anchor="end">58.3</text>
+    <text x="470" y="350">4/4</text>
+    <text x="64" y="378">API clarity</text>
+    <text x="430" y="378" text-anchor="end">100</text>
+    <text x="470" y="378">4/4</text>
+    <text x="64" y="406">Usage guidance</text>
+    <text x="430" y="406" text-anchor="end">0</text>
+    <text x="470" y="406">1/3</text>
+    <text x="64" y="434">Token hygiene</text>
+    <text x="430" y="434" text-anchor="end">0</text>
+    <text x="470" y="434">1/3</text>
+    <text x="64" y="462">Deprecation signalling</text>
+    <text x="430" y="462" text-anchor="end">N/A</text>
+    <text x="470" y="462">0/3 redistributed</text>
+    <text x="64" y="490">Agent metadata</text>
+    <text x="430" y="490" text-anchor="end">0</text>
+    <text x="470" y="490">4/5</text>
 
     <text x="64" y="546" font-weight="700">Top Findings</text>
     <text x="64" y="580">1. <tspan fill="#ff6b6b" font-weight="700">[critical]</tspan> docs.usage-examples</text>
