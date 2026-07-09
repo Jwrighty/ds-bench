@@ -2,7 +2,7 @@
 
 Static audit for design-system agent readiness.
 
-![DS Bench terminal report](docs/assets/readme-report.svg)
+![DS Bench terminal report](https://raw.githubusercontent.com/Jwrighty/ds-bench/main/docs/assets/readme-report.svg)
 
 DS Bench is a diagnostic tool for the loop: score -> findings -> fixes -> re-run delta. It scans a local design-system checkout and reports where the system is hard for coding agents to understand: missing examples, unclear APIs, weak usage guidance, token drift, deprecation traps, and stale agent metadata.
 
