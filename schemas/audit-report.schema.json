@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ds-bench.dev/schemas/audit-report.schema.json",
+  "title": "DS Bench AuditReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "rubricVersion",
+    "toolVersion",
+    "scoredCheckCount",
+    "registryFingerprint",
+    "target",
+    "weights",
+    "composite",
+    "applicability",
+    "categories",
+    "findings"
+  ],
+  "properties": {
+    "rubricVersion": {
+      "type": "string",
+      "description": "Version of the scoring rubric used for this report."
+    },
+    "toolVersion": {
+      "type": "string",
+      "description": "Version of the ds-bench package that produced this report."
+    },
+    "scoredCheckCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of checks included in the composite score."
+    },
+    "registryFingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}$",
+      "description": "Fingerprint of the sorted scored-check id set."
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "path", "detectedCarriers"],
+      "properties": {
+        "name": { "type": "string" },
+        "path": { "type": "string" },
+        "detectedCarriers": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "values"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["default", "custom"]
+        },
+        "values": {
+          "$ref": "#/$defs/categoryWeights"
+        }
+      }
+    },
+    "composite": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applicable", "total", "confidence"],
+      "properties": {
+        "applicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/categoryResult"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    }
+  },
+  "$defs": {
+    "categoryId": {
+      "type": "string",
+      "enum": ["docs", "api", "guidance", "tokens", "deprecation", "agent"]
+    },
+    "categoryWeights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs", "api", "guidance", "tokens", "deprecation", "agent"],
+      "properties": {
+        "docs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "api": {
+          "type": "number",
+          "minimum": 0
+        },
+        "guidance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "number",
+          "minimum": 0
+        },
+        "deprecation": {
+          "type": "number",
+          "minimum": 0
+        },
+        "agent": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "categoryResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "score", "applicable", "total", "weightRedistributed"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/categoryId"
+        },
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "applicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "weightRedistributed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkId",
+        "category",
+        "severity",
+        "outcome",
+        "measure",
+        "evidence",
+        "fix",
+        "receipt"
+      ],
+      "properties": {
+        "checkId": {
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/categoryId"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "warning", "info"]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": ["pass", "fail", "na"]
+        },
+        "naReason": {
+          "type": "string",
+          "enum": ["clean", "uncovered"]
+        },
+        "measure": {
+          "$ref": "#/$defs/measure"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fix": {
+          "type": "string"
+        },
+        "receipt": {
+          "type": "string"
+        }
+      }
+    },
+    "measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "detail"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["ratio", "count"]
+        },
+        "value": {
+          "type": "number"
+        },
+        "detail": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,15 @@
 {
   "name": "ds-bench",
   "version": "0.0.0",
+  "description": "Static audit for design-system agent readiness.",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "files": [
-    "dist/src"
+    "docs/assets/readme-report.svg",
+    "dist/src",
+    "schemas"
   ],
   "bin": {
     "ds-bench": "./dist/src/cli.js"

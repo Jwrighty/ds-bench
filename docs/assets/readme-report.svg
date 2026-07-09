@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-labelledby="title desc">
+  <title id="title">DS Bench terminal report screenshot</title>
+  <desc id="desc">A DS Bench audit report showing score, category scores, and top findings.</desc>
+  <rect width="1120" height="760" fill="#f6f3ee"/>
+  <rect x="36" y="32" width="1048" height="696" rx="8" fill="#161719"/>
+  <rect x="36" y="32" width="1048" height="38" rx="8" fill="#282a2f"/>
+  <circle cx="60" cy="51" r="6" fill="#ff5f57"/>
+  <circle cx="82" cy="51" r="6" fill="#febc2e"/>
+  <circle cx="104" cy="51" r="6" fill="#28c840"/>
+  <text x="132" y="56" fill="#c9cdd4" font-family="Menlo, Consolas, monospace" font-size="14">ds-bench audit fixtures/missing-usage-examples</text>
+  <g font-family="Menlo, Consolas, monospace" font-size="18" fill="#e8eaed">
+    <text x="64" y="108">DS Bench Audit: missing-usage-examples</text>
+    <text x="64" y="140">Score: <tspan fill="#ff6b6b" font-weight="700">40.7 / 100</tspan> - Not agent-ready</text>
+    <text x="64" y="172">Applicable Checks: 14 / 17 (3 N/A)</text>
+    <text x="64" y="204">Carriers: Storybook stories/MDX, TypeScript exports, package.json exports/types</text>
+
+    <text x="64" y="260" font-weight="700">Category Scores</text>
+    <text x="64" y="294" fill="#aeb6c2">Category                Score  Checks</text>
+    <text x="64" y="322" fill="#aeb6c2">----------------------  -----  -----------------</text>
+    <text x="64" y="350">Docs &amp; examples          58.3  4/4</text>
+    <text x="64" y="378">API clarity               100  4/4</text>
+    <text x="64" y="406">Usage guidance              0  1/3</text>
+    <text x="64" y="434">Token hygiene               0  1/3</text>
+    <text x="64" y="462">Deprecation signalling    N/A  0/3 redistributed</text>
+    <text x="64" y="490">Agent metadata              0  4/5</text>
+
+    <text x="64" y="546" font-weight="700">Top Findings</text>
+    <text x="64" y="580">1. <tspan fill="#ff6b6b" font-weight="700">[critical]</tspan> docs.usage-examples</text>
+    <text x="92" y="608" fill="#d7dae0">1/2 exported components have importable usage examples</text>
+    <text x="92" y="636" fill="#d7dae0">Missing: Card</text>
+    <text x="92" y="664" fill="#d7dae0">Fix: Add one canonical story/example per component.</text>
+    <text x="64" y="704" fill="#aeb6c2">Showing 5 of 10 failing findings. Run with --verbose to see all evidence.</text>
+  </g>
+</svg>
