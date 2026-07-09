@@ -103,6 +103,15 @@ npx ds-bench audit . --json > after.json
 
 Composite scores are comparable only when both `rubricVersion` and `registryFingerprint` match. The report shape will not break naive JSON diffing without a `rubricVersion` bump.
 
+## Design & Process
+
+The design record is published alongside the code:
+
+- [PRD](docs/PRD.md) — problem statement, users, and scope for the v0 static tier.
+- [CONTEXT.md](CONTEXT.md) — the project's ubiquitous language: runs, tiers, brownfield axes, battery terms.
+- [ADRs](docs/adr/) — why this is a tool first ([0001](docs/adr/0001-tool-first-not-study-first.md)), static-first with a behavioral tier to follow ([0002](docs/adr/0002-static-first-two-tier.md)), and why intrinsic understandability dominates the score ([0003](docs/adr/0003-intrinsics-dominate-signals-over-tools.md)).
+- [Check reference](docs/audit-checks.md) and [pilot notes](docs/pilot/NOTES.md) — every check's rationale, plus audit runs against MUI, Chakra, Polaris, and Cedar used to calibrate the rubric.
+
 ## Package Contents
 
 The npm package publishes only the files needed for the CLI, schema, and README image:

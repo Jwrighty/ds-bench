@@ -15,3 +15,6 @@ dist/
 
 # Private planning — lives in external notes, never committed
 docs/BRIEF.md
+
+# Local issue tracker (see AGENTS.md) — working notes stay off the public repo
+.scratch/

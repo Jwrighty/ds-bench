@@ -1,11 +1,11 @@
 # M2 pilot — generalization run on public systems
 
 Rubric: **ARS v0.2** (22 scored checks, registry `176a3461`) · tool `0.0.0` · run 2026-07-08
-Issue: [`10-m2-pilot-generalization`](../../.scratch/ds-bench-audit-v0/issues/10-m2-pilot-generalization.md)
-
 Three unmodified public design systems, audited with the same binary, chosen for
-carrier diversity (see the issue for the selection rationale). Artifacts in this
-directory: `<system>.json` (machine report) and `<system>.txt` (rendered report).
+carrier diversity: manifest present (Polaris) vs absent (Chakra/MUI), CSS-in-JS
+(MUI/Chakra) vs CSS files (Polaris), token-object (Chakra) vs token-file (Polaris)
+vs metadata (MUI). Artifacts in this directory: `<system>.json` (machine report)
+and `<system>.txt` (rendered report).
 
 **Framing:** ecosystem patterns first, per-system detail second, no team-shaming.
 These systems are among the best-maintained in the ecosystem; where they fall short
