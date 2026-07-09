@@ -32,12 +32,12 @@
     "schemas"
   ],
   "bin": {
-    "ds-bench": "./dist/src/cli.js"
+    "ds-bench": "dist/src/cli.js"
   },
   "scripts": {
     "test": "tsc && node --test dist/tests/*.test.js",
     "typecheck": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json && mkdir -p dist/audit/checks dist/src/audit/checks && cp src/audit/checks/guidance-confusable-pairs.json dist/audit/checks/guidance-confusable-pairs.json && cp src/audit/checks/guidance-confusable-pairs.json dist/src/audit/checks/guidance-confusable-pairs.json",
+    "build": "tsc -p tsconfig.build.json && mkdir -p dist/audit/checks dist/src/audit/checks && cp src/audit/checks/guidance-confusable-pairs.json dist/audit/checks/guidance-confusable-pairs.json && cp src/audit/checks/guidance-confusable-pairs.json dist/src/audit/checks/guidance-confusable-pairs.json && chmod +x dist/src/cli.js",
     "prepack": "npm run build"
   },
   "dependencies": {
