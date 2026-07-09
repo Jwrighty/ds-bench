@@ -1,7 +1,27 @@
 {
   "name": "ds-bench",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Static audit for design-system agent readiness.",
+  "license": "MIT",
+  "author": "Jason Wright",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jwrighty/ds-bench.git"
+  },
+  "homepage": "https://github.com/Jwrighty/ds-bench#readme",
+  "bugs": {
+    "url": "https://github.com/Jwrighty/ds-bench/issues"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "audit",
+    "static-analysis",
+    "ai-agents",
+    "agent-readiness",
+    "cli",
+    "lint"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
