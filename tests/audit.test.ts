@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { audit, sortFindingsForReport } from "../src/audit/audit.ts";
 import { getExportedComponents, getPublicPackage } from "../src/audit/component-inventory.ts";
@@ -16,7 +17,8 @@ describe("audit seam", () => {
     const report = await audit(fixturePath);
 
     assert.equal(report.rubricVersion, "ARS v0.2");
-    assert.equal(report.toolVersion, "0.0.0");
+    const packageVersion = (JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8")) as { version: string }).version;
+    assert.equal(report.toolVersion, packageVersion);
     assert.equal(report.scoredCheckCount, 22);
     assert.equal(report.registryFingerprint, "176a3461");
     assert.equal(report.target.name, "missing-usage-examples");
