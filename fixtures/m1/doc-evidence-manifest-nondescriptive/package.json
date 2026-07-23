@@ -1,0 +1,5 @@
+{
+  "name": "doc-evidence-manifest-nondescriptive",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

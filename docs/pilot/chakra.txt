@@ -54,7 +54,7 @@ Top Findings
    Fix: Add TSDoc descriptions to public props, starting with the most-used components.
 
 4. [warning] docs.undocumented-exports
-   1871 exported symbols have no documentation evidence: AbsoluteCenterProps, AccordionContext,
+   1872 exported symbols have no documentation evidence: AbsoluteCenterProps, AccordionContext,
    AccordionFocusChangeDetails, AccordionItem, AccordionItemBody, AccordionItemBodyProps, AccordionItemContent,
    AccordionItemContentProps, AccordionItemContext, AccordionItemIndicator, AccordionItemIndicatorProps,
    AccordionItemProps, AccordionItemTrigger, AccordionItemTriggerProps, AccordionPropsProvider, AccordionRoot,
@@ -84,7 +84,7 @@ Top Findings
    CarouselItem, CarouselItemGroup, CarouselItemGroupProps, CarouselItemProps, CarouselNextTrigger,
    CarouselNextTriggerProps, CarouselPageChangeDetails, CarouselPrevTrigger, CarouselPrevTriggerProps,
    CarouselProgressText, CarouselProgressTextProps, CarouselPropsProvider, CarouselRoot, CarouselRootProps,
-   CarouselRootProvider, CarouselRootProviderProps, CenterProps, ChakraComponent, ChakraProvider,
+   CarouselRootProvider, CarouselRootProviderProps, CenterProps, chakra, ChakraComponent, ChakraProvider,
    ChakraProviderProps, CheckboxCardAddon, CheckboxCardAddonProps, CheckboxCardCheckedChangeDetails,
    CheckboxCardContent, CheckboxCardContentProps, CheckboxCardContext, CheckboxCardControl,
    CheckboxCardControlProps, CheckboxCardDescription, CheckboxCardDescriptionProps, CheckboxCardHiddenInput,
@@ -437,12 +437,19 @@ Top Findings
    useTreeViewNodeContext, UseTreeViewProps, UseTreeViewReturn, useTreeViewStyles, useUpdateEffect,
    visuallyHiddenStyle, WithContextOptions, WithProviderOptions, WithRootProviderOptions, Wrap, WrapItem,
    WrapItemProps, WrapProps; documentation evidence resolved via file: Badge via
-   __stories__/sandbox.stories.tsx, Button via __stories__/sandbox.stories.tsx, chakra via CHANGELOG.md,
-   createSlotRecipeContext via CHANGELOG.md, EnvironmentProvider via __stories__/env.stories.tsx, Flex via
+   __stories__/sandbox.stories.tsx, Button via __stories__/sandbox.stories.tsx, createSlotRecipeContext via
+   CHANGELOG.md, EnvironmentProvider via __stories__/env.stories.tsx, Flex via
    __stories__/use-breakpoint.stories.tsx, For via __stories__/sandbox.stories.tsx, Link via
    __stories__/sandbox.stories.tsx, Text via __stories__/sandbox.stories.tsx, Toaster via
    __stories__/toast.stories.tsx, useBreakpointValue via __stories__/use-breakpoint.stories.tsx,
-   useEnvironmentContext via __stories__/env.stories.tsx, useSlotRecipe via CHANGELOG.md
+   useEnvironmentContext via __stories__/env.stories.tsx, useSlotRecipe via CHANGELOG.md; incidental mentions
+   ignored: AnimationStyle via __stories__/tokens.stories.tsx, AspectRatio via CHANGELOG.md, AvatarFallback via
+   CHANGELOG.md, Bleed via CHANGELOG.md, ButtonGroup via CHANGELOG.md, CardDescription via CHANGELOG.md,
+   CardTitle via CHANGELOG.md, chakra via CHANGELOG.md, ChakraProvider via README.md, CheckboxCardDescription
+   via CHANGELOG.md, CheckboxGroup via CHANGELOG.md, CheckboxGroupProps via CHANGELOG.md,
+   CheckboxRootProviderProps via CHANGELOG.md, Checkmark via CHANGELOG.md, Circle via CHANGELOG.md, ClientOnly
+   via CHANGELOG.md, CloseButton via CHANGELOG.md, Code via CHANGELOG.md, Color via CHANGELOG.md, ColorPalette
+   via __stories__/sandbox.stories.tsx (+80 more)
    Fix: Document or un-export undocumented public exports.
 
 5. [warning] api.name-coherence

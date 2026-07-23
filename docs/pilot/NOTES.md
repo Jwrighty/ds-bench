@@ -11,11 +11,13 @@ ARS v0.3 changes the meaning of one scored check: `docs.undocumented-exports` (a
 | System | Composite v0.2 → v0.3 | Docs cat. v0.2 → v0.3 | Undocumented v0.2 → v0.3 | Zombie v0.2 → v0.3 |
 | --- | --- | --- | --- | --- |
 | Cedar | 97.7 → 97.0 | 99.4 → 96.9 | 0 → 16 | 0 → 2 |
-| Shopify Polaris | 68.8 → 68.2 | 78.6 → 76.1 | 149 → 196 | 22 → 53 |
+| Shopify Polaris | 68.8 → 68.2 | 78.6 → 76.1 | 149 → 197 | 22 → 53 |
 | MUI | 45.9 → 45.9 | 25.1 → 25.0 | 705 → 707 | 468 → 470 |
-| Chakra | 37.1 → 36.9 | 50.6 → 49.7 | 1772 → 1871 | 881 → 970 |
+| Chakra | 37.1 → 36.9 | 50.6 → 49.7 | 1772 → 1872 | 881 → 971 |
 
 Composite movement is ≤0.7 everywhere and the sanity ordering (Cedar > Polaris > MUI > Chakra) is unchanged, so the rule is **not materially noisy** — it tightens documentation coverage without destabilising or reordering scores. The undocumented counts rise because exports previously credited by bare-name prose now require real evidence; the increase is a coverage correction, not new failures introduced by the tool.
+
+Post-review hardening narrowed the same mechanical rule without adding semantic analysis: headings must be dedicated to the export (including the conventional `<Component>` form), API tables need documentation-oriented columns, example imports must be referenced, and manifests need explicit descriptive fields. On the same fresh checkouts this removed credit only from two additional changelog-only names (`chakra` and Polaris `Range`); category and composite scores stayed unchanged. Carrier citations now also show incidental mentions that were inspected but correctly ignored.
 
 **Changed findings were inspected against their cited carriers**, not just composite movement:
 

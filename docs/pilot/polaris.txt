@@ -71,7 +71,7 @@ Top Findings
    Fix: Add TSDoc descriptions to public props, starting with the most-used components.
 
 5. [warning] docs.undocumented-exports
-   196 exported symbols have no documentation evidence: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT,
+   197 exported symbols have no documentation evidence: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT,
    _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, Action, ActionListItemDescriptor,
    ActionListItemProps, ActionListProps, ActionListSection, ActionMenu, ActionMenuProps, AlphaPicker,
    AlphaPickerProps, AppliedFilterInterface, AppProviderProps, AutocompleteProps, Backdrop, BackdropProps,
@@ -94,19 +94,21 @@ Top Findings
    NavigationItemProps, NavigationProps, OptionListProps, OutlineableAction, PageActionsProps, PageProps,
    PaginationProps, PolarisTestProvider, PopoverAutofocusTarget, PopoverCloseSource, PopoverProps,
    PopoverPublicAPI, Portal, PortalProps, PortalsManager, PortalsManagerProps, PositionedOverlay,
-   PositionedOverlayProps, ProgressBarProps, RadioButtonProps, RangeSliderProps, ResourceItemProps, RGBAColor,
-   rgbaString, RGBColor, rgbString, rgbToHex, rgbToHsl, ScrollableProps, ScrollLock, SelectAllActionsProps,
-   SelectGroup, SelectOption, SelectProps, SettingToggleProps, SheetProps, SkeletonBodyTextProps,
-   SkeletonDisplayTextProps, SkeletonPageProps, SkeletonTabsProps, SkeletonThumbnailProps, SortButtonChoice,
-   SortDirection, SpinnerProps, Sticky, StickyProps, SubNavigationItem, SUPPORTED_LOCALES, TableData, TableRow,
-   TabsProps, TagProps, TextContainerProps, TextFieldProps, ThemeProviderProps, ThumbnailProps, ToastProps,
-   TopBarProps, TrapFocusProps, Truncate, TruncateProps, UnstableBulkActions, UnstableBulkActionsProps,
-   UnstyledButton, unstyledButtonFrom, UnstyledButtonProps, UnstyledLink, UnstyledLinkProps,
-   useEphemeralPresenceManager, useFocus, useFrame, useIndexTableContainerScroll, useIndexTableRowHovered,
-   useIndexTableRowSelected, useTheme; documentation evidence resolved via file: AccountConnection via
+   PositionedOverlayProps, ProgressBarProps, RadioButtonProps, Range, RangeSliderProps, ResourceItemProps,
+   RGBAColor, rgbaString, RGBColor, rgbString, rgbToHex, rgbToHsl, ScrollableProps, ScrollLock,
+   SelectAllActionsProps, SelectGroup, SelectOption, SelectProps, SettingToggleProps, SheetProps,
+   SkeletonBodyTextProps, SkeletonDisplayTextProps, SkeletonPageProps, SkeletonTabsProps,
+   SkeletonThumbnailProps, SortButtonChoice, SortDirection, SpinnerProps, Sticky, StickyProps,
+   SubNavigationItem, SUPPORTED_LOCALES, TableData, TableRow, TabsProps, TagProps, TextContainerProps,
+   TextFieldProps, ThemeProviderProps, ThumbnailProps, ToastProps, TopBarProps, TrapFocusProps, Truncate,
+   TruncateProps, UnstableBulkActions, UnstableBulkActionsProps, UnstyledButton, unstyledButtonFrom,
+   UnstyledButtonProps, UnstyledLink, UnstyledLinkProps, useEphemeralPresenceManager, useFocus, useFrame,
+   useIndexTableContainerScroll, useIndexTableRowHovered, useIndexTableRowSelected, useTheme; documentation
+   evidence resolved via file: AccountConnection via
    src/components/AccountConnection/AccountConnection.stories.tsx, ActionList via
    src/components/ActionList/ActionList.stories.tsx, AppProvider via
-   src/components/AppProvider/AppProvider.stories.tsx, Autocomplete via CHANGELOG.md, AutoSelection via
+   src/components/AppProvider/AppProvider.stories.tsx, Autocomplete via
+   src/components/Autocomplete/Autocomplete.stories.tsx, AutoSelection via
    src/components/Listbox/Listbox.stories.tsx, Avatar via src/components/ActionList/ActionList.stories.tsx,
    AvatarProps via src/components/Avatar/Avatar.stories.tsx, Badge via src/components/Badge/Badge.stories.tsx,
    BadgeProps via src/components/Badge/Badge.stories.tsx, Banner via src/components/Banner/Banner.stories.tsx,
@@ -117,7 +119,14 @@ Top Findings
    src/components/ActionList/ActionList.stories.tsx, ButtonGroup via src/components/Button/Button.stories.tsx,
    CalloutCard via src/components/CalloutCard/CalloutCard.stories.tsx, Card via
    src/components/Banner/Banner.stories.tsx, Checkbox via src/components/Checkbox/Checkbox.stories.tsx,
-   ChoiceList via src/components/ChoiceList/ChoiceList.stories.tsx (+86 more)
+   ChoiceList via src/components/ChoiceList/ChoiceList.stories.tsx (+85 more); incidental mentions ignored:
+   Action via CHANGELOG.md, ActionMenu via CHANGELOG.md, AlphaPicker via CHANGELOG.md, AppliedFilterInterface
+   via CHANGELOG.md, AppProviderProps via CHANGELOG.md, AutocompleteProps via CHANGELOG.md, Backdrop via
+   CHANGELOG.md, BannerHandles via CHANGELOG.md, Breadcrumbs via CHANGELOG.md, buttonFrom via CHANGELOG.md,
+   buttonsFrom via CHANGELOG.md, CallbackAction via CHANGELOG.md, ComplexAction via CHANGELOG.md, Connected via
+   CHANGELOG.md, ContextualSaveBarProps via CHANGELOG.md, DEFAULT_LOCALE via CHANGELOG.md, DisableableAction via
+   CHANGELOG.md, Error via src/components/Checkbox/Checkbox.stories.tsx, EventListener via CHANGELOG.md,
+   FilterInterface via CHANGELOG.md (+28 more)
    Fix: Document or un-export undocumented public exports.
 
 Showing 5 of 18 failing findings. Run with --verbose to see all evidence.

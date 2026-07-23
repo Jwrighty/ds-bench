@@ -180,7 +180,7 @@ Top Findings
    Unstable_TrapFocus, unstable_useEnhancedEffect, unstable_useId, unsupportedProp, useAutocomplete,
    useColorScheme, useControlled, useEventCallback, useForkRef, useFormControl, useMediaQuery, usePagination,
    useRadioGroup, useScrollTrigger, useSelectFocusSource, useTheme, useThemeProps, version, withStyles,
-   withTheme, Zoom
+   withTheme, Zoom; incidental mentions ignored: Stack via README.md, styled via README.md
    Fix: Document or un-export undocumented public exports.
 
 5. [warning] api.prop-type-soundness

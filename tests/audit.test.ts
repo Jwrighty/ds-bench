@@ -603,26 +603,42 @@ describe("audit seam", () => {
     });
   });
 
-  it("does not credit an export named only in an audit-log prose mention", async () => {
+  it("does not credit exports named only in audit-log prose, headings, or status tables, and cites the ignored carrier", async () => {
     const report = await audit(m1FixturePath("doc-evidence-audit-log"));
     const undocumented = finding(report, "docs.undocumented-exports");
 
     assert.equal(undocumented.outcome, "fail");
-    assert.equal(undocumented.measure.value, 1);
-    assert.deepEqual(undocumented.evidence, ["Widget"]);
+    assert.equal(undocumented.measure.value, 3);
+    assert.deepEqual(undocumented.evidence, ["HeadingWidget", "TableWidget", "Widget"]);
+    assert.match(
+      undocumented.measure.detail,
+      /incidental mentions ignored: HeadingWidget via docs\/ds-bench-audits\/improvement-log\.md, TableWidget via docs\/ds-bench-audits\/improvement-log\.md, Widget via docs\/ds-bench-audits\/improvement-log\.md/,
+    );
   });
 
   it("credits meaningful source documentation, examples, sections, tables, and described manifests", async () => {
     for (const fixture of [
       "doc-evidence-markdown-section",
       "doc-evidence-api-table",
-      "doc-evidence-example-import",
       "doc-evidence-manifest-described",
     ]) {
       const undocumented = finding(await audit(m1FixturePath(fixture)), "docs.undocumented-exports");
       assert.equal(undocumented.outcome, "pass", `${fixture} should be documented`);
       assert.equal(undocumented.measure.value, 0, `${fixture} should have zero undocumented exports`);
     }
+  });
+
+  it("credits an imported binding only when the example uses it", async () => {
+    const undocumented = finding(await audit(m1FixturePath("doc-evidence-example-import")), "docs.undocumented-exports");
+
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 4);
+    assert.deepEqual(undocumented.evidence, ["CommentWidget", "KeyWidget", "StringWidget", "UnusedWidget"]);
+    assert.match(undocumented.measure.detail, /incidental mentions ignored: CommentWidget via src\/Widget\.stories\.tsx/);
+    assert.match(undocumented.measure.detail, /KeyWidget via src\/Widget\.stories\.tsx/);
+    assert.match(undocumented.measure.detail, /StringWidget via src\/Widget\.stories\.tsx/);
+    assert.match(undocumented.measure.detail, /UnusedWidget via src\/Widget\.stories\.tsx/);
+    assert.match(undocumented.measure.detail, /Widget via src\/Widget\.stories\.tsx/);
   });
 
   it("does not credit a name-only manifest inventory entry", async () => {
@@ -633,12 +649,27 @@ describe("audit seam", () => {
     assert.deepEqual(undocumented.evidence, ["Widget"]);
   });
 
+  it("does not treat status or category manifest metadata as a description and cites the ignored carrier", async () => {
+    const undocumented = finding(await audit(m1FixturePath("doc-evidence-manifest-nondescriptive")), "docs.undocumented-exports");
+
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 2);
+    assert.deepEqual(undocumented.evidence, ["CategoryWidget", "StatusWidget"]);
+    assert.match(
+      undocumented.measure.detail,
+      /incidental mentions ignored: CategoryWidget via cedar\.manifest\.json, StatusWidget via cedar\.manifest\.json/,
+    );
+  });
+
   it("does not credit exports named only in task-brief, changelog, or ADR prose", async () => {
     const undocumented = finding(await audit(m1FixturePath("doc-evidence-incidental-prose")), "docs.undocumented-exports");
 
     assert.equal(undocumented.outcome, "fail");
     assert.equal(undocumented.measure.value, 3);
     assert.deepEqual(undocumented.evidence, ["AdrWidget", "ChangeWidget", "TaskWidget"]);
+    assert.match(undocumented.measure.detail, /AdrWidget via docs\/adr\/0001-rendering\.md/);
+    assert.match(undocumented.measure.detail, /ChangeWidget via CHANGELOG\.md/);
+    assert.match(undocumented.measure.detail, /TaskWidget via docs\/task-brief\.md/);
   });
 
   it("fails the audit-log false pass while citing the section that genuinely documents an export", async () => {
@@ -652,13 +683,15 @@ describe("audit seam", () => {
     assert.deepEqual(undocumented.evidence, ["RecipeConfig"]);
     // MetricCard has a dedicated `# MetricCard` section, so it passes and is cited; Button passes via its own JSDoc.
     assert.match(undocumented.measure.detail, /MetricCard via docs\/MetricCard\.md/);
-    assert.doesNotMatch(undocumented.measure.detail, /RecipeConfig via/);
+    assert.match(undocumented.measure.detail, /incidental mentions ignored: RecipeConfig via docs\/ds-bench-audits\/cedar-ui-improvement-log\.md/);
     assert.doesNotMatch(undocumented.measure.detail, /Button via/);
 
     // Button's overview.md line is prose, not a section/table, so it joins RecipeConfig as a zombie; MetricCard's section carries it.
     assert.equal(zombie.outcome, "fail");
     assert.deepEqual(zombie.evidence, ["Button", "RecipeConfig"]);
     assert.match(zombie.measure.detail, /MetricCard via docs\/MetricCard\.md/);
+    assert.match(zombie.measure.detail, /Button via docs\/overview\.md/);
+    assert.match(zombie.measure.detail, /RecipeConfig via docs\/ds-bench-audits\/cedar-ui-improvement-log\.md/);
   });
 
   it("aggregates all four Docs & examples checks into the docs category score", async () => {

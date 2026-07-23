@@ -8,6 +8,15 @@ export type ManifestCoverage = {
 
 /** JSON object keys that manifest/metadata records conventionally use to name an export or component. */
 export const MANIFEST_NAME_FIELDS = ["name", "displayName", "exportName", "component"] as const;
+const MANIFEST_DESCRIPTION_FIELDS = new Set([
+  "description",
+  "documentation",
+  "docs",
+  "purpose",
+  "summary",
+  "usage",
+  "whentouse",
+]);
 
 /** Whether `record` names `exportName` via a bare key or one of the conventional name fields. */
 export function recordNamesExport(record: Record<string, unknown>, exportName: string): boolean {
@@ -39,6 +48,18 @@ export function manifestDescribesExport(content: string, exportName: string): bo
   return nodeDescribesExport(parsed, exportName);
 }
 
+/** Whether a structured manifest names `exportName`, regardless of whether it describes it. */
+export function manifestNamesExport(content: string, exportName: string): boolean {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return new RegExp(`\\b${escapeRegExp(exportName)}\\b`).test(content);
+  }
+
+  return nodeNamesExport(parsed, exportName);
+}
+
 function nodeDescribesExport(value: unknown, exportName: string): boolean {
   if (Array.isArray(value)) {
     return value.some((item) => nodeDescribesExport(item, exportName));
@@ -54,7 +75,7 @@ function nodeDescribesExport(value: unknown, exportName: string): boolean {
 
   // `{ Button: <descriptor> }` — the export name keys its own description or descriptor record.
   const keyed = value[exportName];
-  if (isProse(keyed) || (isRecord(keyed) && Object.values(keyed).some(isProse))) {
+  if (hasMultiwordText(keyed) || (isRecord(keyed) && recordHasDescription(keyed))) {
     return true;
   }
 
@@ -68,15 +89,33 @@ function recordDescribesExport(record: Record<string, unknown>, exportName: stri
     return false;
   }
 
+  return recordHasDescription(record);
+}
+
+function recordHasDescription(record: Record<string, unknown>): boolean {
   return Object.entries(record).some(
-    ([key, nested]) => key !== exportName && !(MANIFEST_NAME_FIELDS as readonly string[]).includes(key) && isProse(nested),
+    ([key, nested]) => MANIFEST_DESCRIPTION_FIELDS.has(normalizeManifestField(key)) && hasMultiwordText(nested),
   );
 }
 
-// Free-text description: at least two whitespace-separated word tokens, so a bare
-// identifier, category tag, or cross-reference ("Popover") is not read as prose.
-function isProse(value: unknown): boolean {
+function normalizeManifestField(value: string): string {
+  return value.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function hasMultiwordText(value: unknown): boolean {
   return typeof value === "string" && /[A-Za-z]/.test(value) && /\S\s+\S/.test(value);
+}
+
+function nodeNamesExport(value: unknown, exportName: string): boolean {
+  if (Array.isArray(value)) {
+    return value.some((item) => nodeNamesExport(item, exportName));
+  }
+
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return recordNamesExport(value, exportName) || Object.values(value).some((nested) => nodeNamesExport(nested, exportName));
 }
 
 /**
