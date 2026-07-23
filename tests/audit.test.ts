@@ -603,6 +603,28 @@ describe("audit seam", () => {
     });
   });
 
+  it("cites the carrier file when docs/zombie presence resolves via file search", async () => {
+    const report = await audit(m1FixturePath("docs-presence-file-citation"));
+    const undocumented = finding(report, "docs.undocumented-exports");
+    const zombie = finding(report, "deprecation.zombie-exports");
+
+    // No pass/fail change — this is an evidence-quality fix.
+    assert.equal(undocumented.outcome, "pass");
+    assert.equal(undocumented.measure.value, 0);
+    assert.equal(
+      undocumented.measure.detail,
+      "0 exported symbols have no docs presence anywhere: none; docs presence resolved via file: MetricCard via docs/MetricCard.md, RecipeConfig via docs/ds-bench-audits/cedar-ui-improvement-log.md",
+    );
+    // Button resolves via its own JSDoc, not file search, so it is not cited.
+    assert.doesNotMatch(undocumented.measure.detail, /Button via/);
+
+    assert.equal(zombie.outcome, "pass");
+    assert.equal(
+      zombie.measure.detail,
+      "0 barrel exports are absent from docs/stories: none; docs/story presence resolved via file: Button via docs/overview.md, MetricCard via docs/MetricCard.md, RecipeConfig via docs/ds-bench-audits/cedar-ui-improvement-log.md",
+    );
+  });
+
   it("aggregates all four Docs & examples checks into the docs category score", async () => {
     const report = await audit(m1FixturePath("docs-category-aggregate"));
     const docsCategory = report.categories.find((category) => category.id === "docs");
@@ -950,7 +972,7 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "deprecation.zombie-exports").measure, {
       kind: "count",
       value: 1,
-      detail: "1 barrel export is absent from docs/stories: GhostButton",
+      detail: "1 barrel export is absent from docs/stories: GhostButton; docs/story presence resolved via file: Button via docs.mdx",
     });
     assert.equal(finding(failing, "deprecation.zombie-exports").outcome, "fail");
     assert.deepEqual(finding(failing, "deprecation.zombie-exports").evidence, ["GhostButton"]);

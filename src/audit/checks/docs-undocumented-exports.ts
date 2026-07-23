@@ -3,7 +3,7 @@ import { isExampleCarrier } from "../example-carriers.ts";
 import { escapeRegExp, type TextFile } from "../file-system.ts";
 import { isManifestCarrier } from "../manifest-carriers.ts";
 import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
-import { formatNames, hasCommentDescription, roundRatio } from "./support.ts";
+import { formatCarrierCitations, formatNames, hasCommentDescription, roundRatio } from "./support.ts";
 
 export const docsUndocumentedExportsCheck: AuditCheck = {
   id: "docs.undocumented-exports",
@@ -19,8 +19,15 @@ export const docsUndocumentedExportsCheck: AuditCheck = {
     const files = context.files;
     const symbols = context.exportedSymbols;
     const docsFiles = files.filter(isDocsPresenceCarrier);
-    const undocumented = symbols.filter((symbol) => !hasDocsPresence(symbol.name, symbol.leadingComment, docsFiles));
+    const resolutions = symbols.map((symbol) => ({ symbol, ...resolveDocsPresence(symbol.name, symbol.leadingComment, docsFiles) }));
+    const undocumented = resolutions.filter((resolution) => !resolution.documented).map((resolution) => resolution.symbol);
+    const citations = resolutions
+      .filter((resolution) => resolution.carrierFile !== null)
+      .map((resolution) => ({ name: resolution.symbol.name, carrierFile: resolution.carrierFile as string }));
     const score = symbols.length === 0 ? 1 : (symbols.length - undocumented.length) / symbols.length;
+    const baseDetail = `${undocumented.length} exported ${undocumented.length === 1 ? "symbol has" : "symbols have"} no docs presence anywhere: ${formatNames(
+      undocumented.map((symbol) => symbol.name),
+    )}`;
 
     return {
       outcome: undocumented.length === 0 ? "pass" : "fail",
@@ -28,9 +35,7 @@ export const docsUndocumentedExportsCheck: AuditCheck = {
       measure: {
         kind: "count",
         value: undocumented.length,
-        detail: `${undocumented.length} exported ${undocumented.length === 1 ? "symbol has" : "symbols have"} no docs presence anywhere: ${formatNames(
-          undocumented.map((symbol) => symbol.name),
-        )}`,
+        detail: citations.length === 0 ? baseDetail : `${baseDetail}; docs presence resolved via file: ${formatCarrierCitations(citations)}`,
       },
       evidence: undocumented.map((symbol) => symbol.name).slice(0, 20),
     };
@@ -42,11 +47,18 @@ function isDocsPresenceCarrier(file: TextFile): boolean {
   return extension === ".md" || extension === ".mdx" || isExampleCarrier(file.relativePath) || isManifestCarrier(file.relativePath);
 }
 
-function hasDocsPresence(name: string, leadingComment: string, docsFiles: TextFile[]): boolean {
+// `carrierFile` is set only when presence resolves via file search (not the
+// symbol's own JSDoc), so the caller can cite which file satisfied the match.
+function resolveDocsPresence(
+  name: string,
+  leadingComment: string,
+  docsFiles: TextFile[],
+): { documented: boolean; carrierFile: string | null } {
   if (hasCommentDescription(leadingComment)) {
-    return true;
+    return { documented: true, carrierFile: null };
   }
 
   const pattern = new RegExp(`\\b${escapeRegExp(name)}\\b`);
-  return docsFiles.some((file) => pattern.test(file.content));
+  const carrier = docsFiles.find((file) => pattern.test(file.content));
+  return carrier ? { documented: true, carrierFile: carrier.relativePath } : { documented: false, carrierFile: null };
 }

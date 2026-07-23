@@ -23,6 +23,18 @@ export function formatNames(names: string[]): string {
   return names.length === 0 ? "none" : Array.from(new Set(names)).join(", ");
 }
 
+/**
+ * Renders `<symbol> via <file>` citations so a file-search-resolved presence
+ * can be traced to the specific file that carried it — making a pass from a
+ * stray markdown mention (rather than real documentation) visible. Capped so a
+ * large system's detail string stays readable.
+ */
+export function formatCarrierCitations(citations: Array<{ name: string; carrierFile: string }>, limit = 20): string {
+  const rendered = citations.slice(0, limit).map((citation) => `${citation.name} via ${citation.carrierFile}`);
+  const overflow = citations.length - rendered.length;
+  return overflow > 0 ? `${rendered.join(", ")} (+${overflow} more)` : rendered.join(", ");
+}
+
 export function hasCommentDescription(comment: string): boolean {
   const description = comment
     .replace(/^\/\*\*/, "")
