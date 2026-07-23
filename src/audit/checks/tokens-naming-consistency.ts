@@ -150,5 +150,8 @@ function isSnakeSegment(segment: string): boolean {
 }
 
 function isLowerOrNumericSegment(segment: string): boolean {
-  return /^[a-z][a-z0-9]*$/.test(segment) || /^[0-9]+$/.test(segment);
+  // A lowercase word, an all-digit number, or a digit-prefixed scale label
+  // (`2xl`, `3xl`) — the last is a standard token-scale convention (Tailwind,
+  // Radix), not an inconsistent name.
+  return /^[a-z][a-z0-9]*$/.test(segment) || /^[0-9]+$/.test(segment) || /^[0-9]+[a-z]+$/.test(segment);
 }

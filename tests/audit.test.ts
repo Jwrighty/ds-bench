@@ -684,6 +684,22 @@ describe("audit seam", () => {
     assert.deepEqual(namingFinding.evidence, []);
   });
 
+  it("accepts numeric-scale token segments like 2xl while still flagging camelCase leaves", async () => {
+    const report = await audit(join(repoRoot, "fixtures/token-scope/token-naming-numeric-scale"));
+    const namingFinding = finding(report, "tokens.naming-consistency");
+
+    assert.equal(namingFinding.outcome, "fail");
+    assert.deepEqual(namingFinding.measure, {
+      kind: "ratio",
+      value: 0.167,
+      detail:
+        "2/12 token names violate the dominant dot-kebab pattern; offenders: base.font.size.2Xl, base.font.lineHeight.tight",
+    });
+    assert.deepEqual(namingFinding.evidence, ["base.font.size.2Xl", "base.font.lineHeight.tight"]);
+    // 2xl / 3xl is a standard scale-naming convention (Tailwind, Radix, ...), not a violation.
+    assert.doesNotMatch(namingFinding.measure.detail, /size\.2xl|size\.3xl/);
+  });
+
   it("reports tokens.hardcoded-values as N/A when zero style-LOC is detected", async () => {
     const report = await audit(m1FixturePath("types-resolve-clean"));
 
