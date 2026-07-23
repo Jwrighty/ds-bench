@@ -263,6 +263,26 @@ describe("audit seam", () => {
     assert.equal(finding(clean, "api.name-coherence").measure.value, 0);
   });
 
+  it("does not flag compound components grouped in the parent's file, but still flags real aliases", async () => {
+    const report = await audit(m1FixturePath("name-coherence-compound"));
+    const nameCoherence = finding(report, "api.name-coherence");
+
+    assert.equal(nameCoherence.outcome, "fail");
+    assert.deepEqual(nameCoherence.measure, {
+      kind: "count",
+      value: 3,
+      detail:
+        "3 component name carrier mismatches: MetricCard source file src/Stat.tsx, Radio source file src/RadioGroup.tsx, StatusPill source file src/Badge.tsx",
+    });
+    assert.deepEqual(nameCoherence.evidence, [
+      "MetricCard source file src/Stat.tsx",
+      "Radio source file src/RadioGroup.tsx",
+      "StatusPill source file src/Badge.tsx",
+    ]);
+    // Compound parts sharing the parent's file + name prefix are healthy, not mismatches.
+    assert.doesNotMatch(nameCoherence.measure.detail, /CardHeader|CardBody|CardFooter|TableRow|TableCell|TableHeaderCell/);
+  });
+
   it("checks api.barrel-completeness against failure and clean fixtures", async () => {
     const failing = await audit(m1FixturePath("incomplete-barrel"));
     const clean = await audit(m1FixturePath("barrel-complete"));

@@ -52,14 +52,36 @@ type NameCheck = {
 };
 
 function sourceNameChecks(symbols: ReturnType<typeof getExportedSymbols>): NameCheck[] {
+  const namesByPath = new Map<string, Set<string>>();
+  for (const symbol of symbols) {
+    const names = namesByPath.get(symbol.relativePath) ?? new Set<string>();
+    names.add(symbol.name);
+    namesByPath.set(symbol.relativePath, names);
+  }
+
   return symbols.map((symbol) => {
     const fileStem = stripKnownSuffixes(basename(symbol.relativePath, extname(symbol.relativePath)));
-    const mismatch = fileStem !== "index" && fileStem !== symbol.name;
+    const mismatch =
+      fileStem !== "index" &&
+      fileStem !== symbol.name &&
+      !isCompoundComponentPart(symbol.name, fileStem, namesByPath.get(symbol.relativePath));
     return {
       label: `${symbol.name} source file ${symbol.relativePath}`,
       mismatch,
     };
   });
+}
+
+// Compound-component parts (`CardHeader`/`CardBody`) grouped in the parent's
+// file (`Card.tsx`, which also exports `Card`) are a standard, discoverable
+// React pattern — not a name mismatch. Real aliases/renames (`MetricCard` in
+// `Stat.tsx`) share no such prefix relationship and stay flagged.
+function isCompoundComponentPart(name: string, fileStem: string, fileNames: Set<string> | undefined): boolean {
+  return (
+    fileNames?.has(fileStem) === true &&
+    name.startsWith(fileStem) &&
+    /^[A-Z]/.test(name.slice(fileStem.length))
+  );
 }
 
 function storyNameChecks(files: TextFile[], componentNames: Set<string>): NameCheck[] {
