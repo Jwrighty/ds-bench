@@ -1,6 +1,6 @@
 {
-  "rubricVersion": "ARS v0.2",
-  "toolVersion": "0.0.0",
+  "rubricVersion": "ARS v0.3",
+  "toolVersion": "0.1.0",
   "scoredCheckCount": 22,
   "registryFingerprint": "176a3461",
   "target": {
@@ -25,7 +25,7 @@
       "agent": 10
     }
   },
-  "composite": 68.7,
+  "composite": 68.2,
   "applicability": {
     "applicable": 18,
     "total": 22,
@@ -34,14 +34,14 @@
   "categories": [
     {
       "id": "docs",
-      "score": 78.6,
+      "score": 76.1,
       "applicable": 4,
       "total": 4,
       "weightRedistributed": false
     },
     {
       "id": "api",
-      "score": 88,
+      "score": 88.3,
       "applicable": 3,
       "total": 4,
       "weightRedistributed": false
@@ -136,6 +136,7 @@
       "category": "api",
       "severity": "critical",
       "outcome": "na",
+      "naReason": "uncovered",
       "measure": {
         "kind": "ratio",
         "value": 0,
@@ -172,6 +173,7 @@
       "category": "agent",
       "severity": "critical",
       "outcome": "na",
+      "naReason": "uncovered",
       "measure": {
         "kind": "ratio",
         "value": 0,
@@ -223,30 +225,30 @@
       "outcome": "fail",
       "measure": {
         "kind": "count",
-        "value": 149,
-        "detail": "149 exported symbols have no docs presence anywhere: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, ActionListItemDescriptor, ActionListItemProps, ActionListProps, ActionListSection, ActionMenuProps, AlphaPickerProps, BackdropProps, BadgeAction, BadgeProgressValue, BadgeStatusValue, BannerProps, BannerTone, BaseButton, BaseCallbackAction, BleedProps, BlockStackProps, BreadcrumbsProps, ButtonGroupProps, ButtonProps, CalloutCardProps, CardProps, CheckboxHandles, CheckboxProps, ChoiceListProps, CollapsibleProps, ColorPickerProps, ColumnContentType, ComboboxProps, ConnectedProps, DATA_ATTRIBUTE, DataTableProps, DatePickerProps, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, DescriptionListProps, DestructableAction, DividerProps, DropZoneProps, EmptySearchResultProps, EmptyStateProps, errorTextID, EventListenerProps, ExceptionListProps, FocusProps, FooterHelpProps, FormLayoutProps, FormProps, FrameProps, FullscreenBarProps, GridCellProps, GridProps, HeadingTagName, HSBAColor, HSBColor, HSBLAColor, hsbToRgb, HSLAColor, HSLColor, hslToRgb, IconProps, IconSource, ImageProps, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, IndicatorProps, InlineCodeProps, InlineErrorProps, InlineGridProps, InlineStackProps, isNavigationItemActive, KeyboardKeyProps, KeypressListenerProps, labelID, LabelledProps, LabelProps, LayoutProps, LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps, LinkAction, LinkProps, ListboxProps, ListProps, LoadingProps, MenuActionDescriptor, MenuGroupDescriptor, ModalProps, NavigationItemProps, NavigationProps, PageActionsProps, PageProps, PaginationProps, PopoverAutofocusTarget, PopoverProps, PopoverPublicAPI, PortalProps, PortalsManagerProps, PositionedOverlayProps, ProgressBarProps, RadioButtonProps, RangeSliderProps, ResourceItemProps, RGBAColor, rgbaString, RGBColor, rgbString, rgbToHex, rgbToHsl, ScrollableProps, SelectAllActionsProps, SelectGroup, SelectOption, SelectProps, SettingToggleProps, SheetProps, SkeletonBodyTextProps, SkeletonDisplayTextProps, SkeletonPageProps, SkeletonThumbnailProps, SortButtonChoice, SortDirection, SpinnerProps, StickyProps, SubNavigationItem, TableData, TableRow, TabsProps, TagProps, TextContainerProps, TextFieldProps, ThemeProviderProps, ThumbnailProps, TopBarProps, TrapFocusProps, TruncateProps, UnstableBulkActions, UnstableBulkActionsProps, unstyledButtonFrom, UnstyledButtonProps, UnstyledLinkProps, useEphemeralPresenceManager, useFrame"
+        "value": 196,
+        "detail": "196 exported symbols have no documentation evidence: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, AccountConnectionProps, Action, ActionListItemDescriptor, ActionListItemProps, ActionListProps, ActionListSection, ActionMenu, ActionMenuProps, AlphaPicker, AlphaPickerProps, AppliedFilterInterface, AppProviderProps, AutocompleteProps, Backdrop, BackdropProps, BadgeAction, BadgeProgressValue, BadgeStatusValue, BannerHandles, BannerProps, BannerTone, BaseButton, BaseCallbackAction, BleedProps, BlockStackProps, Breadcrumbs, BreadcrumbsProps, buttonFrom, ButtonGroupProps, ButtonProps, buttonsFrom, CallbackAction, CalloutCardProps, CardProps, CheckboxHandles, CheckboxProps, ChoiceListProps, CollapsibleProps, ColorPickerProps, ColumnContentType, ComboboxProps, ComplexAction, Connected, ConnectedProps, ContextualSaveBarProps, DATA_ATTRIBUTE, DataTableProps, DatePickerProps, DEFAULT_LOCALE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, DescriptionListProps, DestructableAction, DisableableAction, DividerProps, DropZoneProps, EmptySearchResultProps, EmptyStateProps, Error, errorTextID, EventListener, EventListenerProps, ExceptionListProps, FilterInterface, FocusProps, FooterHelpProps, FormLayoutProps, FormProps, FrameProps, FullscreenBarProps, GridCellProps, GridProps, HeadingTagName, HSBAColor, HSBColor, HSBLAColor, hsbToRgb, HSLAColor, HSLColor, hslToRgb, IconableAction, IconProps, IconSource, ImageProps, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, Indicator, IndicatorProps, InlineCodeProps, InlineErrorProps, InlineGridProps, InlineStackProps, isNavigationItemActive, Key, KeyboardKeyProps, KeypressListener, KeypressListenerProps, Label, labelID, Labelled, LabelledProps, LabelProps, LayoutProps, LegacyCardHeaderProps, LegacyCardProps, LegacyCardSectionProps, LegacyCardSubsectionProps, LegacyFiltersProps, LegacyStackProps, LegacyTabsProps, LinkAction, LinkProps, ListboxProps, ListProps, LoadableAction, LoadingProps, MenuActionDescriptor, MenuGroupDescriptor, ModalProps, NavigationItemProps, NavigationProps, OptionListProps, OutlineableAction, PageActionsProps, PageProps, PaginationProps, PolarisTestProvider, PopoverAutofocusTarget, PopoverCloseSource, PopoverProps, PopoverPublicAPI, Portal, PortalProps, PortalsManager, PortalsManagerProps, PositionedOverlay, PositionedOverlayProps, ProgressBarProps, RadioButtonProps, RangeSliderProps, ResourceItemProps, RGBAColor, rgbaString, RGBColor, rgbString, rgbToHex, rgbToHsl, ScrollableProps, ScrollLock, SelectAllActionsProps, SelectGroup, SelectOption, SelectProps, SettingToggleProps, SheetProps, SkeletonBodyTextProps, SkeletonDisplayTextProps, SkeletonPageProps, SkeletonTabsProps, SkeletonThumbnailProps, SortButtonChoice, SortDirection, SpinnerProps, Sticky, StickyProps, SubNavigationItem, SUPPORTED_LOCALES, TableData, TableRow, TabsProps, TagProps, TextContainerProps, TextFieldProps, ThemeProviderProps, ThumbnailProps, ToastProps, TopBarProps, TrapFocusProps, Truncate, TruncateProps, UnstableBulkActions, UnstableBulkActionsProps, UnstyledButton, unstyledButtonFrom, UnstyledButtonProps, UnstyledLink, UnstyledLinkProps, useEphemeralPresenceManager, useFocus, useFrame, useIndexTableContainerScroll, useIndexTableRowHovered, useIndexTableRowSelected, useTheme; documentation evidence resolved via file: AccountConnection via src/components/AccountConnection/AccountConnection.stories.tsx, ActionList via src/components/ActionList/ActionList.stories.tsx, AppProvider via src/components/AppProvider/AppProvider.stories.tsx, Autocomplete via CHANGELOG.md, AutoSelection via src/components/Listbox/Listbox.stories.tsx, Avatar via src/components/ActionList/ActionList.stories.tsx, AvatarProps via src/components/Avatar/Avatar.stories.tsx, Badge via src/components/Badge/Badge.stories.tsx, BadgeProps via src/components/Badge/Badge.stories.tsx, Banner via src/components/Banner/Banner.stories.tsx, Bleed via src/components/Bleed/Bleed.stories.tsx, BlockStack via src/components/AccountConnection/AccountConnection.stories.tsx, Box via src/components/AccountConnection/AccountConnection.stories.tsx, BoxProps via src/components/ShadowBevel/ShadowBevel.stories.tsx, Button via src/components/ActionList/ActionList.stories.tsx, ButtonGroup via src/components/Button/Button.stories.tsx, CalloutCard via src/components/CalloutCard/CalloutCard.stories.tsx, Card via src/components/Banner/Banner.stories.tsx, Checkbox via src/components/Checkbox/Checkbox.stories.tsx, ChoiceList via src/components/ChoiceList/ChoiceList.stories.tsx (+86 more)"
       },
       "evidence": [
         "_SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT",
         "_SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT",
         "AccountConnectionProps",
+        "Action",
         "ActionListItemDescriptor",
         "ActionListItemProps",
         "ActionListProps",
         "ActionListSection",
+        "ActionMenu",
         "ActionMenuProps",
+        "AlphaPicker",
         "AlphaPickerProps",
+        "AppliedFilterInterface",
+        "AppProviderProps",
+        "AutocompleteProps",
+        "Backdrop",
         "BackdropProps",
         "BadgeAction",
         "BadgeProgressValue",
-        "BadgeStatusValue",
-        "BannerProps",
-        "BannerTone",
-        "BaseButton",
-        "BaseCallbackAction",
-        "BleedProps",
-        "BlockStackProps",
-        "BreadcrumbsProps"
+        "BadgeStatusValue"
       ],
       "fix": "Document or un-export undocumented public exports.",
       "receipt": "Undocumented public exports are trap surface for agents choosing from the design system."
@@ -275,13 +277,12 @@
       "outcome": "fail",
       "measure": {
         "kind": "count",
-        "value": 4,
-        "detail": "4 component name carrier mismatches: AlphaPicker source file src/components/Picker/Picker.tsx, FrameContext source file src/utilities/frame/context.ts, PopoverCloseSource source file src/components/Popover/Popover.tsx, UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx"
+        "value": 3,
+        "detail": "3 component name carrier mismatches: AlphaPicker source file src/components/Picker/Picker.tsx, FrameContext source file src/utilities/frame/context.ts, UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx"
       },
       "evidence": [
         "AlphaPicker source file src/components/Picker/Picker.tsx",
         "FrameContext source file src/utilities/frame/context.ts",
-        "PopoverCloseSource source file src/components/Popover/Popover.tsx",
         "UnstableBulkActions source file src/components/BulkActions/BulkActions.tsx"
       ],
       "fix": "Align component names across source files, stories, and manifest entries.",
@@ -312,6 +313,7 @@
       "category": "guidance",
       "severity": "warning",
       "outcome": "na",
+      "naReason": "uncovered",
       "measure": {
         "kind": "ratio",
         "value": 0,
@@ -408,6 +410,7 @@
       "category": "deprecation",
       "severity": "warning",
       "outcome": "na",
+      "naReason": "uncovered",
       "measure": {
         "kind": "ratio",
         "value": 0,
@@ -543,30 +546,30 @@
       "outcome": "fail",
       "measure": {
         "kind": "count",
-        "value": 22,
-        "detail": "22 barrel exports are absent from docs/stories: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, BadgeProgressValue, BadgeStatusValue, DATA_ATTRIBUTE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, errorTextID, hsbToRgb, hslToRgb, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, isNavigationItemActive, labelID, rgbaString, rgbString, rgbToHex, rgbToHsl, UnstableBulkActions, unstyledButtonFrom, useEphemeralPresenceManager, useFrame"
+        "value": 53,
+        "detail": "53 barrel exports are absent from docs/stories: _SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT, _SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT, ActionMenu, AlphaPicker, Backdrop, BadgeProgressValue, BadgeStatusValue, Breadcrumbs, buttonFrom, buttonsFrom, Connected, DATA_ATTRIBUTE, DEFAULT_LOCALE, DEFAULT_TOAST_DURATION, DEFAULT_TOAST_DURATION_WITH_ACTION, errorTextID, EventListener, hsbToRgb, hslToRgb, INDEX_TABLE_SELECT_ALL_ITEMS, IndexTableSelectionType, Indicator, isNavigationItemActive, Key, KeypressListener, Label, labelID, Labelled, PolarisTestProvider, PopoverCloseSource, Portal, PortalsManager, PositionedOverlay, rgbaString, rgbString, rgbToHex, rgbToHsl, ScrollLock, Sticky, SUPPORTED_LOCALES, Truncate, UnstableBulkActions, UnstyledButton, unstyledButtonFrom, UnstyledLink, useEphemeralPresenceManager, useEventListener, useFocus, useFrame, useIndexTableContainerScroll, useIndexTableRowHovered, useIndexTableRowSelected, useTheme; docs/story presence resolved via file: AccountConnection via src/components/AccountConnection/AccountConnection.stories.tsx, ActionList via src/components/ActionList/ActionList.stories.tsx, AppProvider via src/components/AppProvider/AppProvider.stories.tsx, Autocomplete via CHANGELOG.md, AutoSelection via src/components/Listbox/Listbox.stories.tsx, Avatar via src/components/ActionList/ActionList.stories.tsx, Badge via src/components/Badge/Badge.stories.tsx, Banner via src/components/Banner/Banner.stories.tsx, Bleed via src/components/Bleed/Bleed.stories.tsx, BlockStack via src/components/AccountConnection/AccountConnection.stories.tsx, Box via src/components/AccountConnection/AccountConnection.stories.tsx, Button via src/components/ActionList/ActionList.stories.tsx, ButtonGroup via src/components/Button/Button.stories.tsx, CalloutCard via src/components/CalloutCard/CalloutCard.stories.tsx, Card via src/components/Banner/Banner.stories.tsx, Checkbox via src/components/Checkbox/Checkbox.stories.tsx, ChoiceList via src/components/ChoiceList/ChoiceList.stories.tsx, Collapsible via CHANGELOG.md, ColorPicker via src/components/ColorPicker/ColorPicker.stories.tsx, Combobox via src/components/Combobox/Combobox.stories.tsx (+83 more)"
       },
       "evidence": [
         "_SECRET_INTERNAL_SCROLL_LOCK_MANAGER_CONTEXT",
         "_SECRET_INTERNAL_WITHIN_CONTENT_CONTEXT",
+        "ActionMenu",
+        "AlphaPicker",
+        "Backdrop",
         "BadgeProgressValue",
         "BadgeStatusValue",
+        "Breadcrumbs",
+        "buttonFrom",
+        "buttonsFrom",
+        "Connected",
         "DATA_ATTRIBUTE",
+        "DEFAULT_LOCALE",
         "DEFAULT_TOAST_DURATION",
         "DEFAULT_TOAST_DURATION_WITH_ACTION",
         "errorTextID",
+        "EventListener",
         "hsbToRgb",
         "hslToRgb",
-        "INDEX_TABLE_SELECT_ALL_ITEMS",
-        "IndexTableSelectionType",
-        "isNavigationItemActive",
-        "labelID",
-        "rgbaString",
-        "rgbString",
-        "rgbToHex",
-        "rgbToHsl",
-        "UnstableBulkActions",
-        "unstyledButtonFrom"
+        "INDEX_TABLE_SELECT_ALL_ITEMS"
       ],
       "fix": "Document, deprecate, or remove zombie exports.",
       "receipt": "Zombie exports are trap surface for training-data gravity."

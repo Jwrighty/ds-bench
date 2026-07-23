@@ -1,6 +1,4 @@
-import { extname } from "node:path";
-import { isExampleCarrier } from "../example-carriers.ts";
-import { escapeRegExp, type TextFile } from "../file-system.ts";
+import { findDocOrExampleCarrier } from "../documentation-evidence.ts";
 import type { AuditCheck, AuditContext, CheckResult } from "../types.ts";
 import { formatCarrierCitations, formatNames } from "./support.ts";
 
@@ -17,9 +15,8 @@ export const deprecationZombieExportsCheck: AuditCheck = {
   receipt: "Zombie exports are trap surface for training-data gravity.",
   run(context: AuditContext): CheckResult {
     const files = context.files;
-    const docsAndStories = files.filter(isDocsOrStoryCarrier);
     const exported = context.exportedSymbols.filter((symbol) => symbol.kind === "value");
-    const resolutions = exported.map((symbol) => ({ symbol, carrierFile: resolveDocsOrStoryPresence(symbol.name, docsAndStories) }));
+    const resolutions = exported.map((symbol) => ({ symbol, carrierFile: findDocOrExampleCarrier(symbol.name, files) }));
     const zombies = resolutions.filter((resolution) => resolution.carrierFile === null).map((resolution) => resolution.symbol);
     const citations = resolutions
       .filter((resolution) => resolution.carrierFile !== null)
@@ -40,15 +37,3 @@ export const deprecationZombieExportsCheck: AuditCheck = {
     };
   },
 };
-
-function isDocsOrStoryCarrier(file: TextFile): boolean {
-  const extension = extname(file.relativePath);
-  return extension === ".md" || extension === ".mdx" || isExampleCarrier(file.relativePath);
-}
-
-// Returns the file that carried the docs/story mention (so it can be cited),
-// or null when the export appears in no docs/story carrier at all.
-function resolveDocsOrStoryPresence(name: string, files: TextFile[]): string | null {
-  const pattern = new RegExp(`\\b${escapeRegExp(name)}\\b`);
-  return files.find((file) => pattern.test(file.content))?.relativePath ?? null;
-}

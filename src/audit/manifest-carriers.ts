@@ -21,6 +21,65 @@ export function recordNamesExport(record: Record<string, unknown>, exportName: s
 }
 
 /**
+ * Whether a structured manifest record both names and *describes* `exportName`:
+ * it names the export and carries at least one free-text field (a `{ Button:
+ * "..." }` map, a `{ name, description }` record, a `{ Button: { description }}`
+ * descriptor). A name-only inventory entry (`{ "name": "Button" }`) names but
+ * does not describe, so it earns no documentation credit.
+ */
+export function manifestDescribesExport(content: string, exportName: string): boolean {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    // A described record is a structured signal; unparseable text is prose, not evidence.
+    return false;
+  }
+
+  return nodeDescribesExport(parsed, exportName);
+}
+
+function nodeDescribesExport(value: unknown, exportName: string): boolean {
+  if (Array.isArray(value)) {
+    return value.some((item) => nodeDescribesExport(item, exportName));
+  }
+
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  if (recordDescribesExport(value, exportName)) {
+    return true;
+  }
+
+  // `{ Button: <descriptor> }` — the export name keys its own description or descriptor record.
+  const keyed = value[exportName];
+  if (isProse(keyed) || (isRecord(keyed) && Object.values(keyed).some(isProse))) {
+    return true;
+  }
+
+  return Object.values(value).some((nested) => nodeDescribesExport(nested, exportName));
+}
+
+// The record names the export and carries a descriptive sibling field — not just
+// the name itself and not just enum/boolean/reference tags like `deprecated` or `useInstead`.
+function recordDescribesExport(record: Record<string, unknown>, exportName: string): boolean {
+  if (!recordNamesExport(record, exportName)) {
+    return false;
+  }
+
+  return Object.entries(record).some(
+    ([key, nested]) => key !== exportName && !(MANIFEST_NAME_FIELDS as readonly string[]).includes(key) && isProse(nested),
+  );
+}
+
+// Free-text description: at least two whitespace-separated word tokens, so a bare
+// identifier, category tag, or cross-reference ("Popover") is not read as prose.
+function isProse(value: unknown): boolean {
+  return typeof value === "string" && /[A-Za-z]/.test(value) && /\S\s+\S/.test(value);
+}
+
+/**
  * Whether `relativePath` is a manifest carrier: any file whose name mentions "manifest",
  * the conventional `components.json`/`component-metadata.json` names, or a `storybook*.json` file.
  */

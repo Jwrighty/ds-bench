@@ -1,6 +1,6 @@
 {
-  "rubricVersion": "ARS v0.2",
-  "toolVersion": "0.0.0",
+  "rubricVersion": "ARS v0.3",
+  "toolVersion": "0.1.0",
   "scoredCheckCount": 22,
   "registryFingerprint": "176a3461",
   "target": {
@@ -28,7 +28,7 @@
       "agent": 10
     }
   },
-  "composite": 96,
+  "composite": 97,
   "applicability": {
     "applicable": 19,
     "total": 19,
@@ -37,14 +37,14 @@
   "categories": [
     {
       "id": "docs",
-      "score": 96.4,
+      "score": 96.9,
       "applicable": 4,
       "total": 4,
       "weightRedistributed": false
     },
     {
       "id": "api",
-      "score": 96.3,
+      "score": 97.9,
       "applicable": 4,
       "total": 4,
       "weightRedistributed": false
@@ -58,7 +58,7 @@
     },
     {
       "id": "tokens",
-      "score": 96,
+      "score": 98.8,
       "applicable": 3,
       "total": 3,
       "weightRedistributed": false
@@ -83,16 +83,13 @@
       "checkId": "docs.usage-examples",
       "category": "docs",
       "severity": "critical",
-      "outcome": "fail",
+      "outcome": "pass",
       "measure": {
         "kind": "ratio",
-        "value": 0.933,
-        "detail": "28/30 exported components have importable usage examples; missing: MetricCard, StatusPill"
+        "value": 1,
+        "detail": "30/30 exported components have importable usage examples; missing: none"
       },
-      "evidence": [
-        "MetricCard",
-        "StatusPill"
-      ],
+      "evidence": [],
       "fix": "Add one canonical story/example per component.",
       "receipt": "Agents recreate components they can't see used (Atlassian DESIGN.md experiment)."
     },
@@ -104,7 +101,7 @@
       "measure": {
         "kind": "ratio",
         "value": 1,
-        "detail": "68/68 example component imports resolve against exported components; unresolved: none"
+        "detail": "70/70 example component imports resolve against exported components; unresolved: none"
       },
       "evidence": [],
       "fix": "Correct or delete examples with dead imports.",
@@ -176,13 +173,24 @@
       "outcome": "fail",
       "measure": {
         "kind": "count",
-        "value": 5,
-        "detail": "5 exported symbols have no docs presence anywhere: compositionTemplates, RecipeConfig, RecipeResult, VariantMap, VariantProps"
+        "value": 16,
+        "detail": "16 exported symbols have no documentation evidence: CardSectionProps, compositionTemplates, MetricCardProps, recipe, RecipeConfig, RecipeResult, StatDelta, StatDeltaDirection, StatusPillProps, ToastApi, ToastOptions, ToastProviderProps, ToastRegionProps, ToastVariant, VariantMap, VariantProps; documentation evidence resolved via file: Button via packages/react/src/Button.stories.tsx, formDialogTemplate via packages/react/src/composition-templates.stories.tsx, IconButton via packages/react/src/IconButton.stories.tsx, templateExamples via packages/react/src/canonical-examples.test.tsx, TextField via packages/react/src/TextField.stories.tsx, ToastMessage via packages/react/src/Toast.stories.tsx"
       },
       "evidence": [
+        "CardSectionProps",
         "compositionTemplates",
+        "MetricCardProps",
+        "recipe",
         "RecipeConfig",
         "RecipeResult",
+        "StatDelta",
+        "StatDeltaDirection",
+        "StatusPillProps",
+        "ToastApi",
+        "ToastOptions",
+        "ToastProviderProps",
+        "ToastRegionProps",
+        "ToastVariant",
         "VariantMap",
         "VariantProps"
       ],
@@ -210,19 +218,13 @@
       "outcome": "fail",
       "measure": {
         "kind": "count",
-        "value": 9,
-        "detail": "9 component name carrier mismatches: CardBody source file packages/react/src/Card.tsx, CardFooter source file packages/react/src/Card.tsx, CardHeader source file packages/react/src/Card.tsx, MetricCard source file packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file packages/react/src/Badge.tsx, TableCell source file packages/react/src/Table.tsx, TableHeaderCell source file packages/react/src/Table.tsx, TableRow source file packages/react/src/Table.tsx"
+        "value": 3,
+        "detail": "3 component name carrier mismatches: MetricCard source file packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file packages/react/src/Badge.tsx"
       },
       "evidence": [
-        "CardBody source file packages/react/src/Card.tsx",
-        "CardFooter source file packages/react/src/Card.tsx",
-        "CardHeader source file packages/react/src/Card.tsx",
         "MetricCard source file packages/react/src/Stat.tsx",
         "Radio source file packages/react/src/RadioGroup.tsx",
-        "StatusPill source file packages/react/src/Badge.tsx",
-        "TableCell source file packages/react/src/Table.tsx",
-        "TableHeaderCell source file packages/react/src/Table.tsx",
-        "TableRow source file packages/react/src/Table.tsx"
+        "StatusPill source file packages/react/src/Badge.tsx"
       ],
       "fix": "Align component names across source files, stories, and manifest entries.",
       "receipt": "Name mismatch drives discovery-driven component recreation."
@@ -308,16 +310,13 @@
       "checkId": "tokens.machine-readable",
       "category": "tokens",
       "severity": "warning",
-      "outcome": "fail",
+      "outcome": "pass",
       "measure": {
         "kind": "ratio",
-        "value": 0.933,
-        "detail": "28/30 token sources are present and parseable; invalid: packages/tokens/src/base/motion.json (DTCG token base.motion.easing.out is missing $type; DTCG token base.motion.easing.snap is missing $type; DTCG token base.motion.easing.decelerate is missing $type; DTCG token base.motion.easing.overshoot is missing $type; DTCG token base.motion.spring.gentle.stiffness is missing $type; DTCG token base.motion.spring.gentle.damping is missing $type; DTCG token base.motion.spring.gentle.mass is missing $type; DTCG token base.motion.spring.snappy.stiffness is missing $type; DTCG token base.motion.spring.snappy.damping is missing $type; DTCG token base.motion.spring.snappy.mass is missing $type), packages/tokens/src/semantic/motion.json (DTCG token semantic.motion.easing.settle is missing $type; DTCG token semantic.motion.easing.enter is missing $type; DTCG token semantic.motion.easing.emphasized is missing $type; DTCG token semantic.motion.easing.playful is missing $type; DTCG token semantic.motion.spring.overlay.stiffness is missing $type; DTCG token semantic.motion.spring.overlay.damping is missing $type; DTCG token semantic.motion.spring.overlay.mass is missing $type; DTCG token semantic.motion.spring.live-update.stiffness is missing $type; DTCG token semantic.motion.spring.live-update.damping is missing $type; DTCG token semantic.motion.spring.live-update.mass is missing $type)"
+        "value": 1,
+        "detail": "30/30 token sources are present and parseable; invalid: none"
       },
-      "evidence": [
-        "packages/tokens/src/base/motion.json (DTCG token base.motion.easing.out is missing $type; DTCG token base.motion.easing.snap is missing $type; DTCG token base.motion.easing.decelerate is missing $type; DTCG token base.motion.easing.overshoot is missing $type; DTCG token base.motion.spring.gentle.stiffness is missing $type; DTCG token base.motion.spring.gentle.damping is missing $type; DTCG token base.motion.spring.gentle.mass is missing $type; DTCG token base.motion.spring.snappy.stiffness is missing $type; DTCG token base.motion.spring.snappy.damping is missing $type; DTCG token base.motion.spring.snappy.mass is missing $type)",
-        "packages/tokens/src/semantic/motion.json (DTCG token semantic.motion.easing.settle is missing $type; DTCG token semantic.motion.easing.enter is missing $type; DTCG token semantic.motion.easing.emphasized is missing $type; DTCG token semantic.motion.easing.playful is missing $type; DTCG token semantic.motion.spring.overlay.stiffness is missing $type; DTCG token semantic.motion.spring.overlay.damping is missing $type; DTCG token semantic.motion.spring.overlay.mass is missing $type; DTCG token semantic.motion.spring.live-update.stiffness is missing $type; DTCG token semantic.motion.spring.live-update.damping is missing $type; DTCG token semantic.motion.spring.live-update.mass is missing $type)"
-      ],
+      "evidence": [],
       "fix": "Publish tokens in a machine-readable format.",
       "receipt": "Machine-readable tokens are the theming signal agents can consume."
     },
@@ -405,16 +404,12 @@
       "outcome": "fail",
       "measure": {
         "kind": "ratio",
-        "value": 0.016,
-        "detail": "6/375 token names violate carrier-local dominant patterns (DTCG JSON: 6/369 dot-kebab; CSS custom properties: 0/6 kebab); offenders: base.font.size.2xl, base.font.lineHeight.tight, base.font.lineHeight.normal, component.heading.font.size.2xl, component.text.font.size.2xl, semantic.font.size.2xl"
+        "value": 0.005,
+        "detail": "2/375 token names violate carrier-local dominant patterns (DTCG JSON: 2/369 dot-kebab; CSS custom properties: 0/6 kebab); offenders: base.font.lineHeight.tight, base.font.lineHeight.normal"
       },
       "evidence": [
-        "base.font.size.2xl",
         "base.font.lineHeight.tight",
-        "base.font.lineHeight.normal",
-        "component.heading.font.size.2xl",
-        "component.text.font.size.2xl",
-        "semantic.font.size.2xl"
+        "base.font.lineHeight.normal"
       ],
       "fix": "Rename token outliers to the dominant pattern.",
       "receipt": "Inconsistent names invite fabricated tokens."
@@ -427,11 +422,11 @@
       "measure": {
         "kind": "count",
         "value": 2,
-        "detail": "2 barrel exports are absent from docs/stories: compositionTemplates, MetricCard"
+        "detail": "2 barrel exports are absent from docs/stories: compositionTemplates, recipe; docs/story presence resolved via file: Badge via packages/react/src/Badge.stories.tsx, badgeMeta via packages/react/src/Badge.stories.tsx, Box via packages/react/src/Box.stories.tsx, boxMeta via packages/react/src/Box.stories.tsx, Button via packages/react/src/Button.stories.tsx, buttonMeta via packages/react/src/Button.stories.tsx, Card via packages/react/src/Card.stories.tsx, CardBody via packages/react/src/Card.stories.tsx, CardFooter via packages/react/src/Card.stories.tsx, CardHeader via packages/react/src/Card.stories.tsx, cardMeta via packages/react/src/Card.stories.tsx, Checkbox via packages/react/src/Checkbox.stories.tsx, checkboxMeta via packages/react/src/Checkbox.stories.tsx, Dialog via packages/react/src/Dialog.stories.tsx, dialogMeta via packages/react/src/Dialog.stories.tsx, formDialogTemplate via packages/react/src/composition-templates.stories.tsx, Heading via packages/react/src/Heading.stories.tsx, headingMeta via packages/react/src/Heading.stories.tsx, IconButton via packages/react/src/IconButton.stories.tsx, iconButtonMeta via packages/react/src/IconButton.stories.tsx (+34 more)"
       },
       "evidence": [
         "compositionTemplates",
-        "MetricCard"
+        "recipe"
       ],
       "fix": "Document, deprecate, or remove zombie exports.",
       "receipt": "Zombie exports are trap surface for training-data gravity."

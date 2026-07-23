@@ -4,9 +4,10 @@ import { CHECK_REGISTRY } from "../src/audit/checks/registry.ts";
 import { getCheckRegistryMetadata, getScoredCheckIds, RUBRIC_VERSION } from "../src/audit/rubric.ts";
 import type { AuditCheck } from "../src/audit/types.ts";
 
-const SCORED_CHECK_IDS_BY_RUBRIC_VERSION: Record<string, string[]> = {
-  "ARS v0.2": [
-    "agent.context-file-quality",
+// The scored surface is unchanged from ARS v0.2 — v0.3 re-versions the *meaning* of
+// docs.undocumented-exports (mechanical documentation evidence), not the check list.
+const V0_2_AND_V0_3_SCORED_CHECK_IDS = [
+  "agent.context-file-quality",
     "agent.instruction-manual",
     "agent.llms-txt",
     "agent.manifest-coverage",
@@ -28,7 +29,11 @@ const SCORED_CHECK_IDS_BY_RUBRIC_VERSION: Record<string, string[]> = {
     "tokens.hardcoded-values",
     "tokens.machine-readable",
     "tokens.naming-consistency",
-  ],
+];
+
+const SCORED_CHECK_IDS_BY_RUBRIC_VERSION: Record<string, string[]> = {
+  "ARS v0.2": V0_2_AND_V0_3_SCORED_CHECK_IDS,
+  "ARS v0.3": V0_2_AND_V0_3_SCORED_CHECK_IDS,
 };
 
 describe("check registry", () => {

@@ -1,7 +1,7 @@
 ds-bench audit cedar
 
 DS Bench Audit: cedar
-Score: 96 / 100 - Agent-ready with gaps
+Score: 97 / 100 - Agent-ready with gaps
 Applicable Checks: 19 / 19
 Target: cedar-ui
 Carriers: CSS files, Storybook stories/MDX, TypeScript exports, agent metadata files, canonical-examples files,
@@ -10,42 +10,38 @@ Carriers: CSS files, Storybook stories/MDX, TypeScript exports, agent metadata f
 Category Scores
 Category                Score  Checks           
 ----------------------  -----  -----------------
-Docs & examples          96.4  4/4
-API clarity              96.3  4/4
+Docs & examples          96.9  4/4
+API clarity              97.9  4/4
 Usage guidance           92.2  3/3
-Token hygiene              96  3/3
+Token hygiene            98.8  3/3
 Deprecation signalling    N/A  0/3 redistributed
 Agent metadata            100  5/5
 
 Legend: redistributed = N/A category weight moved to applicable categories.
 
 Top Findings
-1. [critical] docs.usage-examples
-   28/30 exported components have importable usage examples
-   Missing: 2 total; showing 2.
-     MetricCard
-     StatusPill
-   Fix: Add one canonical story/example per component.
-
-2. [warning] docs.prop-descriptions
+1. [warning] docs.prop-descriptions
    29/30 exported components have documented public props
    Missing: TextField
    Fix: Add TSDoc descriptions to public props, starting with the most-used components.
 
-3. [warning] docs.undocumented-exports
-   5 exported symbols have no docs presence anywhere: compositionTemplates, RecipeConfig, RecipeResult,
-   VariantMap, VariantProps
+2. [warning] docs.undocumented-exports
+   16 exported symbols have no documentation evidence: CardSectionProps, compositionTemplates, MetricCardProps,
+   recipe, RecipeConfig, RecipeResult, StatDelta, StatDeltaDirection, StatusPillProps, ToastApi, ToastOptions,
+   ToastProviderProps, ToastRegionProps, ToastVariant, VariantMap, VariantProps; documentation evidence resolved
+   via file: Button via packages/react/src/Button.stories.tsx, formDialogTemplate via
+   packages/react/src/composition-templates.stories.tsx, IconButton via
+   packages/react/src/IconButton.stories.tsx, templateExamples via
+   packages/react/src/canonical-examples.test.tsx, TextField via packages/react/src/TextField.stories.tsx,
+   ToastMessage via packages/react/src/Toast.stories.tsx
    Fix: Document or un-export undocumented public exports.
 
-4. [warning] api.name-coherence
-   9 component name carrier mismatches: CardBody source file packages/react/src/Card.tsx, CardFooter source file
-   packages/react/src/Card.tsx, CardHeader source file packages/react/src/Card.tsx, MetricCard source file
-   packages/react/src/Stat.tsx, Radio source file packages/react/src/RadioGroup.tsx, StatusPill source file
-   packages/react/src/Badge.tsx, TableCell source file packages/react/src/Table.tsx, TableHeaderCell source file
-   packages/react/src/Table.tsx, TableRow source file packages/react/src/Table.tsx
+3. [warning] api.name-coherence
+   3 component name carrier mismatches: MetricCard source file packages/react/src/Stat.tsx, Radio source file
+   packages/react/src/RadioGroup.tsx, StatusPill source file packages/react/src/Badge.tsx
    Fix: Align component names across source files, stories, and manifest entries.
 
-5. [warning] guidance.alternatives-resolve
+4. [warning] guidance.alternatives-resolve
    56/73 alternatives/instead component references resolve to exported components
    Unresolved: 8 total; showing 8.
      Link
@@ -58,15 +54,29 @@ Top Findings
      Accordion
    Fix: Reference real components in alternatives guidance.
 
-Showing 5 of 10 failing findings. Run with --verbose to see all evidence.
+5. [warning] tokens.hardcoded-values
+   11 magic values across 1174 style LOC (0.937 per 100 LOC); token references: 406
+   Offenders: 11 total; showing 8.
+     100 in packages/react/src/Dialog.module.css:10
+     rgb(0 0 0 / 35%) in packages/react/src/Dialog.module.css:44
+     1rem in packages/react/src/IconButton.module.css:41
+     1rem in packages/react/src/IconButton.module.css:42
+     1.25rem in packages/react/src/IconButton.module.css:49
+     1.25rem in packages/react/src/IconButton.module.css:50
+     1.5rem in packages/react/src/IconButton.module.css:57
+     1.5rem in packages/react/src/IconButton.module.css:58
+   Run with --verbose to see all 11.
+   Fix: Replace named hardcoded colors, spacing, and z-index values with token references.
+
+Showing 5 of 8 failing findings. Run with --verbose to see all evidence.
 
 Full Detail
   Run with --verbose for all evidence: ds-bench audit cedar-ui --verbose
   Run with --json for machine-readable output.
 
 --------------------------------------------
-Result: 96/100 - Agent-ready with gaps
-Findings: 1 critical - 6 warnings - 3 info
+Result: 97/100 - Agent-ready with gaps
+Findings: 0 criticals - 5 warnings - 3 info
 Checks: 19 / 19
 Next: run `ds-bench audit cedar-ui --verbose` for full evidence
 --------------------------------------------

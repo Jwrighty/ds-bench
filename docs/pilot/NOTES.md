@@ -1,4 +1,42 @@
-# M2 pilot — generalization run on public systems
+# Pilot notes
+
+## ARS v0.3 documentation-evidence rerun (2026-07-23)
+
+Rubric: **ARS v0.3** (22 scored checks — unchanged surface, registry `176a3461`) · tool `0.1.0` · run 2026-07-23. The `<system>.{json,txt}` artifacts in this directory are now the **canonical ARS v0.3 reports**; the ARS v0.2 versions remain in git history and self-identify via their `rubricVersion` field.
+
+ARS v0.3 changes the meaning of one scored check: `docs.undocumented-exports` (and the mechanical recognition reused by `deprecation.zombie-exports`) no longer credits a bare export-name occurrence in prose. Documentation coverage now requires a directly detectable carrier — meaningful JSDoc/TSDoc, a dedicated Markdown section or API-table entry, an importable usage example, or a manifest record that names *and* describes the export. See ADR 0004 and the check catalogue.
+
+**Same-checkout validation (rubric effect isolated).** Each system was audited on one fresh checkout with both the v0.2 and v0.3 binaries, so the delta below is the rubric change alone, not repository drift:
+
+| System | Composite v0.2 → v0.3 | Docs cat. v0.2 → v0.3 | Undocumented v0.2 → v0.3 | Zombie v0.2 → v0.3 |
+| --- | --- | --- | --- | --- |
+| Cedar | 97.7 → 97.0 | 99.4 → 96.9 | 0 → 16 | 0 → 2 |
+| Shopify Polaris | 68.8 → 68.2 | 78.6 → 76.1 | 149 → 196 | 22 → 53 |
+| MUI | 45.9 → 45.9 | 25.1 → 25.0 | 705 → 707 | 468 → 470 |
+| Chakra | 37.1 → 36.9 | 50.6 → 49.7 | 1772 → 1871 | 881 → 970 |
+
+Composite movement is ≤0.7 everywhere and the sanity ordering (Cedar > Polaris > MUI > Chakra) is unchanged, so the rule is **not materially noisy** — it tightens documentation coverage without destabilising or reordering scores. The undocumented counts rise because exports previously credited by bare-name prose now require real evidence; the increase is a coverage correction, not new failures introduced by the tool.
+
+**Changed findings were inspected against their cited carriers**, not just composite movement:
+
+- **Cedar's 16** are almost all type/config exports (`MetricCardProps`, `ToastApi`, `RecipeConfig`, `VariantProps`, …) that carry no JSDoc on their own declaration, no dedicated section, no importable example, and no described manifest record — their member fields are documented, the exports themselves are not. `RecipeConfig` is the Issue 30 false pass: it was named only in a remediation log describing it as undocumented, and v0.2 awarded it coverage. Under v0.3 it correctly fails.
+- **Polaris's additions** (e.g. `ActionMenu`) are real components whose usage examples and reference docs live on the external Polaris site, not colocated in `polaris-react` — the pre-existing "examples outside the package dir" limitation, now surfaced honestly instead of masked by a stray prose mention.
+
+No behaviour was rejected or narrowed: every changed finding resolved to an explainable mechanical rule, so no semantic heuristic was needed.
+
+### Cedar — repository remediation vs. methodology change
+
+Cedar's numbers must not be presented as one direct delta. Three distinct measurements:
+
+- **96.0** — the published M2 reference (2026-07-08, ARS v0.2, older checkout).
+- **97.7** — the *current* Cedar checkout under ARS v0.2. The **+1.7 over 96.0 is repository remediation** — real improvements to Cedar between checkouts, independent of the rubric.
+- **97.0** — the *current* checkout under ARS v0.3, the **canonical after-report**. The **−0.7 from 97.7 is the methodology change** alone.
+
+The canonical ARS v0.3 Cedar after-report (`cedar.json`/`cedar.txt`) does **not** depend on the audit log for documentation coverage: `docs/ds-bench-audits/**` no longer resolves any export's coverage, and the log-only export (`RecipeConfig`) is now a documentation failure. Final Cedar case-study numbers are unblocked by this validation.
+
+---
+
+# M2 pilot — generalization run on public systems (ARS v0.2, historical)
 
 Rubric: **ARS v0.2** (22 scored checks, registry `176a3461`) · tool `0.0.0` · run 2026-07-08
 Three unmodified public design systems, audited with the same binary, chosen for

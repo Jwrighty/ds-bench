@@ -124,7 +124,9 @@ DS Bench turns those learnings into versioned, repeatable checks. Each check nam
 
 ## How the rubric was built
 
-The current rubric, **ARS v0.2**, contains 22 scored checks. Category scores are weighted by finding severity, then combined using the category weights above. Checks that genuinely do not apply are handled separately rather than automatically counted as failures.
+The current rubric, **ARS v0.3**, contains 22 scored checks. Category scores are weighted by finding severity, then combined using the category weights above. Checks that genuinely do not apply are handled separately rather than automatically counted as failures.
+
+**Documentation coverage requires real evidence (ARS v0.3).** An export counts as documented only when the audit directly detects meaningful JSDoc/TSDoc on it, a dedicated Markdown section or API-table entry naming it, an importable usage example, or a manifest record that both names and describes it. Simply naming an export in prose — an audit log, task brief, changelog, or ADR — is treated as an incidental mention and does not earn coverage. The audit stays deterministic and local: it detects these mechanical signals and cites the carrier, leaving deeper semantic interpretation to the human or AI reading the report. This changed the meaning of a scored check, so it ships as ARS v0.3; v0.2 reports remain valid historical artifacts and should not be compared composite-to-composite with v0.3.
 
 The weights and checks were calibrated against four different design-system checkouts: Cedar UI, MUI, Chakra UI, and Shopify Polaris. The public-system findings are presented as ecosystem patterns, not judgments about the teams that maintain them.
 

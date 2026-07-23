@@ -1,0 +1,5 @@
+{
+  "name": "doc-evidence-markdown-section",
+  "exports": "./src/index.ts",
+  "types": "./src/index.ts"
+}

@@ -1,0 +1,5 @@
+{
+  "components": [
+    { "name": "Widget", "description": "Renders the headline control." }
+  ]
+}

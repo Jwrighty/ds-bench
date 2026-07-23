@@ -9,7 +9,7 @@ Carriers: TypeScript exports, package.json exports/types, token files/CSS custom
 Category Scores
 Category                Score  Checks
 ----------------------  -----  ------
-Docs & examples          25.1  3/4
+Docs & examples            25  3/4
 API clarity              89.2  4/4
 Usage guidance            4.4  2/3
 Token hygiene            40.9  2/3
@@ -48,7 +48,7 @@ Top Findings
    Fix: Add TSDoc descriptions to public props, starting with the most-used components.
 
 4. [warning] docs.undocumented-exports
-   705 exported symbols have no docs presence anywhere: Accordion, AccordionActions, accordionActionsClasses,
+   707 exported symbols have no documentation evidence: Accordion, AccordionActions, accordionActionsClasses,
    AccordionActionsClasses, AccordionActionsClassKey, accordionClasses, AccordionClasses, AccordionClassKey,
    AccordionDetails, accordionDetailsClasses, AccordionDetailsClasses, AccordionDetailsClassKey,
    AccordionSummary, accordionSummaryClasses, AccordionSummaryClasses, AccordionSummaryClassKey, adaptV4Theme,
@@ -154,12 +154,12 @@ Top Findings
    SnackbarContent, snackbarContentClasses, SnackbarContentClasses, SnackbarContentClassKey, SpeedDial,
    SpeedDialAction, speedDialActionClasses, SpeedDialActionClasses, SpeedDialActionClassKey, speedDialClasses,
    SpeedDialClasses, SpeedDialClassKey, SpeedDialIcon, speedDialIconClasses, SpeedDialIconClasses,
-   SpeedDialIconClassKey, stackClasses, Step, StepButton, stepButtonClasses, StepButtonClasses,
+   SpeedDialIconClassKey, Stack, stackClasses, Step, StepButton, stepButtonClasses, StepButtonClasses,
    StepButtonClassKey, stepClasses, StepClasses, StepClassKey, StepConnector, stepConnectorClasses,
    StepConnectorClasses, StepConnectorClassKey, StepContent, stepContentClasses, StepContentClasses,
    StepContentClassKey, StepContext, StepContextType, StepIcon, stepIconClasses, StepIconClasses,
    StepIconClassKey, StepLabel, stepLabelClasses, StepLabelClasses, StepLabelClassKey, Stepper, stepperClasses,
-   StepperClasses, StepperClassKey, StepperContext, StepperContextType, StyledEngineProvider, SvgIcon,
+   StepperClasses, StepperClassKey, StepperContext, StepperContextType, styled, StyledEngineProvider, SvgIcon,
    svgIconClasses, SvgIconClasses, SvgIconClassKey, SwipeableDrawer, Switch, switchClasses, SwitchClasses,
    SwitchClassKey, Tab, tabClasses, TabClasses, TabClassKey, Table, TableBody, tableBodyClasses,
    TableBodyClasses, TableBodyClassKey, TableCell, tableCellClasses, TableCellClasses, TableCellClassKey,

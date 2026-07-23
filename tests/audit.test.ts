@@ -13,10 +13,10 @@ const m1FixturePath = (name: string) => join(repoRoot, "fixtures/m1", name);
 const agentMetadataFixturePath = (name: string) => join(repoRoot, "fixtures/agent-metadata", name);
 
 describe("audit seam", () => {
-  it("returns the ARS v0.2 report contract for a missing usage examples fixture", async () => {
+  it("returns the ARS v0.3 report contract for a missing usage examples fixture", async () => {
     const report = await audit(fixturePath);
 
-    assert.equal(report.rubricVersion, "ARS v0.2");
+    assert.equal(report.rubricVersion, "ARS v0.3");
     const packageVersion = (JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8")) as { version: string }).version;
     assert.equal(report.toolVersion, packageVersion);
     assert.equal(report.scoredCheckCount, 22);
@@ -165,7 +165,7 @@ describe("audit seam", () => {
     assert.equal(report.categories.find((category) => category.id === "deprecation")?.weightRedistributed, true);
   });
 
-  it("applies custom weights from config without mutating default ARS v0.2 weights", async () => {
+  it("applies custom weights from config without mutating default ARS v0.3 weights", async () => {
     const targetPath = join(repoRoot, "fixtures/scoring/deprecation-without-migration");
 
     const defaultReport = await audit(targetPath);
@@ -591,7 +591,7 @@ describe("audit seam", () => {
     assert.deepEqual(finding(failing, "docs.undocumented-exports").measure, {
       kind: "count",
       value: 1,
-      detail: "1 exported symbol has no docs presence anywhere: Card",
+      detail: "1 exported symbol has no documentation evidence: Card",
     });
     assert.equal(finding(failing, "docs.undocumented-exports").outcome, "fail");
     assert.deepEqual(finding(failing, "docs.undocumented-exports").evidence, ["Card"]);
@@ -599,30 +599,66 @@ describe("audit seam", () => {
     assert.deepEqual(finding(clean, "docs.undocumented-exports").measure, {
       kind: "count",
       value: 0,
-      detail: "0 exported symbols have no docs presence anywhere: none",
+      detail: "0 exported symbols have no documentation evidence: none",
     });
   });
 
-  it("cites the carrier file when docs/zombie presence resolves via file search", async () => {
+  it("does not credit an export named only in an audit-log prose mention", async () => {
+    const report = await audit(m1FixturePath("doc-evidence-audit-log"));
+    const undocumented = finding(report, "docs.undocumented-exports");
+
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 1);
+    assert.deepEqual(undocumented.evidence, ["Widget"]);
+  });
+
+  it("credits meaningful source documentation, examples, sections, tables, and described manifests", async () => {
+    for (const fixture of [
+      "doc-evidence-markdown-section",
+      "doc-evidence-api-table",
+      "doc-evidence-example-import",
+      "doc-evidence-manifest-described",
+    ]) {
+      const undocumented = finding(await audit(m1FixturePath(fixture)), "docs.undocumented-exports");
+      assert.equal(undocumented.outcome, "pass", `${fixture} should be documented`);
+      assert.equal(undocumented.measure.value, 0, `${fixture} should have zero undocumented exports`);
+    }
+  });
+
+  it("does not credit a name-only manifest inventory entry", async () => {
+    const undocumented = finding(await audit(m1FixturePath("doc-evidence-manifest-name-only")), "docs.undocumented-exports");
+
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 1);
+    assert.deepEqual(undocumented.evidence, ["Widget"]);
+  });
+
+  it("does not credit exports named only in task-brief, changelog, or ADR prose", async () => {
+    const undocumented = finding(await audit(m1FixturePath("doc-evidence-incidental-prose")), "docs.undocumented-exports");
+
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 3);
+    assert.deepEqual(undocumented.evidence, ["AdrWidget", "ChangeWidget", "TaskWidget"]);
+  });
+
+  it("fails the audit-log false pass while citing the section that genuinely documents an export", async () => {
     const report = await audit(m1FixturePath("docs-presence-file-citation"));
     const undocumented = finding(report, "docs.undocumented-exports");
     const zombie = finding(report, "deprecation.zombie-exports");
 
-    // No pass/fail change — this is an evidence-quality fix.
-    assert.equal(undocumented.outcome, "pass");
-    assert.equal(undocumented.measure.value, 0);
-    assert.equal(
-      undocumented.measure.detail,
-      "0 exported symbols have no docs presence anywhere: none; docs presence resolved via file: MetricCard via docs/MetricCard.md, RecipeConfig via docs/ds-bench-audits/cedar-ui-improvement-log.md",
-    );
-    // Button resolves via its own JSDoc, not file search, so it is not cited.
+    // RecipeConfig is named only in an audit-log prose gap note — no longer credited (the Issue 30 false pass, now closed).
+    assert.equal(undocumented.outcome, "fail");
+    assert.equal(undocumented.measure.value, 1);
+    assert.deepEqual(undocumented.evidence, ["RecipeConfig"]);
+    // MetricCard has a dedicated `# MetricCard` section, so it passes and is cited; Button passes via its own JSDoc.
+    assert.match(undocumented.measure.detail, /MetricCard via docs\/MetricCard\.md/);
+    assert.doesNotMatch(undocumented.measure.detail, /RecipeConfig via/);
     assert.doesNotMatch(undocumented.measure.detail, /Button via/);
 
-    assert.equal(zombie.outcome, "pass");
-    assert.equal(
-      zombie.measure.detail,
-      "0 barrel exports are absent from docs/stories: none; docs/story presence resolved via file: Button via docs/overview.md, MetricCard via docs/MetricCard.md, RecipeConfig via docs/ds-bench-audits/cedar-ui-improvement-log.md",
-    );
+    // Button's overview.md line is prose, not a section/table, so it joins RecipeConfig as a zombie; MetricCard's section carries it.
+    assert.equal(zombie.outcome, "fail");
+    assert.deepEqual(zombie.evidence, ["Button", "RecipeConfig"]);
+    assert.match(zombie.measure.detail, /MetricCard via docs\/MetricCard\.md/);
   });
 
   it("aggregates all four Docs & examples checks into the docs category score", async () => {

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { AuditCheck } from "./types.ts";
 
-export const RUBRIC_VERSION = "ARS v0.2";
+export const RUBRIC_VERSION = "ARS v0.3";
 
 export type CheckRegistryMetadata = {
   scoredCheckCount: number;

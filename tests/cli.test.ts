@@ -40,7 +40,7 @@ describe("CLI", () => {
     assert.equal(result.stdout, `${JSON.stringify(expectedReport, null, 2)}\n`);
 
     const report = JSON.parse(result.stdout) as { rubricVersion: string; scoredCheckCount: number; registryFingerprint: string; findings: Array<{ checkId: string }> };
-    assert.equal(report.rubricVersion, "ARS v0.2");
+    assert.equal(report.rubricVersion, "ARS v0.3");
     assert.equal(report.scoredCheckCount, 22);
     assert.equal(report.registryFingerprint, "176a3461");
     assert.equal(report.findings[0].checkId, "docs.usage-examples");
