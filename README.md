@@ -130,6 +130,7 @@ The current rubric, **ARS v0.3**, contains 22 scored checks. Category scores are
 
 The weights and checks were calibrated against four different design-system checkouts: Cedar UI, MUI, Chakra UI, and Shopify Polaris. The public-system findings are presented as ecosystem patterns, not judgments about the teams that maintain them.
 
+- [See the research and methodology behind the rubric](docs/research/README.md) for what makes a design system usable by agents and how the evidence became checks.
 - [Read the full check catalogue](docs/audit-checks.md) for every measure, fix, and receipt.
 - [Read the pilot notes](docs/pilot/NOTES.md) for calibration decisions and known limitations.
 - [Browse the research index](docs/research/resources.md) for the articles, experiments, tools, and studies that informed the checks.
